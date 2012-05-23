@@ -1,0 +1,80 @@
+function ps_raw=singleConditionStats(zscore_stack,zscore_baseline,test_samps)
+%%do single condition statistics on one condition
+%%Use range null hypothesis: zscore-delta>0 for zscore>delta | zscore+delta<0 for zscore<-delta (latencies within "good enough" belt of baseline)
+%%delta is the bootstrap standard error of baseline means
+%%INPUTS:
+%%ZSCORE_STACK= N BY S MATRIX OF SINGLE CONDITION ZSCORES WHERE N IS NUMBER
+%%OF TRIALS AND S IS NUMBER OF SAMPLES
+%%ZSCORE_BASELINE=
+%%  1 BY Sb ARRAY OF BASELINE ZSCORES IF TAKEN FROM END OR REST BLOCK
+%%  1 BY 2 ARRAY OF SAMPLE INDEX OF ZSCORE_STACK IF BASELINE TAKEN FROM BEFORE EACH EVENT ONSET
+%%TEST_SAMP= 1 BY St ARRAY OF SAMPLES IN ZSCORE_DATA TO PERFORM STATS ON
+%%OUTPUT:
+%%PS_RAW= UNCORRECT P VALUES
+
+if length(zscore_baseline)==1
+    tmp=zscore_stack(:,1:zscore_baseline);
+    baseline=reshape(tmp,1,numel(tmp));
+else
+    baseline=zscore_baseline;
+    zscore_baseline=length(zscore_baseline);
+end
+ps=repmat(NaN,[1,size(zscore_stack,2)]); 
+%set number of bootstrap iterations
+nboot=10000;
+boot_means=zeros([1 nboot]);
+
+%make delta (good enough belt) using bootstrap distribution of baseline
+for bi=1:nboot
+    rand_idx=ceil(rand(1,zscore_baseline)*zscore_baseline);
+    boot_means(bi)=mean(baseline(rand_idx));%Get the bootstrap distribution of be baseline mean
+end
+bse=sqrt(sum((mean(boot_means)-boot_means).^2)/(nboot-1));%Calculate the standard error of the bootstrap distribution of baseline mean (d aka delta)
+
+ave_zscore=mean(zscore_stack,1);
+tmps=intersect(find(abs(ave_zscore)>bse),test_samps); %get latencies exceeding delta to test for statistical significance
+
+
+%%
+%build bootstrap distribution around observed mean of data
+neps1=size(zscore_stack,1);
+tmpJ=zeros([1 neps1]);
+
+for s=tmps %test each latency where values exceed delta belt
+    tmp1=zscore_stack(:,s); %Get vector of all repetitions at that latency
+    m1=mean(tmp1);%Average of zscores at latency
+    for bi=1:nboot
+        %Pick values from vector at random with replacement,
+        %for each bootstrap replication, then get the mean.
+        %Will build the bootstrap distribution.
+        boot_means(bi)=mean(tmp1(ceil(rand(1,neps1)*neps1)));
+    end
+    
+    %assigned significance level (ASL): get percentage of bootstrap means within delta (chance of erroneously labeling latency as significant)
+    if zscore_stack(s)>0,
+        ps(s)=length(find(boot_means<bse))/nboot;
+    else
+        ps(s)=length(find(boot_means>-bse))/nboot;
+    end
+    
+    %adjust if ASL is 0 or 1
+    if ps(s)==0,
+        ps(s)=1/nboot;
+    end
+    if ps(s)==1,
+        ps(s)=(nboot-1)/nboot;
+    end
+    
+    %ASL bias-corrected and accelerated
+    z0=length(find(boot_means<m1))/nboot;
+    z0=-sqrt(2).*erfcinv(2*z0);
+    w0=-sqrt(2).*erfcinv(2*ps(s));
+    tmpJ(neps1)=sum(tmp1(1:neps1-1))/(neps1-1);
+    for ep=1:neps1-1,
+        tmpJ(ep)=sum(tmp1([1:ep-1 ep+1:neps1]))/(neps1-1);
+    end
+    a=sum((m1-tmpJ).^3)/(6*(sum((m1-tmpJ).^2)^1.5));
+    ps(s)=.5*erfc(-((w0-z0)/(1+a*(w0-z0))-z0)./sqrt(2));
+end
+
+ps_raw=2*min(ps,1-ps);%resulting two tailed uncorrected P-value

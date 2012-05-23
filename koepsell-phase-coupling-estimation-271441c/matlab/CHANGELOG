@@ -1,0 +1,33 @@
+----
+v0.4
+----
+:data: Oct 7 2009
+:summary:
+    * added sampling using hmc2.m
+    * added bias term to distribution
+    * added regularized matrix inverse in fit_model.m
+    * added -largeArrayDims fill_matrix.c mex option (required in matlab Version > 7.3 (R2006b)
+
+----
+v0.3
+----
+:data: Jun 25 2008
+:summary:
+    * added script to estimate computation time (timing_estimate.m)
+
+----
+v0.2
+----
+:date: Jun 20 2008
+:summary:
+    * now works for single precision phase data.
+    * sped-up by better pointer arithmetic.
+    * replaced all functions with compiler definitions (#define).
+    * modified the code, so that the conjugate is computed in the mex file.
+
+----
+v0.1
+----
+:date: Jun 18 2008
+:summary:
+    * packaged everything up for distribution. v0.1

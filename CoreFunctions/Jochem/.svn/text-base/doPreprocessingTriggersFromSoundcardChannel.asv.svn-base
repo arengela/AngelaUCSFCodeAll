@@ -1,0 +1,145 @@
+%% CREATÉ TRIGGER TIME SERIES BY THRESHOLDING A TIME SERIES AND ASSIGNING
+%% VALUES FOR DIFFERENT SOUND STIMULI
+
+%% CHECK WHICH ANALOGUE CHANNELS MIGHT BE INFORMATIVE
+% Also get the time interval of interest
+% ***User parameters
+analogueChannels2Check={'ANIN1','ANIN2','ANIN3','ANIN4'};
+
+%Visualize the analogue channels
+ecogAna.data=[]
+for k=1:length(analogueChannels2Check)
+    load(analogueChannels2Check{k});
+    ecogAna.data=[ecogAna.data; data];
+end
+baselineDurMs=0;
+sampDur=1000/params.sampFreq;
+ecogAna=ecogRaw2Ecog(ecogAna.data,baselineDurMs,sampDur,[]);
+%ecogTSGUI(ecogAna);
+
+%% CREATE TRIGGER TIME SERRIES FOR ROM A SET
+% ***User parameters
+% Variables for trigger detection. Choice of thresholds might require some
+% try and error
+intervalStartEndSeconds=[16 230]; % defines the interval to use (in samples)
+analogueChannels2Use={'ANIN1'};
+stimulusLogFiles2Use={'C:\Users\Angela\Documents\ECOG\Example\TDTconvert\GP33_B19\trialslog_sounds_33_19.mat'};
+minThresh=[0.003]; %An event is triggered when this value is exceeded. One entry for each analogue channel
+minDurOfStimulusInSeconds=[0.5]; % That is the duration of the event.This is a "dead time" after an event was detected. Other events happening during this interval are ignored.
+
+%variables for result visualization
+checkResultVisually=1;%user parameter
+pre=0.01; % interval start prior to the event
+dur=0.02; % displpay interval duration
+
+%RUN THIS TO MAKE THE TRIGGERS
+
+%Load the analogue channel
+for k=1:length(analogueChannels2Use)
+    %load stimulus logfile
+    load(stimulusLogFiles2Use{k});
+    availStim=unique(trialslog(:,1));
+    %load analogue channel
+    load(analogueChannels2Use{k});
+    intervalStartEndSample=nearly(intervalStartEndSeconds,(1:length(data))/params.sampFreq);
+    data(1:intervalStartEndSample(1))=0;
+    data(intervalStartEndSample(2):end)=0;
+    %min trigger duration to samples
+    minDurOfStimulusInSamples=round(minDurOfStimulusInSeconds(k)*params.sampFreq);
+    % I) Stimulus order from trialslog
+    idx=[];
+    timeFromStart=[];
+    for m=1:length(availStim)
+        % index for stimulus types
+        idx(:,m)=findstrmult(trialslog,availStim{m});
+        onsetTime(:,m)=[trialslog{idx(:,m),2}]';
+    end
+    onsetSamp=round(onsetTime*params.sampFreq);
+    
+    %II) Sound onsets from sound channel
+    % differentiate the time series
+    dData=[0 diff(data)];
+    toneOnset=abs(dData>minThresh); %candidate onset
+    toneOnset= [0 diff(toneOnset)>minThresh]; % correct offset introduced by diff
+    for m=1:length(toneOnset) % find the first sample with a slope above threshold and then skip the samples within the rest of the tone
+        if toneOnset(m)==1
+            for n=1:minDurOfStimulusInSeconds*params.sampFreq
+                toneOnset(m+n)=0;
+            end
+            m=m+n;
+        end
+    end
+    
+    % III) Match stimulus order with sound onset to make trigger vector
+    trigger=zeros(length(data),1);
+    tmp=find(toneOnset>0);
+    for m=1:length(availStim)
+        trigger(tmp(idx(:,m)))=m; % This places the correct stimulus code at the correct temporal positionof the trigger vector. idx holds the index in the stimulus order for a specific stimulus type.
+        m
+        
+    end
+    disp(['Number of triggersfound: ' num2str(length(find(trigger>0)))])
+    %Save what we have
+    save(['trigger' analogueChannels2Use{k}], 'trigger', 'params')
+    
+    
+    clear trigger params
+    %Now we have to downsample to the same sample frequency as the brain data
+    load Wav11
+    wParams=params;
+    load(['trigger'  analogueChannels2Use{k}])
+    tParams=params;
+    decFac=tParams.sampFreq/wParams.sampFreq;
+    oldIdx=find(trigger>0);
+    newIdx=round(oldIdx/decFac);
+    data(:)=0;
+    for m=1:length(newIdx)
+        data(newIdx(m))=trigger(oldIdx(m));
+    end
+    params.sampFreq=wParams.sampFreq;
+    save(['trigger'  analogueChannels2Use{k}],'trigger','data','params', 'tParams')
+    
+    
+    %are the triggers good?
+    load(analogueChannels2Use{k})
+    [B,A] = butter(3,1/(2*decFac),'low'); %factor to nyquits of downsampled sequence
+    data=filtfilt(B,A,double(data));
+    aninDown=data(1:decFac:end);
+    load(['trigger'  analogueChannels2Use{k}])
+    save([ analogueChannels2Use{k} 'DownSamp'],'aninDown','params')
+    
+    load(['trigger' analogueChannels2Use{k}])
+    % load the downssampled trigger and compared it to the downsampled analog channel
+    idx=find(data);
+    figure;
+    %pre=0;dur=0.02;
+    r=ceil(-pre*params.sampFreq:(-pre+dur)*params.sampFreq);
+    timebase=r*1000/params.sampFreq;
+    for m=1:length(idx)
+        plot(timebase,[aninDown(r+idx(m));data(r+idx(m))*0.1]');
+        title(['Channel:' analogueChannels2Use{k} ' trial # : ' num2str(m)])
+        input(num2str(m));
+    end
+    if length(analogueChannels2Use)>k
+        flag = 0;
+        while flag==0
+            r=input(['Continue processing next set? [y]/n '],'s');
+            if strcmpi('y',r)
+                flag = 1;
+                % Next channel
+            elseif strcmpi('n',r)
+                error(['User aborted. Current channel: ' analogueChannels2Use{k}]);
+                flag=0;
+            else
+                disp('Inavlid answer. Try again.')
+                flag=0;
+            end
+        end
+    end
+    
+end
+
+
+
+
+
