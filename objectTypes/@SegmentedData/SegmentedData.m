@@ -25,7 +25,11 @@ classdef SegmentedData < handle
             [handles.MainPath,handles.folderType,~]=fileparts(Filepath);
             cd(Filepath)
             handles.Filepath=Filepath;
-            handles.getDataParams;
+
+            cd(handles.Filepath)
+            [data, handles.Params.sampFreq, ~,chanNum] = readhtk ( 'Wav11.htk');               
+            handles.Params.sampDur=1000/handles.Params.sampFreq;
+            
             handles.loadArtifacts
             handles.loadGridPic
 
@@ -116,7 +120,7 @@ classdef SegmentedData < handle
                 handles.gridlayout.dim=[size(gridlayout,1) size(gridlayout,2)];
                 
             catch
-                usechans=[1:size(handles.ecogFiltered.data,1)];
+                usechans=[1:handles.channelsTot];
                 handles.gridlayout.dim=[16 16];
             end
             
@@ -583,8 +587,24 @@ classdef SegmentedData < handle
             load([handles.MainPath '/Analog/allEventTimes.mat'])
             load([handles.MainPath '/Analog/allConditions.mat'])
             
+            
+            %discard bad segments
+            buffer=handles.eventParams.segmentTimeWindow{1};
+
+            
+
+%             for b=1:size(handles.Artifacts.badTimeSegments,1)
+%                 for t=1:size(allEventTimes,1)
+%                     segmentTimes=[allEventTimes{t,1}-buffer(1)/1000, allEventTimes(t,1)+buffer(2)/1000];
+%                     if (handles.Artifacts.badTimeSegments(b,1)>=segmentTimes(t,1)) & (handles.Artifacts.badTimeSegments(b,1)<=segmentTimes(t,2)) | (handles.Artifacts.badTimeSegments(b,2)>=segmentTimes(t,1)) & (handles.Artifacts.badTimeSegments(b,2)<=segmentTimes(t,2))
+%                         allEventTimes{t,1}='0';
+%                     end
+%                 end
+%             end
+    
+            
             for i=1:length(handles.eventParams.subsetLabel)
-                curevent=allConditions(handles.eventParams.subsetLabel{i}(1,:));
+                curevent=allConditions(unique(handles.eventParams.subsetLabel{i}(1,:)));
                 p3=find(ismember(allEventTimes(:,2),curevent));                
                 if nargin<5
                     trialnum=length(p3);
@@ -593,11 +613,11 @@ classdef SegmentedData < handle
                 switch saveflag
                     case 'save'
                         handles.segmentedEcog(i).data=NaN(handles.channelsTot,ceil((sum(buffer)/1000)*handles.Params.sampFreq),40,2);
-                        dest=sprintf('%s/segmented_40band/event%s_%i_%i',handles.MainPath,int2str(subsetLabel{i}(1,:)),buffer(1),buffer(2));
+                        dest=sprintf('%s/segmented_40band/event%s_%i_%i',handles.MainPath,int2str(unique(subsetLabel{i}(1,:))),buffer(1),buffer(2));
                         mkdir(dest);
                         cd(dest)
                     case 'keep'
-                        handles.segmentedEcog(i).data=zeros(handles.channelsTot,ceil((sum(buffer)/1000)*handles.Params.sampFreq),40,trialnum);
+                        %handles.segmentedEcog(i).data=zeros(handles.channelsTot,ceil((sum(buffer)/1000)*handles.Params.sampFreq),40,trialnum);
                         handles.segmentedEcog(i).event=cell(trialnum,2);
 
                     otherwise                          
@@ -610,12 +630,22 @@ classdef SegmentedData < handle
                         [R,I]=loadHTKtoEcog_onechan_complex_real_imag(handles.MainPath,chanNum,timeInt);
                         data=complex(R,I);
                         switch saveflag                            
-                            case 'save'                            
+                            case 'save'
+                                %nextevent=find(strcmp(allEventTimes{p3(s)+1,2},allConditions(1:40)))
+
                                 mkdir([dest '/Chan' int2str(chanNum)]);
                                 cd([dest filesep 'Chan' int2str(chanNum)])
-                                writehtk(['t' int2str(s) '.htk'],data',400);
-                                handles.segmentedEcog(i).data(chanNum,:,:,2)=abs(data)';
-                                handles.segmentedEcog(i).data(chanNum,:,:,1)=nanmean(handles.segmentedEcog(i).data(chanNum,:,:,:),4);
+                                writehtk(['t' int2str(s) '.htk'],data',allEventTimes{p3(s),1}*1000,find(strcmp(allConditions,allEventTimes{p3(s),2})));
+                                
+                                if chanNum==1
+                                    if find(strcmp(allEventTimes{p3(s)+1,2},unique(allConditions(handles.eventParams.subsetLabel{i}(2,:)))))
+                                        handles.segmentedEcog(i).event(s,1:4)=[allEventTimes(p3(s),1:2)  allEventTimes{p3(s)+1,1} allEventTimes{p3(s)+1,2}];
+                                    else
+                                        handles.segmentedEcog(i).event(s,1:4)=[allEventTimes(p3(s),1:2) 0 0];
+                                    end
+                                end
+                                %handles.segmentedEcog(i).data(chanNum,:,:,2)=abs(data)';
+                                %handles.segmentedEcog(i).data(chanNum,:,:,1)=nanmean(handles.segmentedEcog(i).data(chanNum,:,:,:),4);
                             case 'keep'
                                 handles.segmentedEcog(i).data(chanNum,:,:,s)=abs(data)';
                                 handles.segmentedEcog(i).event(s,1:2)=allEventTimes(p3(s),1:2);
@@ -632,8 +662,11 @@ classdef SegmentedData < handle
                 end 
                 %meanSeg=squeeze(mean(zscore(mean(handles.segmentedEcog(i).data(:,:,:,:),2),[],4),3));
 
-
+                cd(dest)
+                segmentLog=handles.segmentedEcog(i).event;
+                save('segmentLog.mat','segmentLog')
             end
+
     end
     
     
@@ -648,6 +681,18 @@ classdef SegmentedData < handle
             handles.eventParams.segmentTimeWindow=segmentTimeWindow;
             load([handles.MainPath '/Analog/allEventTimes.mat'])
             load([handles.MainPath '/Analog/allConditions.mat'])
+            
+            %discard bad segments
+            buffer=handles.eventParams.segmentTimeWindow{1};
+            segmentTimes=[E-buffer(1)/1000, allEventTimes(:,1)+buffer(2)/1000];
+            for b=1:size(handles.params.badTimeIntervals,1)
+                for t=1:size(segmentTimes,1)
+                    if (handles.params.badTimeIntervals(b,1)>=segmentTimes(t,1)) & (handles.params.badTimeIntervals(b,1)<=segmentTimes(t,2)) | (handles.params.badTimeIntervals(b,2)>=segmentTimes(t,1)) & (handles.params.badTimeIntervals(b,2)<=segmentTimes(t,2))
+                        s3{t}='0';
+                    end
+                end
+            end
+    
             for i=1:length(handles.eventParams.subsetLabel)
                 curevent=allConditions(handles.eventParams.subsetLabel{i}(1,:))
                 p3=find(ismember(allEventTimes(:,2),curevent))
@@ -672,6 +717,11 @@ classdef SegmentedData < handle
                          %cd(handles.MainPath)
 
                         timeInt=[allEventTimes{p3(s),1}*1000-buffer(1) allEventTimes{p3(s),1}*1000+buffer(2)];
+                        
+                        
+  
+                        
+                        
                         cd(handles.Filepath)
                         data=loadHTKtoEcog_onechan(chanNum,round(timeInt));
                         switch saveflag 
@@ -681,6 +731,7 @@ classdef SegmentedData < handle
                             case 'save'                            
                                 mkdir([dest '/Chan' int2str(chanNum)]);
                                 cd([dest filesep 'Chan' int2str(chanNum)])
+                                
                                 writehtk(['t' int2str(s) '.htk'],data',400);
                                 handles.segmentedEcog(i).data(chanNum,:,:,2)=abs(data);
                                 handles.segmentedEcog(i).data(chanNum,:,:,1)=nanmean(handles.segmentedEcog(i).data(chanNum,:,:,:),4);
@@ -698,6 +749,81 @@ classdef SegmentedData < handle
             end
      end
     
+     function loadSegments(handles,folderPath,trialNum,sorttrials)
+        
+        
+         for i=1:length(folderPath)
+             
+             load([handles.MainPath '/Analog/allConditions.mat'])
+             load([handles.MainPath '/Analog/allEventTimes.mat'])
+
+            [tmp,segFolder]=fileparts(folderPath{i})
+            cd(folderPath{i})
+            
+            
+            
+            chanFolder=cellstr(ls);
+            handles.channelsTot=length(cellstr(ls))-2;
+            [~,tmp]=fileparts(segFolder);
+            tok=regexp(tmp,'_','split');
+            handles.eventParams.segmentTimes{i}=str2num([tok{2} ' ' tok{3}]);
+            handles.eventParams.subsetLabel{i}=str2num(tok{1}(find(isstrprop(tok{1},'digit'))));
+
+            buffer=handles.eventParams.segmentTimes{i}
+            
+            for j=3:handles.channelsTot
+                numidx=find(isstrprop(chanFolder{j},'digit'))
+                chanNum=str2num(chanFolder{j}(numidx));
+                cd([folderPath{i} filesep chanFolder{j}])
+                if nargin<3
+                    trialNum=length(ls)-2;                  
+                end
+                 [data,b,c]=readhtk(['t2.htk']);
+
+                handles.segmentedEcog(i).data=zeros(handles.channelsTot,length(data),40,trialNum);
+                for t=2:trialNum
+                    [data,b,c]=readhtk(['t' num2str(t) '.htk']);
+                    tmp=size(data,2);
+                    if size(data,2)<40
+                        load([handles.MainPath '/Analog/allConditions.mat'])
+                        load([handles.MainPath '/Analog/allEventTimes.mat'])
+                        curevent=allConditions{handles.eventParams.subsetLabel{i}(1,:)};
+                        p3=find(ismember(allEventTimes(:,2),curevent))
+                        timeInt=[allEventTimes{p3(t),1}*1000-buffer(1) allEventTimes{p3(t),1}*1000+buffer(2)];
+                        [R,I]=loadHTKtoEcog_onechan_complex_real_imag(handles.MainPath,chanNum,timeInt);
+                        data=complex(R,I);
+                        
+                        cd([folderPath{i} filesep chanFolder{j}])
+                        writehtk(['t' int2str(t) '.htk'],data',allEventTimes{p3(t),1}*1000,find(strcmp(allConditions,allEventTimes{p3(t),2})));
+                        [data,b,c]=readhtk(['t' num2str(t) '.htk']);
+                    
+                    end
+                        handles.segmentedEcog(i).data(chanNum,:,:,t)=data;
+                    if sorttrials==1 & chanNum==1
+                        cureventidx=findnearest(b/1000,cell2mat(allEventTimes(:,1)));
+                        handles.segmentedEcog(i).event{t,1}=allEventTimes{cureventidx,1};
+                        handles.segmentedEcog(i).event{t,2}=allEventTimes{cureventidx,2};
+                        handles.segmentedEcog(i).event{t,3}=allEventTimes{cureventidx+1,1};
+                        handles.segmentedEcog(i).event{t,4}=allEventTimes{cureventidx+1,2};
+                    end
+                end
+            end
+            
+            if sorttrials==1
+                rt=cell2mat(handles.segmentedEcog(i).event(:,3))-cell2mat(handles.segmentedEcog(i).event(:,1));
+
+                [~,sortidx]=sort(rt);
+                handles.segmentedEcog(i).rt=rt(sortidx);
+                handles.segmentedEcog(i).data=handles.segmentedEcog(i).data(chanNum,:,:,sortidx);
+                handles.segmentedEcog(i).event=handles.segmentedEcog(i).event(sortidx,:);            
+            end
+            
+         end
+     end
+             
+     
+     
+     
      function rejectExtremes(handles)
          for event=1:length(handles.segmentedEcog)
              for chanNum=1:256
