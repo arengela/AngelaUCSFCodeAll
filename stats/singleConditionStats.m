@@ -1,4 +1,4 @@
-function ps_raw=singleConditionStats(zscore_stack,zscore_baseline,test_samps)
+function [ps_raw,bse,base_boot_means]=singleConditionStats(zscore_stack,zscore_baseline,test_samps)
 %%do single condition statistics on one condition
 %%Use range null hypothesis: zscore-delta>0 for zscore>delta | zscore+delta<0 for zscore<-delta (latencies within "good enough" belt of baseline)
 %%delta is the bootstrap standard error of baseline means
@@ -12,37 +12,45 @@ function ps_raw=singleConditionStats(zscore_stack,zscore_baseline,test_samps)
 %%OUTPUT:
 %%PS_RAW= UNCORRECT P VALUES
 
-if length(zscore_baseline)==1
-    tmp=zscore_stack(:,1:zscore_baseline);
+if length(zscore_baseline)==2
+    tmp=zscore_stack(:,zscore_baseline(1):zscore_baseline(2));
     baseline=reshape(tmp,1,numel(tmp));
+    zscore_baseline=size(baseline,2);
 else
     baseline=zscore_baseline;
     zscore_baseline=length(zscore_baseline);
 end
 ps=repmat(NaN,[1,size(zscore_stack,2)]); 
 %set number of bootstrap iterations
-nboot=10000;
+nboot=20000;
 boot_means=zeros([1 nboot]);
 
 %make delta (good enough belt) using bootstrap distribution of baseline
-for bi=1:nboot
-    rand_idx=ceil(rand(1,zscore_baseline)*zscore_baseline);
-    boot_means(bi)=mean(baseline(rand_idx));%Get the bootstrap distribution of be baseline mean
-end
-bse=sqrt(sum((mean(boot_means)-boot_means).^2)/(nboot-1));%Calculate the standard error of the bootstrap distribution of baseline mean (d aka delta)
+% for bi=1:nboot
+%     rand_idx=ceil(rand(1,zscore_baseline)*zscore_baseline);
+%     boot_means(bi)=mean(baseline(rand_idx));%Get the bootstrap distribution of be baseline mean
+% end
+boot_means=baseline;
+%bse=sqrt(sum((mean(boot_means)-boot_means).^2)/(length(boot_means)-1));%Calculate the standard error of the bootstrap distribution of baseline mean (d aka delta)
+bse=std(boot_means)/sqrt(length(boot_means));%Calculate the standard error of the bootstrap distribution of baseline mean (d aka delta)
+
+
 
 ave_zscore=mean(zscore_stack,1);
-tmps=intersect(find(abs(ave_zscore)>bse),test_samps); %get latencies exceeding delta to test for statistical significance
+tmps=intersect(find(ave_zscore>mean(boot_means)-bse | ave_zscore<mean(boot_means)+bse),test_samps); %get latencies exceeding delta to test for statistical significance
 
-
+base_boot_means=boot_means;
 %%
 %build bootstrap distribution around observed mean of data
+nboot=10000;
+boot_means=[];
 neps1=size(zscore_stack,1);
 tmpJ=zeros([1 neps1]);
 
 for s=tmps %test each latency where values exceed delta belt
     tmp1=zscore_stack(:,s); %Get vector of all repetitions at that latency
-    m1=mean(tmp1);%Average of zscores at latency
+    m1=mean(tmp1);%Average of zscores at latencyfigure
+    
     for bi=1:nboot
         %Pick values from vector at random with replacement,
         %for each bootstrap replication, then get the mean.

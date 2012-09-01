@@ -80,17 +80,19 @@ for i=1:length(usechans)
 axis tight
             hold on
             if isempty(bounds)
-                    axis([0 length(zScore(1,:)) minZallchan(usechans(i)) minZallchan(usechans(i))+maxdiff])
+                    %axis([0 length(zScore(1,:)) minZallchan(usechans(i)) minZallchan(usechans(i))+maxdiff])
                     %axis([0 length(zScore(1,:)) minZallchan(usechans(i)) maxZallchan(usechans(i))])
 
-                    plot([eventSamp,eventSamp+0.001],[minZallchan(usechans(i)), minZallchan(usechans(i))+maxdiff],'r')
-                    
+                    %plot([eventSamp,eventSamp+0.001],[minZallchan(usechans(i)), minZallchan(usechans(i))+maxdiff],'r')
+                    plot([eventSamp,eventSamp+0.001],[-1, 5],'r')
+                    axis([0 length(zScore(1,:)) -1 5])
                    %plot([eventSamp+800,eventSamp+800+0.001],[minZallchan(usechans(i)), minZallchan(usechans(i))+maxdiff],'g')
                     %axis([0 length(zScore(1,:)) -.5 1])
                     axis tight
             %set(gca,'xtick',[],'ytick',[])  
                     %text(1,3,num2str(usechans(i)))
-                    text(1,minZallchan(usechans(i))+maxdiff-0.1,num2str(usechans(i)))
+                    text(1,4.5,num2str(usechans(i)))
+                    
             else
                    axis([0 length(zScore(1,:)) minZallchan maxZallchan]);
                    %axis tight

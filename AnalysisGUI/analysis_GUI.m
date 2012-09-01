@@ -121,7 +121,7 @@ function segmentData_Callback(hObject, eventdata, handles)
 
 %sort=input('Sort Events? (y/n)','s');
 %checkEvents=input('Check Events Visually? (y/n)','s');
-sortstacked='y';
+sortstacked='n';
 if strcmp(sortstacked,'n')
     handles.sortstacked=0;
 else
@@ -183,7 +183,9 @@ else
         %handles.sortstacked=1;
     end
      
-    handles.segmentedEcogGrouped=handles.segmentedEcog.data;
+    for i=1:length(handles.segmentedEcog)
+         handles.segmentedEcogGrouped{i}=handles.segmentedEcog(i).data;
+    end
     guidata(hObject, handles);
 end
 cd(handles.pathName)
@@ -272,9 +274,9 @@ for i=1:length(handles.segmentedEcogGrouped)
 end
 
 %Plot zScores
-colors={'k','g','m','b','c','r'};
+colors={'k','r','m','b','c','g'};
 %comparePlots=input('Compare Plots? (y/n)','s');
-comparePlots='n';
+comparePlots='y';
 if strmatch('y',comparePlots)    
     figure
     set(gcf,'Name',handles.patientID);

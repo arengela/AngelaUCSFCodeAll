@@ -1,0 +1,9 @@
+Contributors to the OSU-SVM Support Vector Machine Toolbox:
+	* Junshui Ma <junshui@lanl.gov>
+	* Yi Zhao <zhaoy@ee.eng.ohio-state.edu>
+	* Stanley Ahalt <http://www.eleceng.ohio-state.edu/~sca>
+	* Damian Eads <eads@lanl.gov>
+
+External Contributors
+	* OSU-SVM is based on the LIBSVM library available at
+	http://www.csie.ntu.edu.tw/~cjlin/libsvm/

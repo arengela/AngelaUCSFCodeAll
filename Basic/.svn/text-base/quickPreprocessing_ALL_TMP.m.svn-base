@@ -13,6 +13,8 @@ function [ecog_out, per_out]=quickPreprocessing_ALL_TMP(pathName,flag,perFlag,in
 %      8. Test
 %      9. Output DS and periodogram data ***NOT DONE****
 %      10. No CAR
+%      11. Output DS 
+
 %perFlag= 1: Making and saving figures for periodogram and spectrograms
 %         2: Making and saving variables for periodogram and spectrograms
 %         0: No periodograms or spectrograms

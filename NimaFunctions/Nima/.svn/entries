@@ -60,19 +60,16 @@ Angela_2
 
 1687
 
-GUI
-dir
-
-ECogDataVis.m
+ECogDataVis.asv
 file
-19
+27
 
 
 
-2012-05-04T04:22:18.787607Z
-a812e3af3f7da4d505d086a9e59045dc
-2012-05-23T22:58:00.702319Z
-19
+2012-07-19T22:59:06.816347Z
+62f16cf5b06d6312591045443e2e0094
+2012-07-20T04:14:58.883161Z
+27
 Angela_2
 
 
@@ -95,7 +92,44 @@ Angela_2
 
 
 
-6101
+10928
+
+GUI
+dir
+
+ECogDataVis.m
+file
+27
+
+
+
+2012-07-19T23:32:26.876855Z
+97f682eb9c6e05a80f931fe36d3f08d5
+2012-07-20T04:14:58.883161Z
+27
+Angela_2
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+10981
 
 analysis_art.m
 file
@@ -437,40 +471,6 @@ Angela_2
 
 3397
 
-ECogDataMovie_montage.m
-file
-
-
-
-
-2011-11-04T18:28:50.000000Z
-ddd57d6dc8f903129d2e9790d09512d4
-2011-11-04T18:19:07.192262Z
-1
-Angela_2
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-505
-
 articulation.txt
 file
 
@@ -504,4 +504,38 @@ Angela_2
 
 
 5682
+
+ECogDataMovie_montage.m
+file
+
+
+
+
+2011-11-04T18:28:50.000000Z
+ddd57d6dc8f903129d2e9790d09512d4
+2011-11-04T18:19:07.192262Z
+1
+Angela_2
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+505
 

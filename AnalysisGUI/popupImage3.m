@@ -1,7 +1,7 @@
 function popupImage3(hObject, eventdata)
-global EC18_B2_seg;
-global EC18_B1_seg_v2;
-global idx;
+%global EC18_B2_seg;
+%global EC18_B1_seg_v2;
+%global idx;
 
 hFig = get(hObject, 'parent');
 %if strcmp(get(hFig,'SelectionType'),'open')
@@ -9,7 +9,7 @@ hFig = get(hObject, 'parent');
 %disp('do something')
 tmp=get(gca,'Children')
 %set(gca,'Color','y')
-y=get(findobj(tmp(5)))
+y=get(findobj(tmp(3)))
 figure
 
 min=0;
@@ -21,7 +21,7 @@ colormap(flipud(gray))
 freezeColors;
 
 hold on
-y=get(findobj(tmp(2)))
+y=get(findobj(tmp(1)))
 plot(y.XData,y.YData,'r')
 
 
@@ -32,6 +32,7 @@ try
     plot(y.XData,y.YData,'r')
 end
 axis tight
+%{
 subplot(2,3,4)
 y=get(findobj(tmp(5)))
 plot(mean(y.CData,1));
@@ -75,3 +76,4 @@ plot([eventSamp eventSamp+.001],[0 size(EC18_B2_seg.zscore{1},3)],'r')
 uiwait
 %set(hObject,'Color','w')
 %end
+%}

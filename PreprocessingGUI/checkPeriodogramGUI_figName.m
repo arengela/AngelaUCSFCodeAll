@@ -27,8 +27,7 @@ f=[periodogramFrequencyband(1):periodogramFrequencyband(2)-1];
 logPeriodogram=log10(p);
 surf(logPeriodogram)
 currentFolder=pwd;
-cd('Figures')
-saveas(gcf,figName,'fig')
+
 cd(currentFolder);
 
 if ~exist('showInGuiOrSingleChannel')

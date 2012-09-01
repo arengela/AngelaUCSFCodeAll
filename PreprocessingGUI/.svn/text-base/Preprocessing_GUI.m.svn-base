@@ -35,6 +35,7 @@ if nargout
 else
     gui_mainfcn(gui_State, varargin{:});
 end
+
 % End initialization code - DO NOT EDIT
 
 % --- Executes just before Preprocessing_GUI is made visible.
@@ -47,31 +48,21 @@ if length(varargin)>=1
         if length(varargin)>=2
             set(handles.datatype,'Value',varargin{2})        
         end
-
         inputFileLocation_Callback(handles.output, eventdata, handles)
-
-        handles=guidata(handles.output);
-        
-        
-        loadBadTimeSegments_Callback(handles.output, eventdata, guidata(handles.output))
-        
+        handles=guidata(handles.output);    
+        loadBadTimeSegments_Callback(handles.output, eventdata, guidata(handles.output))        
         loadBadCh_Callback(handles.output, handles.inputFileLocation, guidata(handles.output))
         spectrogramAllChan_DS_Callback(handles.output, eventdata, guidata(handles.output))
         std_dev_Callback(handles.output, eventdata, guidata(handles.output))
         allPeriodograms_Callback(handles.output, eventdata, guidata(handles.output))
-        
         handles=guidata(handles.output);
     end
 end
-
-
-
 
 if length(varargin)>=3
     handles.type=varargin{2};
 end
 
-%guidata(handles.output,x);
 guidata(hObject, handles);
 
 % --- Outputs from this function are returned to the command line.
@@ -107,13 +98,11 @@ if isempty(strmatch('badTimeSegments',ls)) & isempty(strmatch('badChannels',ls))
     handles.badChannels=[];
     handles.suspiciousChannels=[];
     handles.badTimeSegments=[];
-
 else
     load 'badTimeSegments.mat';
     handles.badTimeSegments=badTimeSegments;
     guidata(hObject, handles);
     fprintf('%d bad time segments loaded\n',size(handles.badTimeSegments,1));
-
     fid = fopen('badChannels.txt');
     tmp = fscanf(fid, '%d');
     handles.badChannels=tmp';
@@ -125,14 +114,9 @@ else
 end
 cd(handles.pathName)
 
-if isempty(strmatch('Figures',ls))
-    mkdir('Figures')
-end
-
 fprintf('File opened: %s\n',handles.pathName);
 fprintf('Block: %s',handles.blockName);
 handles=loadMatlabVar_Callback(hObject, eventdata, handles)
-%handles.ecogDS.data=detrend(handles.ecogDS.data','constant')';
 guidata(hObject, handles);
 
 
@@ -145,12 +129,8 @@ handles.sampFreq=400;
 handles.freqRange=[70 150];
 handles.filterOption='Build Filter Bank';
 handles.individualPer='y';
-
 contents = cellstr(get(handles.datatype,'String'));
-
- handles.type=[contents{get(handles.datatype,'Value')}];
-
-
+handles.type=[contents{get(handles.datatype,'Value')}];
 
 flag=1;
 switch handles.type
@@ -163,7 +143,6 @@ switch handles.type
         timeInt=[];
         %handles.ecog=loadHTKtoEcog_rat_CT(sprintf('%s/%s',handles.pathName,'AfterCARandNotch'),channelsTot,timeInt,'rat');
         handles.ecog=loadHTKtoEcog_rat_CT(sprintf('%s/%s',handles.pathName,'downsampled400'),channelsTot,timeInt,'rat');
-        
         handles.ecogDS=handles.ecog;
         baselineDurMs=0;
         sampDur=1000/handles.ecogDS.sampFreq;
@@ -173,9 +152,7 @@ switch handles.type
         timeInt=[];
         handles.ecog=loadHTKtoEcog_rat_CT(sprintf('%s/%s',handles.pathName,'RawHTK'),channelsTot,timeInt,'rat');
     case 'DS'
-        %channelsTot=128;
         channelsTot=256;
-        
         timeInt=[];
         handles.ecog=loadHTKtoEcog_CT(sprintf('%s/%s',handles.pathName,'Downsampled400'),channelsTot,timeInt)
         handles.ecogDS=handles.ecog;
@@ -184,7 +161,7 @@ switch handles.type
         flag=0;
         handles.ecogDS=handles.ecog;
 end
-%fprintf('Loading complete. Matlab variable is %d x %d matrix.\n',size(handles.ecogDS.data,1),size(handles.ecogDS.data,2));
+
 if flag==1
     %Downsample to 400
     baselineDurMs=0;
@@ -215,9 +192,10 @@ dcshifted=handles.ecogDS;
 dcshifted.badChannels=handles.badChannels;
 dcshifted.data=handles.ecogDS.data-repmat(mean(handles.ecogDS.data,2),[1 size(handles.ecogDS.data,2)]);
 dcshifted.badIntervals=handles.badTimeSegments;
-[~,handles.badTimeSegments]=ecogTSGUI(dcshifted);
-handles.badTimeSegments(find(handles.badTimeSegments(:,2)<0),:)=[];
 
+[~,handles.badTimeSegments]=ecogTSGUI(dcshifted);
+
+handles.badTimeSegments(find(handles.badTimeSegments(:,2)<0),:)=[];
 handles.badTimeSegments(find(handles.badTimeSegments(:,1)<0),1)=0;
 maxTime=size(handles.ecogDS.data,2)/handles.ecogDS.sampFreq;
 handles.badTimeSegments(find(handles.badTimeSegments(:,1)>maxTime),:)=[];

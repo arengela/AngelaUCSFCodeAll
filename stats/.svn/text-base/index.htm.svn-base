@@ -1,0 +1,68 @@
+<HTML>
+<HEAD>
+<TITLE>Erik Erhardt NonParametric Statistical Toolbox in MatLab</TITLE>
+</HEAD>
+<BODY BGCOLOR="#000000" TEXT="#FFFFFF" LINK="#FFFF90" VLINK="#FFFF00" ALINK="#FFCC00">
+<FONT FACE="TIMES NEW ROMAN">
+
+<P><h2>Erik B. Erhardt</h2></p>
+<H3>NonParametric Statistical Toolbox in MatLab</H3>
+
+These are MatLab functions for performing NonParametric statistics on small
+data sets.
+ <BR>
+Begin at npar_data.m to input your data and set switches for the test you
+want.  You will find examples of data sets already there. Run npar_data.m in
+MatLab.  npar_main.m will be called.
+ <BR>
+You may need to adjust switches in this program to determine the output you
+want. This is "use at your own risk" software, though I have tested this code
+to my satisfaction.
+ <BR>
+All the files beginning with "npar_" are integrated parts of the package. The
+other files may be helpful otherwise, so are included here.
+
+<ul type="disc">
+<h4>
+  <LI><A HREF="binary.txt">binary.txt</A><BR>
+  <LI><A HREF="gammafun.m">gammafun.m</A><BR>
+  <LI><A HREF="KendallTau.m">KendallTau.m</A><BR>
+  <LI><A HREF="MakeCorr.m">MakeCorr.m</A><BR>
+  <LI><A HREF="npar_data.m">npar_data.m</A><BR>
+  <LI><A HREF="npar_kendallrank.m">npar_kendallrank.m</A><BR>
+  <LI><A HREF="npar_main.m">npar_main.m</A><BR>
+  <LI><A HREF="npar_out.txt">npar_out.txt</A><BR>
+  <LI><A HREF="npar_pitman.m">npar_pitman.m</A><BR>
+  <LI><A HREF="npar_pitmanind.m">npar_pitmanind.m</A><BR>
+  <LI><A HREF="npar_pitmanmc.m">npar_pitmanmc.m</A><BR>
+  <LI><A HREF="npar_runsrandom.m">npar_runsrandom.m</A><BR>
+  <LI><A HREF="npar_sign.m">npar_sign.m</A><BR>
+  <LI><A HREF="npar_sign_ci.m">npar_sign_ci.m</A><BR>
+  <LI><A HREF="npar_vdwaerden.m">npar_vdwaerden.m</A><BR>
+  <LI><A HREF="npar_wilcoxmwrsum.m">npar_wilcoxmwrsum.m</A><BR>
+  <LI><A HREF="npar_wilcoxrsum.m">npar_wilcoxrsum.m</A><BR>
+  <LI><A HREF="npar_wilcoxsr.m">npar_wilcoxsr.m</A><BR>
+  <LI><A HREF="npar_wilcoxsr_ci.m">npar_wilcoxsr_ci.m</A><BR>
+  <LI><A HREF="npar_wmwrsum.m">npar_wmwrsum.m</A><BR>
+  <LI><A HREF="pitman_mc.m">pitman_mc.m</A><BR>
+  <LI><A HREF="SpearmanRankTest.m">SpearmanRankTest.m</A><BR>
+</h4>
+</ul>
+
+</FONT>
+
+<br>
+<A HREF="http://erike.unicyclist.com"><IMG BORDER="0" SRC="http://erike.unicyclist.com/ringspin.gif"></A>
+
+<!!!! begin last updated !!!!><HR><h6>
+Last updated
+<SCRIPT language="JavaScript" TYPE="text/javascript">
+<!--
+document.write(document.lastModified);
+//-->
+</SCRIPT>
+.
+</h6><!!!! end last updated !!!!>
+
+</BODY>
+</HTML>

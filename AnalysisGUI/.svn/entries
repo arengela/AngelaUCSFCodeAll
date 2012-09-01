@@ -26,40 +26,6 @@ Angela_2
 
 e3b95e40-31f7-a042-8bb2-7f2375390001
 
-processingPlotSingleStacked_inputZscoreGUI.m
-file
-19
-
-
-
-2012-02-10T04:19:59.000000Z
-c44e24ece6b3d7aa141440805029ed3a
-2012-05-23T22:58:00.702319Z
-19
-Angela_2
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-2919
-
 checkEventSegmentationVisually.m
 file
 
@@ -94,14 +60,14 @@ Angela_2
 
 715
 
-analysis_GUI.m
+processingPlotSingleStacked_inputZscoreGUI.m
 file
 19
 
 
 
-2012-05-11T16:17:59.283738Z
-d34c3fb89f9bf6f1ac91f1184b9de19c
+2012-02-10T04:19:59.000000Z
+c44e24ece6b3d7aa141440805029ed3a
 2012-05-23T22:58:00.702319Z
 19
 Angela_2
@@ -126,7 +92,41 @@ Angela_2
 
 
 
-21037
+2919
+
+analysis_GUI.m
+file
+21
+
+
+
+2012-05-30T00:56:03.345394Z
+f0b03b9f7b184a5da376c4d397edb636
+2012-07-20T04:13:54.905502Z
+21
+Angela_2
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+21098
 
 popupImage2.m
 file
@@ -198,14 +198,14 @@ Angela_2
 
 processingPlotAllChannels_inputZscoreGUI.m
 file
-19
+21
 
 
 
-2012-04-27T00:05:26.205046Z
-64a67e78658068fd3a39ad081df66933
-2012-05-23T22:58:00.702319Z
-19
+2012-05-30T00:59:45.023073Z
+5b6d329e326ffab95f4ac6cc8baba648
+2012-07-20T04:13:54.905502Z
+21
 Angela_2
 
 
@@ -228,41 +228,7 @@ Angela_2
 
 
 
-4345
-
-makeDataSegmentGUI.m
-file
-
-
-
-
-2011-11-04T18:28:35.000000Z
-7aa835d922a58160808fd8e602cd3ddb
-2011-11-04T18:19:07.192262Z
-1
-Angela_2
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-293
+4437
 
 doStatistics2.m
 file
@@ -297,6 +263,40 @@ Angela_2
 
 
 6845
+
+makeDataSegmentGUI.m
+file
+
+
+
+
+2011-11-04T18:28:35.000000Z
+7aa835d922a58160808fd8e602cd3ddb
+2011-11-04T18:19:07.192262Z
+1
+Angela_2
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+293
 
 analysis_GUI.fig
 file
@@ -400,40 +400,6 @@ Angela_2
 
 2898
 
-popupImage.m
-file
-20
-
-
-
-2012-02-10T04:26:08.000000Z
-f870a5857661b876bbf617e7269a5744
-2012-05-23T23:01:32.442430Z
-20
-Angela_2
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-973
-
 processingPlotSingleStacked_inputZscoreGUI_sorted.m
 file
 19
@@ -467,6 +433,40 @@ Angela_2
 
 
 2161
+
+popupImage.m
+file
+20
+
+
+
+2012-02-10T04:26:08.000000Z
+f870a5857661b876bbf617e7269a5744
+2012-05-23T23:01:32.442430Z
+20
+Angela_2
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+973
 
 processingPlotAllSpectrograms_inputZscoreGUI.m
 file

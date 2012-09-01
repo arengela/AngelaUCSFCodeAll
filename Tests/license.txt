@@ -1,4 +1,4 @@
-Copyright (c) 2011, Praneeth Namburi
+Copyright (c) 2011, Martina Callaghan
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without 

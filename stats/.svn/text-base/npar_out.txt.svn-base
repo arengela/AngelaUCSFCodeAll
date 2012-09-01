@@ -1,0 +1,952 @@
+Time Started:  2003-2-27 23:14:24.2
+================================================================================
+Nonparametric Statistics Toolbox for Matlab by Erik Erhardt
+
+Note:  All p-values are one-tailed (unless stated otherwise).
+       Multiply by 2 for two-tailed test p-value.
+
+Note:  21 choose 10=352716 combinations will be performed, patience may be needed.
+wmwmean =
+
+   110
+
+
+================================================================================
+Wilcoxon-Mann-Whitney Rank-Sum Test (Independent Samples) Results: 
+
+printdataorg =
+
+    23    18    17    25    22    19    31    26    29    33
+
+
+printdata2org =
+
+    21    28    32    30    41    24    35    34    27    39    36
+
+Um stat: 21.00 , has 2799 at least as extreme, p-value: 0.007935563 
+Un stat: 89.00 , has 2799 at least as extreme, p-value: 0.007935563 
+Un stat seems to match StatXact value in S&S book, Um does not.
+Normal approximation with continuity correction  p-value: 0.000000000 
+
+========================================
+Normal Confidence Intervals (inappropriate for nonnormal data): 
+0.99000 Confidence Limit on the Mean 24.30000: (19.80479,28.79521) 
+0.98000 Confidence Limit on the Mean 24.30000: (20.24017,28.35983) 
+0.97000 Confidence Limit on the Mean 24.30000: (20.51286,28.08714) 
+0.96000 Confidence Limit on the Mean 24.30000: (20.71590,27.88410) 
+0.95000 Confidence Limit on the Mean 24.30000: (20.87956,27.72044) 
+0.94000 Confidence Limit on the Mean 24.30000: (21.01773,27.58227) 
+0.93000 Confidence Limit on the Mean 24.30000: (21.13794,27.46206) 
+0.92000 Confidence Limit on the Mean 24.30000: (21.24479,27.35521) 
+0.91000 Confidence Limit on the Mean 24.30000: (21.34127,27.25873) 
+0.90000 Confidence Limit on the Mean 24.30000: (21.42948,27.17052) 
+
+========================================
+t-distribution Confidence Intervals (inappropriate for nonnormal data): 
+0.99000 Confidence Limit on the Mean 24.30000: (18.62854,29.97146) 
+0.98000 Confidence Limit on the Mean 24.30000: (19.37616,29.22384) 
+0.97000 Confidence Limit on the Mean 24.30000: (19.80832,28.79168) 
+0.96000 Confidence Limit on the Mean 24.30000: (20.11436,28.48564) 
+0.95000 Confidence Limit on the Mean 24.30000: (20.35219,28.24781) 
+0.94000 Confidence Limit on the Mean 24.30000: (20.54727,28.05273) 
+0.93000 Confidence Limit on the Mean 24.30000: (20.71302,27.88698) 
+0.92000 Confidence Limit on the Mean 24.30000: (20.85742,27.74258) 
+0.91000 Confidence Limit on the Mean 24.30000: (20.98557,27.61443) 
+0.90000 Confidence Limit on the Mean 24.30000: (21.10094,27.49906) 
+================================================================================
+Time elapsed:    518.73 seconds.
+Time Started:  2003-2-27 23:25:40.2
+================================================================================
+Nonparametric Statistics Toolbox for Matlab by Erik Erhardt
+
+Note:  All p-values are one-tailed (unless stated otherwise).
+       Multiply by 2 for two-tailed test p-value.
+
+Note:  21 choose 10=352716 combinations will be performed, patience may be needed.  Interrupt
+Error in ==> /home/erike/npar/npar_wmwrsum.m
+On line 74  ==>    for jj=temptempind(1):kk-1;
+
+Error in ==> /home/erike/npar/npar_main.m
+On line 344  ==>   [unstat,umstat,u1,pval1,u2,pval2,wmwnormalpval]=npar_wmwrsum(data,data2,k,k2,exact);
+
+Error in ==> /home/erike/npar/npar_data.m
+On line 326  ==> npar_main(method,data,data2,testmedian)
+
+>> npar_data
+Time Started:  2003-2-27 23:26:39.0
+================================================================================
+Nonparametric Statistics Toolbox for Matlab by Erik Erhardt
+
+Note:  All p-values are one-tailed (unless stated otherwise).
+       Multiply by 2 for two-tailed test p-value.
+
+Note:  21 choose 10=352716 combinations will be performed, patience may be needed.
+wmwmean =
+
+   110
+
+
+wmwvar =
+
+  201.6667
+
+
+zval =
+
+   -6.2320
+
+
+normalpval1 =
+
+   2.3028e-10
+
+
+normalpval2 =
+
+    1.0000
+
+
+wmwnormalpval =
+
+   2.3028e-10
+
+
+================================================================================
+Wilcoxon-Mann-Whitney Rank-Sum Test (Independent Samples) Results: 
+
+printdataorg =
+
+    23    18    17    25    22    19    31    26    29    33
+
+
+printdata2org =
+
+    21    28    32    30    41    24    35    34    27    39    36
+
+Um stat: 21.00 , has 9999 at least as extreme, p-value: 9999.000000000 
+Un stat: 89.00 , has 9999 at least as extreme, p-value: 9999.000000000 
+Un stat seems to match StatXact value in S&S book, Um does not.
+Normal approximation with continuity correction  p-value: 0.000000000 
+
+========================================
+Normal Confidence Intervals (inappropriate for nonnormal data): 
+0.99000 Confidence Limit on the Mean 24.30000: (19.80479,28.79521) 
+0.98000 Confidence Limit on the Mean 24.30000: (20.24017,28.35983) 
+0.97000 Confidence Limit on the Mean 24.30000: (20.51286,28.08714) 
+0.96000 Confidence Limit on the Mean 24.30000: (20.71590,27.88410) 
+0.95000 Confidence Limit on the Mean 24.30000: (20.87956,27.72044) 
+0.94000 Confidence Limit on the Mean 24.30000: (21.01773,27.58227) 
+0.93000 Confidence Limit on the Mean 24.30000: (21.13794,27.46206) 
+0.92000 Confidence Limit on the Mean 24.30000: (21.24479,27.35521) 
+0.91000 Confidence Limit on the Mean 24.30000: (21.34127,27.25873) 
+0.90000 Confidence Limit on the Mean 24.30000: (21.42948,27.17052) 
+
+========================================
+t-distribution Confidence Intervals (inappropriate for nonnormal data): 
+0.99000 Confidence Limit on the Mean 24.30000: (18.62854,29.97146) 
+0.98000 Confidence Limit on the Mean 24.30000: (19.37616,29.22384) 
+0.97000 Confidence Limit on the Mean 24.30000: (19.80832,28.79168) 
+0.96000 Confidence Limit on the Mean 24.30000: (20.11436,28.48564) 
+0.95000 Confidence Limit on the Mean 24.30000: (20.35219,28.24781) 
+0.94000 Confidence Limit on the Mean 24.30000: (20.54727,28.05273) 
+0.93000 Confidence Limit on the Mean 24.30000: (20.71302,27.88698) 
+0.92000 Confidence Limit on the Mean 24.30000: (20.85742,27.74258) 
+0.91000 Confidence Limit on the Mean 24.30000: (20.98557,27.61443) 
+0.90000 Confidence Limit on the Mean 24.30000: (21.10094,27.49906) 
+================================================================================
+Time elapsed:      0.22 seconds.
+Time Started:  2003-2-27 23:27:58.5
+================================================================================
+Nonparametric Statistics Toolbox for Matlab by Erik Erhardt
+
+Note:  All p-values are one-tailed (unless stated otherwise).
+       Multiply by 2 for two-tailed test p-value.
+
+Note:  21 choose 10=352716 combinations will be performed, patience may be needed.
+wmwmean =
+
+   110
+
+
+wmwvar =
+
+  201.6667
+
+
+zval =
+
+   -6.2320
+
+
+normalpval1 =
+
+   2.3028e-10
+
+
+normalpval2 =
+
+    1.0000
+
+
+wmwnormalpval =
+
+   2.3028e-10
+
+
+================================================================================
+Wilcoxon-Mann-Whitney Rank-Sum Test (Independent Samples) Results: 
+
+printdataorg =
+
+    23    18    17    25    22    19    31    26    29    33
+
+
+printdata2org =
+
+    21    28    32    30    41    24    35    34    27    39    36
+
+Um stat: 21.00 , has 9999 at least as extreme, p-value: 9999.000000000 
+Un stat: 89.00 , has 9999 at least as extreme, p-value: 9999.000000000 
+Un stat seems to match StatXact value in S&S book, Um does not.
+Normal approximation with continuity correction  p-value: 0.000000000 
+
+========================================
+Normal Confidence Intervals (inappropriate for nonnormal data): 
+0.99000 Confidence Limit on the Mean 24.30000: (19.80479,28.79521) 
+0.98000 Confidence Limit on the Mean 24.30000: (20.24017,28.35983) 
+0.97000 Confidence Limit on the Mean 24.30000: (20.51286,28.08714) 
+0.96000 Confidence Limit on the Mean 24.30000: (20.71590,27.88410) 
+0.95000 Confidence Limit on the Mean 24.30000: (20.87956,27.72044) 
+0.94000 Confidence Limit on the Mean 24.30000: (21.01773,27.58227) 
+0.93000 Confidence Limit on the Mean 24.30000: (21.13794,27.46206) 
+0.92000 Confidence Limit on the Mean 24.30000: (21.24479,27.35521) 
+0.91000 Confidence Limit on the Mean 24.30000: (21.34127,27.25873) 
+0.90000 Confidence Limit on the Mean 24.30000: (21.42948,27.17052) 
+
+========================================
+t-distribution Confidence Intervals (inappropriate for nonnormal data): 
+0.99000 Confidence Limit on the Mean 24.30000: (18.62854,29.97146) 
+0.98000 Confidence Limit on the Mean 24.30000: (19.37616,29.22384) 
+0.97000 Confidence Limit on the Mean 24.30000: (19.80832,28.79168) 
+0.96000 Confidence Limit on the Mean 24.30000: (20.11436,28.48564) 
+0.95000 Confidence Limit on the Mean 24.30000: (20.35219,28.24781) 
+0.94000 Confidence Limit on the Mean 24.30000: (20.54727,28.05273) 
+0.93000 Confidence Limit on the Mean 24.30000: (20.71302,27.88698) 
+0.92000 Confidence Limit on the Mean 24.30000: (20.85742,27.74258) 
+0.91000 Confidence Limit on the Mean 24.30000: (20.98557,27.61443) 
+0.90000 Confidence Limit on the Mean 24.30000: (21.10094,27.49906) 
+================================================================================
+Time elapsed:      0.24 seconds.
+Time Started:  2003-2-27 23:29:51.1
+================================================================================
+Nonparametric Statistics Toolbox for Matlab by Erik Erhardt
+
+Note:  All p-values are one-tailed (unless stated otherwise).
+       Multiply by 2 for two-tailed test p-value.
+
+Note:  21 choose 10=352716 combinations will be performed, patience may be needed.
+wmwmean =
+
+   110
+
+
+wmwvar =
+
+  201.6667
+
+
+zval =
+
+   -6.2320
+
+
+normalpval1 =
+
+   2.3028e-10
+
+
+normalpval2 =
+
+    1.0000
+
+
+wmwnormalpval =
+
+   2.3028e-10
+
+
+================================================================================
+Wilcoxon-Mann-Whitney Rank-Sum Test (Independent Samples) Results: 
+
+printdataorg =
+
+    23    18    17    25    22    19    31    26    29    33
+
+
+printdata2org =
+
+    21    28    32    30    41    24    35    34    27    39    36
+
+Um stat: 21.00 , has 9999 at least as extreme, p-value: 9999.000000000 
+Un stat: 89.00 , has 9999 at least as extreme, p-value: 9999.000000000 
+Un stat seems to match StatXact value in S&S book, Um does not.
+Normal approximation with continuity correction  p-value: 0.000000000 
+
+========================================
+Normal Confidence Intervals (inappropriate for nonnormal data): 
+0.99000 Confidence Limit on the Mean 24.30000: (19.80479,28.79521) 
+0.98000 Confidence Limit on the Mean 24.30000: (20.24017,28.35983) 
+0.97000 Confidence Limit on the Mean 24.30000: (20.51286,28.08714) 
+0.96000 Confidence Limit on the Mean 24.30000: (20.71590,27.88410) 
+0.95000 Confidence Limit on the Mean 24.30000: (20.87956,27.72044) 
+0.94000 Confidence Limit on the Mean 24.30000: (21.01773,27.58227) 
+0.93000 Confidence Limit on the Mean 24.30000: (21.13794,27.46206) 
+0.92000 Confidence Limit on the Mean 24.30000: (21.24479,27.35521) 
+0.91000 Confidence Limit on the Mean 24.30000: (21.34127,27.25873) 
+0.90000 Confidence Limit on the Mean 24.30000: (21.42948,27.17052) 
+
+========================================
+t-distribution Confidence Intervals (inappropriate for nonnormal data): 
+0.99000 Confidence Limit on the Mean 24.30000: (18.62854,29.97146) 
+0.98000 Confidence Limit on the Mean 24.30000: (19.37616,29.22384) 
+0.97000 Confidence Limit on the Mean 24.30000: (19.80832,28.79168) 
+0.96000 Confidence Limit on the Mean 24.30000: (20.11436,28.48564) 
+0.95000 Confidence Limit on the Mean 24.30000: (20.35219,28.24781) 
+0.94000 Confidence Limit on the Mean 24.30000: (20.54727,28.05273) 
+0.93000 Confidence Limit on the Mean 24.30000: (20.71302,27.88698) 
+0.92000 Confidence Limit on the Mean 24.30000: (20.85742,27.74258) 
+0.91000 Confidence Limit on the Mean 24.30000: (20.98557,27.61443) 
+0.90000 Confidence Limit on the Mean 24.30000: (21.10094,27.49906) 
+================================================================================
+Time elapsed:      0.22 seconds.
+Time Started:  2003-2-27 23:30:35.7
+================================================================================
+Nonparametric Statistics Toolbox for Matlab by Erik Erhardt
+
+Note:  All p-values are one-tailed (unless stated otherwise).
+       Multiply by 2 for two-tailed test p-value.
+
+Note:  21 choose 10=352716 combinations will be performed, patience may be needed.
+wmwmean =
+
+   110
+
+
+wmwvar =
+
+  201.6667
+
+
+zval =
+
+   -6.2320
+
+
+normalpval1 =
+
+   2.3028e-10
+
+
+normalpval2 =
+
+    1.0000
+
+
+wmwnormalpval =
+
+   2.3028e-10
+
+
+================================================================================
+Wilcoxon-Mann-Whitney Rank-Sum Test (Independent Samples) Results: 
+
+printdataorg =
+
+    23    18    17    25    22    19    31    26    29    33
+
+
+printdata2org =
+
+    21    28    32    30    41    24    35    34    27    39    36
+
+Um stat: 21.00 , has 9999 at least as extreme, p-value: 9999.000000000 
+Un stat: 89.00 , has 9999 at least as extreme, p-value: 9999.000000000 
+Un stat seems to match StatXact value in S&S book, Um does not.
+Normal approximation with continuity correction  p-value: 0.000000000 
+
+========================================
+Normal Confidence Intervals (inappropriate for nonnormal data): 
+0.99000 Confidence Limit on the Mean 24.30000: (19.80479,28.79521) 
+0.98000 Confidence Limit on the Mean 24.30000: (20.24017,28.35983) 
+0.97000 Confidence Limit on the Mean 24.30000: (20.51286,28.08714) 
+0.96000 Confidence Limit on the Mean 24.30000: (20.71590,27.88410) 
+0.95000 Confidence Limit on the Mean 24.30000: (20.87956,27.72044) 
+0.94000 Confidence Limit on the Mean 24.30000: (21.01773,27.58227) 
+0.93000 Confidence Limit on the Mean 24.30000: (21.13794,27.46206) 
+0.92000 Confidence Limit on the Mean 24.30000: (21.24479,27.35521) 
+0.91000 Confidence Limit on the Mean 24.30000: (21.34127,27.25873) 
+0.90000 Confidence Limit on the Mean 24.30000: (21.42948,27.17052) 
+
+========================================
+t-distribution Confidence Intervals (inappropriate for nonnormal data): 
+0.99000 Confidence Limit on the Mean 24.30000: (18.62854,29.97146) 
+0.98000 Confidence Limit on the Mean 24.30000: (19.37616,29.22384) 
+0.97000 Confidence Limit on the Mean 24.30000: (19.80832,28.79168) 
+0.96000 Confidence Limit on the Mean 24.30000: (20.11436,28.48564) 
+0.95000 Confidence Limit on the Mean 24.30000: (20.35219,28.24781) 
+0.94000 Confidence Limit on the Mean 24.30000: (20.54727,28.05273) 
+0.93000 Confidence Limit on the Mean 24.30000: (20.71302,27.88698) 
+0.92000 Confidence Limit on the Mean 24.30000: (20.85742,27.74258) 
+0.91000 Confidence Limit on the Mean 24.30000: (20.98557,27.61443) 
+0.90000 Confidence Limit on the Mean 24.30000: (21.10094,27.49906) 
+================================================================================
+Time elapsed:      0.19 seconds.
+Time Started:  2003-3-4 13:39:50.4
+================================================================================
+Nonparametric Statistics Toolbox for Matlab by Erik Erhardt
+
+Note:  All p-values are one-tailed (unless stated otherwise).
+       Multiply by 2 for two-tailed test p-value.
+
+Note:  15 choose 7=6435 combinations will be performed, patience may be needed.
+unstat =
+
+    49
+
+
+umstat =
+
+     7
+
+  Interrupt
+Error in ==> /home/erike/npar/npar_wmwrsum.m
+On line 78  ==>     temptemp(jj)=temptemp(jj+1);
+
+Error in ==> /home/erike/npar/npar_main.m
+On line 344  ==>   [unstat,umstat,u1,pval1,u2,pval2,wmwnormalpval]=npar_wmwrsum(data,data2,k,k2,exact);
+
+Error in ==> /home/erike/npar/npar_data.m
+On line 326  ==> npar_main(method,data,data2,testmedian)
+
+exit
+Time Started:  2003-3-4 13:41:6.5
+================================================================================
+Nonparametric Statistics Toolbox for Matlab by Erik Erhardt
+
+Note:  All p-values are one-tailed (unless stated otherwise).
+       Multiply by 2 for two-tailed test p-value.
+
+Note:  15 choose 7=6435 combinations will be performed, patience may be needed.
+unstat =
+
+    49
+
+
+umstat =
+
+     7
+
+
+================================================================================
+Wilcoxon-Mann-Whitney Rank-Sum Test (Independent Samples) Results: 
+
+printdataorg =
+
+   204   218   197   183   227   233   191
+
+
+printdata2org =
+
+   243   228   261   202   343   242   220   239
+
+Um stat:  7.00 , has 45 at least as extreme, p-value: 0.006993007 
+Un stat: 49.00 , has 45 at least as extreme, p-value: 0.006993007 
+Un stat seems to match StatXact value in S&S book, Um does not.
+Normal approximation with continuity correction  p-value: 0.008836138 
+
+========================================
+Normal Confidence Intervals (inappropriate for nonnormal data): 
+0.99000 Confidence Limit on the Mean 207.57143: (189.20334,225.93952) 
+0.98000 Confidence Limit on the Mean 207.57143: (190.98238,224.16048) 
+0.97000 Confidence Limit on the Mean 207.57143: (192.09664,223.04622) 
+0.96000 Confidence Limit on the Mean 207.57143: (192.92626,222.21659) 
+0.95000 Confidence Limit on the Mean 207.57143: (193.59504,221.54782) 
+0.94000 Confidence Limit on the Mean 207.57143: (194.15960,220.98326) 
+0.93000 Confidence Limit on the Mean 207.57143: (194.65080,220.49206) 
+0.92000 Confidence Limit on the Mean 207.57143: (195.08739,220.05547) 
+0.91000 Confidence Limit on the Mean 207.57143: (195.48165,219.66121) 
+0.90000 Confidence Limit on the Mean 207.57143: (195.84207,219.30079) 
+
+========================================
+t-distribution Confidence Intervals (inappropriate for nonnormal data): 
+0.99000 Confidence Limit on the Mean 207.57143: (181.13397,234.00888) 
+0.98000 Confidence Limit on the Mean 207.57143: (185.16124,229.98162) 
+0.97000 Confidence Limit on the Mean 207.57143: (187.39851,227.74435) 
+0.96000 Confidence Limit on the Mean 207.57143: (188.94368,226.19917) 
+0.95000 Confidence Limit on the Mean 207.57143: (190.12264,225.02022) 
+0.94000 Confidence Limit on the Mean 207.57143: (191.07568,224.06718) 
+0.93000 Confidence Limit on the Mean 207.57143: (191.87580,223.26705) 
+0.92000 Confidence Limit on the Mean 207.57143: (192.56574,222.57711) 
+0.91000 Confidence Limit on the Mean 207.57143: (193.17262,221.97023) 
+0.90000 Confidence Limit on the Mean 207.57143: (193.71472,221.42814) 
+================================================================================
+Time elapsed:      5.85 seconds.
+Time Started:  2003-3-4 13:42:12.8
+================================================================================
+Nonparametric Statistics Toolbox for Matlab by Erik Erhardt
+
+Note:  All p-values are one-tailed (unless stated otherwise).
+       Multiply by 2 for two-tailed test p-value.
+
+Note:  2^10=1024 combinations will be performed, patience may be needed.
+================================================================================
+Wilcoxon Signed-Rank Test Results: 
+
+printdatadiff =
+
+   -0.8000   -0.2000    0.1000    0.3000   -1.1000   -0.5000    0.4000   -1.2000   -0.9000   -0.5000
+
+
+printdata =
+
+    1.0000   -2.0000    3.0000    4.0000   -5.5000   -5.5000   -7.0000   -8.0000   -9.0000  -10.0000
+
+Median  0.00 
+
+n=10 
+
+Order stat: 1004 ,  S-: 47 ,  p-value: 0.980468750 
+Order stat: 23 ,  S+: 8 ,  p-value: 0.022460938 
+Normal approximation with continuity correction  p-value: 0.026316606 
+
+========================================
+Wilcoxon Signed-Rank Confidence Intervals using Walsh averages: 
+0.99609 Confidence Limit on the Median -0.45000 (index   1): (-1.20000,0.40000) 
+0.99414 Confidence Limit on the Median -0.45000 (index   2): (-1.15000,0.35000) 
+0.99219 Confidence Limit on the Median -0.45000 (index   3): (-1.10000,0.30000) 
+0.98828 Confidence Limit on the Median -0.45000 (index   4): (-1.05000,0.25000) 
+0.98438 Confidence Limit on the Median -0.45000 (index   5): (-1.00000,0.20000) 
+0.97656 Confidence Limit on the Median -0.45000 (index   6): (-1.00000,0.10000) 
+0.96875 Confidence Limit on the Median -0.45000 (index   7): (-0.95000,0.10000) 
+0.95898 Confidence Limit on the Median -0.45000 (index   8): (-0.90000,0.05000) 
+0.94531 Confidence Limit on the Median -0.45000 (index   9): (-0.85000,-0.05000) 
+0.92969 Confidence Limit on the Median -0.45000 (index  10): (-0.85000,-0.05000) 
+0.91016 Confidence Limit on the Median -0.45000 (index  11): (-0.85000,-0.05000) 
+0.88867 Confidence Limit on the Median -0.45000 (index  12): (-0.80000,-0.10000) 
+0.86133 Confidence Limit on the Median -0.45000 (index  13): (-0.80000,-0.10000) 
+
+========================================
+Normal Confidence Intervals (inappropriate for nonnormal data): 
+0.99000 Confidence Limit on the Mean -0.44000: (-0.90745,0.02745) 
+0.98000 Confidence Limit on the Mean -0.44000: (-0.86217,-0.01783) 
+0.97000 Confidence Limit on the Mean -0.44000: (-0.83382,-0.04618) 
+0.96000 Confidence Limit on the Mean -0.44000: (-0.81270,-0.06730) 
+0.95000 Confidence Limit on the Mean -0.44000: (-0.79569,-0.08431) 
+0.94000 Confidence Limit on the Mean -0.44000: (-0.78132,-0.09868) 
+0.93000 Confidence Limit on the Mean -0.44000: (-0.76882,-0.11118) 
+0.92000 Confidence Limit on the Mean -0.44000: (-0.75771,-0.12229) 
+0.91000 Confidence Limit on the Mean -0.44000: (-0.74767,-0.13233) 
+0.90000 Confidence Limit on the Mean -0.44000: (-0.73850,-0.14150) 
+
+========================================
+t-distribution Confidence Intervals (inappropriate for nonnormal data): 
+0.99000 Confidence Limit on the Mean -0.44000: (-1.02977,0.14977) 
+0.98000 Confidence Limit on the Mean -0.44000: (-0.95202,0.07202) 
+0.97000 Confidence Limit on the Mean -0.44000: (-0.90708,0.02708) 
+0.96000 Confidence Limit on the Mean -0.44000: (-0.87526,-0.00474) 
+0.95000 Confidence Limit on the Mean -0.44000: (-0.85053,-0.02947) 
+0.94000 Confidence Limit on the Mean -0.44000: (-0.83024,-0.04976) 
+0.93000 Confidence Limit on the Mean -0.44000: (-0.81300,-0.06700) 
+0.92000 Confidence Limit on the Mean -0.44000: (-0.79799,-0.08201) 
+0.91000 Confidence Limit on the Mean -0.44000: (-0.78466,-0.09534) 
+0.90000 Confidence Limit on the Mean -0.44000: (-0.77266,-0.10734) 
+================================================================================
+Time elapsed:      0.65 seconds.
+Time Started:  2003-3-4 13:44:34.3
+================================================================================
+Nonparametric Statistics Toolbox for Matlab by Erik Erhardt
+
+Note:  All p-values are one-tailed (unless stated otherwise).
+       Multiply by 2 for two-tailed test p-value.
+
+Note:  2^15=32768 combinations will be performed, patience may be needed.
+================================================================================
+Wilcoxon Signed-Rank Test Results: 
+
+printdatadiff =
+
+  Columns 1 through 10 
+
+    2.0000   -6.7000   -1.8000   -1.0000    4.0000    1.5000    5.0000    3.2000    5.5000    1.7000
+
+  Columns 11 through 15 
+
+    4.4000   -0.1000    0.6000   -3.4000   -1.0000
+
+
+printdata =
+
+  Columns 1 through 10 
+
+   -1.0000    2.0000   -3.5000   -3.5000    5.0000    6.0000   -7.0000    8.0000    9.0000  -10.0000
+
+  Columns 11 through 15 
+
+   11.0000   12.0000   13.0000   14.0000  -15.0000
+
+Median  0.00 
+
+n=15 
+
+Order stat: 4433 ,  S-: 40 ,  p-value: 0.135284424 
+Order stat: 28535 ,  S+: 80 ,  p-value: 0.870819092 
+Normal approximation with continuity correction  p-value: 0.133985129 
+
+========================================
+Wilcoxon Signed-Rank Confidence Intervals using Walsh averages: 
+0.99988 Confidence Limit on the Median 1.10000 (index   1): (-6.70000,5.50000) 
+0.99982 Confidence Limit on the Median 1.10000 (index   2): (-5.05000,5.25000) 
+0.99976 Confidence Limit on the Median 1.10000 (index   3): (-4.25000,5.00000) 
+0.99957 Confidence Limit on the Median 1.10000 (index   4): (-3.85000,4.95000) 
+0.99945 Confidence Limit on the Median 1.10000 (index   5): (-3.85000,4.75000) 
+0.99927 Confidence Limit on the Median 1.10000 (index   6): (-3.40000,4.70000) 
+0.99902 Confidence Limit on the Median 1.10000 (index   7): (-3.40000,4.50000) 
+0.99878 Confidence Limit on the Median 1.10000 (index   8): (-3.05000,4.40000) 
+0.99835 Confidence Limit on the Median 1.10000 (index   9): (-2.60000,4.35000) 
+0.99780 Confidence Limit on the Median 1.10000 (index  10): (-2.60000,4.20000) 
+0.99713 Confidence Limit on the Median 1.10000 (index  11): (-2.50000,4.10000) 
+0.99634 Confidence Limit on the Median 1.10000 (index  12): (-2.35000,4.00000) 
+0.99542 Confidence Limit on the Median 1.10000 (index  13): (-2.20000,3.80000) 
+0.99432 Confidence Limit on the Median 1.10000 (index  14): (-2.20000,3.75000) 
+0.99292 Confidence Limit on the Median 1.10000 (index  15): (-1.80000,3.60000) 
+0.99121 Confidence Limit on the Median 1.10000 (index  16): (-1.75000,3.60000) 
+0.98920 Confidence Limit on the Median 1.10000 (index  17): (-1.75000,3.50000) 
+0.98688 Confidence Limit on the Median 1.10000 (index  18): (-1.40000,3.50000) 
+0.98413 Confidence Limit on the Median 1.10000 (index  19): (-1.40000,3.35000) 
+0.98108 Confidence Limit on the Median 1.10000 (index  20): (-1.40000,3.25000) 
+0.97754 Confidence Limit on the Median 1.10000 (index  21): (-1.35000,3.20000) 
+0.97339 Confidence Limit on the Median 1.10000 (index  22): (-1.15000,3.20000) 
+0.96869 Confidence Limit on the Median 1.10000 (index  23): (-1.00000,3.05000) 
+0.96326 Confidence Limit on the Median 1.10000 (index  24): (-1.00000,3.05000) 
+0.95709 Confidence Limit on the Median 1.10000 (index  25): (-1.00000,3.00000) 
+0.95026 Confidence Limit on the Median 1.10000 (index  26): (-0.95000,2.95000) 
+0.94263 Confidence Limit on the Median 1.10000 (index  27): (-0.95000,2.85000) 
+0.93408 Confidence Limit on the Median 1.10000 (index  28): (-0.85000,2.80000) 
+0.92462 Confidence Limit on the Median 1.10000 (index  29): (-0.85000,2.75000) 
+0.91406 Confidence Limit on the Median 1.10000 (index  30): (-0.70000,2.70000) 
+0.90240 Confidence Limit on the Median 1.10000 (index  31): (-0.60000,2.60000) 
+0.88971 Confidence Limit on the Median 1.10000 (index  32): (-0.60000,2.50000) 
+0.87585 Confidence Limit on the Median 1.10000 (index  33): (-0.55000,2.45000) 
+0.86072 Confidence Limit on the Median 1.10000 (index  34): (-0.55000,2.45000) 
+
+========================================
+Normal Confidence Intervals (inappropriate for nonnormal data): 
+0.99000 Confidence Limit on the Mean 0.92667: (-1.31586,3.16919) 
+0.98000 Confidence Limit on the Mean 0.92667: (-1.09866,2.95199) 
+0.97000 Confidence Limit on the Mean 0.92667: (-0.96262,2.81595) 
+0.96000 Confidence Limit on the Mean 0.92667: (-0.86133,2.71467) 
+0.95000 Confidence Limit on the Mean 0.92667: (-0.77968,2.63302) 
+0.94000 Confidence Limit on the Mean 0.92667: (-0.71076,2.56409) 
+0.93000 Confidence Limit on the Mean 0.92667: (-0.65079,2.50412) 
+0.92000 Confidence Limit on the Mean 0.92667: (-0.59749,2.45082) 
+0.91000 Confidence Limit on the Mean 0.92667: (-0.54935,2.40268) 
+0.90000 Confidence Limit on the Mean 0.92667: (-0.50535,2.35868) 
+
+========================================
+t-distribution Confidence Intervals (inappropriate for nonnormal data): 
+0.99000 Confidence Limit on the Mean 0.92667: (-1.66498,3.51831) 
+0.98000 Confidence Limit on the Mean 0.92667: (-1.35823,3.21156) 
+0.97000 Confidence Limit on the Mean 0.92667: (-1.17575,3.02908) 
+0.96000 Confidence Limit on the Mean 0.92667: (-1.04419,2.89752) 
+0.95000 Confidence Limit on the Mean 0.92667: (-0.94059,2.79392) 
+0.94000 Confidence Limit on the Mean 0.92667: (-0.85473,2.70807) 
+0.93000 Confidence Limit on the Mean 0.92667: (-0.78116,2.63449) 
+0.92000 Confidence Limit on the Mean 0.92667: (-0.71659,2.56993) 
+0.91000 Confidence Limit on the Mean 0.92667: (-0.65893,2.51227) 
+0.90000 Confidence Limit on the Mean 0.92667: (-0.60673,2.46007) 
+================================================================================
+Time elapsed:     11.45 seconds.
+Time Started:  2003-3-6 19:16:44.5
+================================================================================
+Nonparametric Statistics Toolbox for Matlab by Erik Erhardt
+
+Note:  All p-values are one-tailed (unless stated otherwise).
+       Multiply by 2 for two-tailed test p-value.
+
+================================================================================
+Sign Test Results: 
+
+printdataorg =
+
+     1     0     0     1     1     1     1     1     1     1     0     1     1     1     0     1     1
+
+
+printsign =
+
+    -1    -1    -1    -1     1     1     1     1     1     1     1     1     1     1     1     1     1
+
+Median  0.50 
+
+n=17 
+
+Number of signs: 4 ,  p-value: 0.024520874 
+Normal approximation with continuity correction  p-value: 0.026172532 
+
+========================================
+Sign Confidence Intervals: 
+0.99998 Confidence Limit on the Median 1.00000 (index   1): (0.00000,1.00000) 
+0.99973 Confidence Limit on the Median 1.00000 (index   2): (0.00000,1.00000) 
+0.99765 Confidence Limit on the Median 1.00000 (index   3): (0.00000,1.00000) 
+0.98727 Confidence Limit on the Median 1.00000 (index   4): (0.00000,1.00000) 
+0.95096 Confidence Limit on the Median 1.00000 (index   5): (1.00000,1.00000) 
+0.85654 Confidence Limit on the Median 1.00000 (index   6): (1.00000,1.00000) 
+0.66769 Confidence Limit on the Median 1.00000 (index   7): (1.00000,1.00000) 
+0.37094 Confidence Limit on the Median 1.00000 (index   8): (1.00000,1.00000) 
+
+========================================
+Normal Confidence Intervals (inappropriate for nonnormal data): 
+0.99000 Confidence Limit on the Mean 0.76471: (0.49155,1.03786) 
+0.98000 Confidence Limit on the Mean 0.76471: (0.51801,1.01140) 
+0.97000 Confidence Limit on the Mean 0.76471: (0.53458,0.99483) 
+0.96000 Confidence Limit on the Mean 0.76471: (0.54691,0.98250) 
+0.95000 Confidence Limit on the Mean 0.76471: (0.55686,0.97255) 
+0.94000 Confidence Limit on the Mean 0.76471: (0.56526,0.96416) 
+0.93000 Confidence Limit on the Mean 0.76471: (0.57256,0.95685) 
+0.92000 Confidence Limit on the Mean 0.76471: (0.57905,0.95036) 
+0.91000 Confidence Limit on the Mean 0.76471: (0.58492,0.94450) 
+0.90000 Confidence Limit on the Mean 0.76471: (0.59028,0.93914) 
+
+========================================
+t-distribution Confidence Intervals (inappropriate for nonnormal data): 
+0.99000 Confidence Limit on the Mean 0.76471: (0.45497,1.07444) 
+0.98000 Confidence Limit on the Mean 0.76471: (0.49074,1.03867) 
+0.97000 Confidence Limit on the Mean 0.76471: (0.51215,1.01726) 
+0.96000 Confidence Limit on the Mean 0.76471: (0.52766,1.00176) 
+0.95000 Confidence Limit on the Mean 0.76471: (0.53990,0.98951) 
+0.94000 Confidence Limit on the Mean 0.76471: (0.55007,0.97934) 
+0.93000 Confidence Limit on the Mean 0.76471: (0.55880,0.97061) 
+0.92000 Confidence Limit on the Mean 0.76471: (0.56648,0.96293) 
+0.91000 Confidence Limit on the Mean 0.76471: (0.57334,0.95607) 
+0.90000 Confidence Limit on the Mean 0.76471: (0.57956,0.94985) 
+================================================================================
+Time elapsed:      0.81 seconds.
+Time Started:  2003-3-6 19:41:33.0
+================================================================================
+Nonparametric Statistics Toolbox for Matlab by Erik Erhardt
+
+Note:  All p-values are one-tailed (unless stated otherwise).
+       Multiply by 2 for two-tailed test p-value.
+
+Note:  2^9=512 combinations will be performed, patience may be needed.
+================================================================================
+Wilcoxon Signed-Rank Test Results: 
+
+printdatadiff =
+
+   -25     2    14    -8     3   -47   -50   -82   -24
+
+
+printdata =
+
+     1     2    -3     4    -5    -6    -7    -8    -9
+
+Median  0.00 
+
+n=9 
+
+Order stat: 498 ,  S-: 38 ,  p-value: 0.972656250 
+Order stat: 19 ,  S+: 7 ,  p-value: 0.037109375 
+Normal approximation with continuity correction  p-value: 0.037780284 
+
+========================================
+Wilcoxon Signed-Rank Confidence Intervals using Walsh averages: 
+0.99219 Confidence Limit on the Median -23.50000 (index   1): (-82.00000,14.00000) 
+0.98828 Confidence Limit on the Median -23.50000 (index   2): (-66.00000,8.50000) 
+0.98438 Confidence Limit on the Median -23.50000 (index   3): (-64.50000,8.00000) 
+0.97656 Confidence Limit on the Median -23.50000 (index   4): (-53.50000,3.00000) 
+0.96875 Confidence Limit on the Median -23.50000 (index   5): (-53.00000,3.00000) 
+0.95703 Confidence Limit on the Median -23.50000 (index   6): (-50.00000,2.50000) 
+0.94141 Confidence Limit on the Median -23.50000 (index   7): (-48.50000,2.00000) 
+0.92188 Confidence Limit on the Median -23.50000 (index   8): (-47.00000,-2.50000) 
+0.89844 Confidence Limit on the Median -23.50000 (index   9): (-45.00000,-3.00000) 
+0.86719 Confidence Limit on the Median -23.50000 (index  10): (-40.00000,-5.00000) 
+
+========================================
+Normal Confidence Intervals (inappropriate for nonnormal data): 
+0.99000 Confidence Limit on the Mean -24.11111: (-50.70531,2.48309) 
+0.98000 Confidence Limit on the Mean -24.11111: (-48.12953,-0.09269) 
+0.97000 Confidence Limit on the Mean -24.11111: (-46.51625,-1.70597) 
+0.96000 Confidence Limit on the Mean -24.11111: (-45.31508,-2.90714) 
+0.95000 Confidence Limit on the Mean -24.11111: (-44.34680,-3.87543) 
+0.94000 Confidence Limit on the Mean -24.11111: (-43.52940,-4.69282) 
+0.93000 Confidence Limit on the Mean -24.11111: (-42.81822,-5.40401) 
+0.92000 Confidence Limit on the Mean -24.11111: (-42.18610,-6.03612) 
+0.91000 Confidence Limit on the Mean -24.11111: (-41.61528,-6.60695) 
+0.90000 Confidence Limit on the Mean -24.11111: (-41.09343,-7.12879) 
+
+========================================
+t-distribution Confidence Intervals (inappropriate for nonnormal data): 
+0.99000 Confidence Limit on the Mean -24.11111: (-58.75387,10.53165) 
+0.98000 Confidence Limit on the Mean -24.11111: (-54.01566,5.79344) 
+0.97000 Confidence Limit on the Mean -24.11111: (-51.30398,3.08175) 
+0.96000 Confidence Limit on the Mean -24.11111: (-49.39570,1.17348) 
+0.95000 Confidence Limit on the Mean -24.11111: (-47.91949,-0.30273) 
+0.94000 Confidence Limit on the Mean -24.11111: (-46.71308,-1.50914) 
+0.93000 Confidence Limit on the Mean -24.11111: (-45.69107,-2.53115) 
+0.92000 Confidence Limit on the Mean -24.11111: (-44.80301,-3.41921) 
+0.91000 Confidence Limit on the Mean -24.11111: (-44.01663,-4.20559) 
+0.90000 Confidence Limit on the Mean -24.11111: (-43.31005,-4.91217) 
+================================================================================
+Time elapsed:      0.87 seconds.
+Time Started:  2003-3-6 19:41:56.7
+================================================================================
+Nonparametric Statistics Toolbox for Matlab by Erik Erhardt
+
+Note:  All p-values are one-tailed (unless stated otherwise).
+       Multiply by 2 for two-tailed test p-value.
+
+================================================================================
+Sign Test Results: 
+
+printdatadiff =
+
+   -25     2    14    -8     3   -47   -50   -82   -24
+
+
+printsign =
+
+     1     1    -1     1    -1    -1    -1    -1    -1
+
+Median  0.00 
+
+n=9 
+
+Number of signs: 3 ,  p-value: 0.253906250 
+Normal approximation with continuity correction  p-value: 0.252492538 
+
+========================================
+Sign Confidence Intervals: 
+0.99609 Confidence Limit on the Median -24.00000 (index   1): (-82.00000,14.00000) 
+0.96094 Confidence Limit on the Median -24.00000 (index   2): (-50.00000,3.00000) 
+0.82031 Confidence Limit on the Median -24.00000 (index   3): (-47.00000,2.00000) 
+0.49219 Confidence Limit on the Median -24.00000 (index   4): (-25.00000,-8.00000) 
+
+========================================
+Normal Confidence Intervals (inappropriate for nonnormal data): 
+0.99000 Confidence Limit on the Mean -24.11111: (-50.70531,2.48309) 
+0.98000 Confidence Limit on the Mean -24.11111: (-48.12953,-0.09269) 
+0.97000 Confidence Limit on the Mean -24.11111: (-46.51625,-1.70597) 
+0.96000 Confidence Limit on the Mean -24.11111: (-45.31508,-2.90714) 
+0.95000 Confidence Limit on the Mean -24.11111: (-44.34680,-3.87543) 
+0.94000 Confidence Limit on the Mean -24.11111: (-43.52940,-4.69282) 
+0.93000 Confidence Limit on the Mean -24.11111: (-42.81822,-5.40401) 
+0.92000 Confidence Limit on the Mean -24.11111: (-42.18610,-6.03612) 
+0.91000 Confidence Limit on the Mean -24.11111: (-41.61528,-6.60695) 
+0.90000 Confidence Limit on the Mean -24.11111: (-41.09343,-7.12879) 
+
+========================================
+t-distribution Confidence Intervals (inappropriate for nonnormal data): 
+0.99000 Confidence Limit on the Mean -24.11111: (-58.75387,10.53165) 
+0.98000 Confidence Limit on the Mean -24.11111: (-54.01566,5.79344) 
+0.97000 Confidence Limit on the Mean -24.11111: (-51.30398,3.08175) 
+0.96000 Confidence Limit on the Mean -24.11111: (-49.39570,1.17348) 
+0.95000 Confidence Limit on the Mean -24.11111: (-47.91949,-0.30273) 
+0.94000 Confidence Limit on the Mean -24.11111: (-46.71308,-1.50914) 
+0.93000 Confidence Limit on the Mean -24.11111: (-45.69107,-2.53115) 
+0.92000 Confidence Limit on the Mean -24.11111: (-44.80301,-3.41921) 
+0.91000 Confidence Limit on the Mean -24.11111: (-44.01663,-4.20559) 
+0.90000 Confidence Limit on the Mean -24.11111: (-43.31005,-4.91217) 
+================================================================================
+Time elapsed:      0.27 seconds.
+Time Started:  2003-3-6 19:44:44.7
+================================================================================
+Nonparametric Statistics Toolbox for Matlab by Erik Erhardt
+
+Note:  All p-values are one-tailed (unless stated otherwise).
+       Multiply by 2 for two-tailed test p-value.
+
+Note:  2^9=512 combinations will be performed, patience may be needed.
+================================================================================
+Pitman Test Results: 
+
+printdatadiff =
+
+   -25     2    14    -8     3   -47   -50   -82   -24
+
+
+printdata =
+
+   -82   -50   -47   -25   -24    -8     2     3    14
+
+Median  0.00 
+
+n=9 
+
+Order stat: 501 ,  S-: 236 ,  p-value: 0.978515625 
+Order stat: 12 ,  S+: 19 ,  p-value: 0.023437500 
+Normal approximation with continuity correction  p-value: 0.028634102 
+================================================================================
+Time elapsed:      0.31 seconds.
+Time Started:  2003-3-12 12:50:6.8
+================================================================================
+Nonparametric Statistics Toolbox for Matlab by Erik Erhardt
+
+Note:  All p-values are one-tailed (unless stated otherwise).
+       Multiply by 2 for two-tailed test p-value.
+Warning: Result may not be exact.
+> In /usr/local/matlab12.1/toolbox/matlab/specfun/nchoosek.m at line 50
+  In /home/erike/npar/npar_main.m at line 336
+  In /home/erike/npar/npar_data.m at line 399
+Warning: Result may not be exact.
+> In /usr/local/matlab12.1/toolbox/matlab/specfun/nchoosek.m at line 50
+  In /home/erike/npar/npar_main.m at line 337
+  In /home/erike/npar/npar_data.m at line 399
+
+unstat =
+
+   1.2485e+03
+
+
+umstat =
+
+  587.5000
+
+
+================================================================================
+Wilcoxon-Mann-Whitney Rank-Sum Test (Independent Samples) Results: 
+
+printdataorg =
+
+  Columns 1 through 17 
+
+     8     6     4     2    10     5     6     6    19     4    10     4    10    12     7     2     5
+
+  Columns 18 through 34 
+
+     1     8     2     0     7     6     4     4    11     2    16     8     7     8     4     0     2
+
+
+printdata2org =
+
+  Columns 1 through 17 
+
+     4     7    13     4     8     8     4    14     5     6     4    12     9     9     9     8    12
+
+  Columns 18 through 34 
+
+     4     8     8     4    11     6    15     9     8    14     9     8     9     7    12    11     7
+
+  Columns 35 through 51 
+
+     4    10     7     8     8     7     9    10    16    14    15    10     4     6     3     9     3
+
+  Columns 52 through 54 
+
+    10     3     8
+
+n=88 gives 2.721577e+24 comparisions with array size 9.253362e+25 which is > 2147483647 is max elements in array. 
+Normal approximation available. 
+
+Normal approximation with continuity correction  p-value: 0.002230954 
+================================================================================
+Time elapsed:      0.24 seconds.

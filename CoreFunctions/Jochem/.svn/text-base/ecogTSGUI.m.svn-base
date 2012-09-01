@@ -544,10 +544,10 @@ plot(handles.ecg_axes,x,y,'color','k');
 hold(handles.ecg_axes,'on');
 c=get(handles.ecg_axes,'colororder');
 set(handles.ecg_axes,'colororder',c(1:2,:));
-ph=plot(handles.ecg_axes,timebaseGuiUnits,plotData);
 xlabel(handles.ecg_axes,'Time(Seconds)');
 ylabel(handles.ecg_axes,'Channel #');
 set(handles.ecg_axes,'ytick',y(1,:),'yticklabel',strvcat(num2str(channelsToShow')));
+
 axis(handles.ecg_axes,'tight');
 
 %{
@@ -562,7 +562,17 @@ end
 
 badch=find(ismember(channelsToShow,handles.ecog.badChannels));
 if ~isempty(badch)
-    plot(handles.ecg_axes,timebaseGuiUnits,plotData(badch,:),'r');
+    if ~length(find(handles.ecog.badChannels==999))
+        ph=plot(handles.ecg_axes,timebaseGuiUnits,plotData);
+        plot(handles.ecg_axes,timebaseGuiUnits,plotData(badch,:),'r');
+    else
+        plotData(badch,:)=NaN;
+        ph=plot(handles.ecg_axes,timebaseGuiUnits,plotData);
+
+    end
+
+else 
+    ph=plot(handles.ecg_axes,timebaseGuiUnits,plotData);
 end
 
 %MAKE TRANSPARENT BOX AROUND BAD TIME SEGMENTS
@@ -664,9 +674,9 @@ function BadInterval=pushbutton10_Callback(hObject, eventdata, handles)
 RECT=getrect;
 
 BadInterval=[RECT(1) RECT(1)+RECT(3)];
-%BadInterval(1,5) = 0;
+BadInterval(1,5) = 0;
 
-BadInterval(1,5) = handles.showChan;
+%BadInterval(1,5) = handles.showChan;
 yLimits=get(gca,'YLim');
 ymax=yLimits(2);
 ymin=yLimits(1);

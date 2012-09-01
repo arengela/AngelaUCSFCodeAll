@@ -34,7 +34,7 @@ for jj=1:573
         m_norm_length=(abs(m_raw)-surrogate_mean)/surrogate_std; 
         m_norm_phase=angle(m_raw); 
         m_norm(c,jj)=m_norm_length*exp(i*m_norm_phase); 
-        keep ecogDS m_norm
+        %keep ecogDS m_norm
     end
 end
 

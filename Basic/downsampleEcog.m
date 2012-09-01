@@ -10,6 +10,9 @@ else
 end
 
     for i=1:size(ecog.data,1)
+        
+        %ecogDS.data(i,:)=resample(ecog.data(i,:),400, round(oldFreq));
+
         ecogDS.data(i,:)=resample(ecog.data(i,:),m*2^11, n*5^6);
         fprintf('%i\n',i)
     end

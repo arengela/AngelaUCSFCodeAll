@@ -101,7 +101,7 @@ if perFlag~=0
 end
 %%
 %LOAD ARTIFACT FILES
-
+try
     cd(sprintf('%s/Artifacts',pathName))
     load 'badTimeSegments.mat'
     fid = fopen('badChannels.txt');
@@ -109,6 +109,7 @@ end
     badChannels=tmp';
     fclose(fid);
     cd(pathName)
+end
     
 %%
 %SUBTRACT CAR

@@ -7,7 +7,7 @@ analogueChannels2Use=analogueChannels2Use(1:end-1);
 %intervalStartEndSeconds=[1 1220];% defines the interval of data to use (in seconds)
 minThresh=repmat(0.01,1,length(analogueChannels2Use)); %An event is triggered when this value is exceeded. One entry for each analogue channel
 %minDurOfStimulusInSeconds=repmat(0.7,1,length(analogueChannels2Use)); % That is the duration of the event.This is a "dead time" after an event was detected. Other events happening during this interval are ignored.
-minDurOfStimulusInSeconds=repmat(2,1,length(analogueChannels2Use)); % That is the duration of the event.This is a "dead time" after an event was detected. Other events happening during this interval are ignored.
+minDurOfStimulusInSeconds=repmat(.5,1,length(analogueChannels2Use)); % That is the duration of the event.This is a "dead time" after an event was detected. Other events happening during this interval are ignored.
 
 stimulusLogFiles2Use={'trialslog_sounds.mat'};
 
@@ -15,7 +15,7 @@ stimulusLogFiles2Use={'trialslog_sounds.mat'};
 %variables for result visualization
 checkResultVisually=1;%user parameter
 pre=0.1; % interval start prior to the event
-dur=0.5; % displpay interval duration
+dur=0.4; % displpay interval duration
 
 for k=1:length(analogueChannels2Use)
     %load stimulus logfile

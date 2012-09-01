@@ -1,4 +1,4 @@
-function ECogDataVis (dpath, subject, elects, data, flag, imname,maxsc)
+function ECogDataVis (dpath, subject, elects, data, flag, imname,maxsc,data2,impch)
 %
 %
 %{
@@ -19,16 +19,18 @@ if isempty(imname)
 end
 [xy,img] = eCogImageRegister(imname,0);
 xy = xy(:,elects);
+G=real2rgb(img,'gray');
 switch flag
     case 0
-        figure;
+        %figure;
         imagesc(img);colormap(gray);
         hold on;
         plot(xy(1,:),xy(2,:),'r.');
     case 2
         %figure;
-        imagesc(img);
+        %imagesc(img);
         %colormap(gray);
+        hi=imagesc(G);
         hold on;
         plot(xy(1,:),xy(2,:),'r.');
         for cnt1 = 1:size(xy,2)
@@ -53,19 +55,184 @@ switch flag
         %
         d = fspecial('disk',9);
         tmpp = max(tmp1,0);
-        tmpp = conv2(tmpp,d,'same').^1.33;
-        %tmpn = -min(tmp1,0);
+        %tmpp = conv2(tmpp,d,'same').^1.33;
+         tmpp = conv2(tmpp,d,'same');
+
+        tmpn = -min(tmp1,0);
         %tmpn = conv2(tmpn,d,'same').^1.33;
+        %tmpn = conv2(tmpn,d,'same');
+
         if isempty(maxsc)
-            %mm = max(max(tmpp(:)),max(tmpn(:)));
-            mm=max(tmpp(:));
+            mm = max(max(tmpp(:)),max(tmpn(:)));
+            %mm=max(tmpp(:));
         else
             mm = maxsc;
         end
         tmpp = tmpp/mm;
-        %tmpn = tmpn/mm;
+        tmpn = tmpn/mm;
         set(hr,'AlphaData',tmpp);
         %set(hb,'AlphaData',tmpn);
+        
+        
+     
+        
+        
+    case 8 
+        xy = ceil(xy);
+        % this line has to be optimized:
+        tmp1 = zeros(size(img));
+        for cnt1 = 1:length(xy)
+            tmp1(xy(2,cnt1),xy(1,cnt1)) = data(cnt1);
+        end
+        %         tmp1 = conv2(tmp1,fspecial('disk',16),'same');
+        r = cat(3,ones(size(img)),zeros(size(img)),zeros(size(img)));
+        b = cat(3,zeros(size(img)),zeros(size(img)),ones(size(img)));
+        %         figure;
+        hold off;
+        imshow(img);
+        hold on
+        hr = imshow(r);
+        %hb = imshow(b);
+        %
+        d = fspecial('disk',9);
+        tmpp = max(tmp1,0);
+        %tmpp = conv2(tmpp,d,'same').^1.33;
+         tmpp = conv2(tmpp,d,'same');
+
+        tmpn = -min(tmp1,0);
+        %tmpn = conv2(tmpn,d,'same').^1.33;
+        %tmpn = conv2(tmpn,d,'same');
+
+        if isempty(maxsc)
+            mm = max(max(tmpp(:)),max(tmpn(:)));
+            %mm=max(tmpp(:));
+        else
+            mm = maxsc;
+        end
+        tmpp = tmpp/mm;
+        tmpn = tmpn/mm;
+        set(hr,'AlphaData',tmpp);
+        %set(hb,'AlphaData',tmpn);
+        
+        %p=prctile(mean(data,2),90);
+        %elects=find(mean(data,2)>p);
+        hold on;
+        %xy = xy(:,elects);
+
+        plot(xy(1,:),xy(2,:),'r.');
+        for cnt1 = 1:size(xy,2)
+            text(xy(1,cnt1)+3,xy(2,cnt1),num2str(elects(cnt1)),'color','y','FontSize',8);
+            %text(xy(1,cnt1)+3,xy(2,cnt1),num2str(cnt1),'color','y','FontSize',8);
+
+        end
+        hold off
+
+     case 9 
+        xy = ceil(xy);
+        % this line has to be optimized:
+        tmp1 = zeros(size(img));
+        for cnt1 = 1:length(xy)
+            tmp1(xy(2,cnt1),xy(1,cnt1)) = data(cnt1);
+        end
+        %         tmp1 = conv2(tmp1,fspecial('disk',16),'same');
+        r = cat(3,ones(size(img)),zeros(size(img)),zeros(size(img)));
+        b = cat(3,zeros(size(img)),zeros(size(img)),ones(size(img)));
+        %         figure;
+        hold off;
+        imshow(img);
+        hold on
+%         hr = imshow(r);
+%         %hb = imshow(b);
+%         %
+%         d = fspecial('disk',9);
+%         tmpp = max(tmp1,0);
+%         %tmpp = conv2(tmpp,d,'same').^1.33;
+%          tmpp = conv2(tmpp,d,'same');
+% 
+%         tmpn = -min(tmp1,0);
+%         %tmpn = conv2(tmpn,d,'same').^1.33;
+%         %tmpn = conv2(tmpn,d,'same');
+% 
+%         if isempty(maxsc)
+%             mm = max(max(tmpp(:)),max(tmpn(:)));
+%             %mm=max(tmpp(:));
+%         else
+%             mm = maxsc;
+%         end
+%         tmpp = tmpp/mm;
+%         tmpn = tmpn/mm;
+%         set(hr,'AlphaData',tmpp);
+%         %set(hb,'AlphaData',tmpn);
+%         
+%         %p=prctile(mean(data,2),90);
+%         %elects=find(mean(data,2)>p);
+%         hold on;
+        %xy = xy(:,elects);
+
+        %plot(xy(1,:),xy(2,:),'r.');
+        freezeColors;
+       
+        data2(find(data2<=0))=.01;
+        data(find(data<=0))=.01;
+
+        
+        
+        if isempty(impch)
+            scatter(xy(1,:),xy(2,:),100*(data/max(data)),(data2-min(data2))/max(data2-min(data2))*256,'filled')
+
+            colormap(spring)
+            for cnt1 = 1:size(xy,2)
+                text(xy(1,cnt1)+6,xy(2,cnt1),num2str(elects(cnt1)),'color','w','FontSize',7);
+                %text(xy(1,cnt1)+5,xy(2,cnt1),num2str(cnt1),'color','w','FontSize',7);
+
+            end
+        else
+            scatter(xy(1,:),xy(2,:),10,repmat(50,[1 length(data2)]),'filled')
+
+            idx=find(elects==impch)
+            scatter(xy(1,idx),xy(2,idx),50,'filled','r')
+            text(xy(1,idx)+6,xy(2,idx),num2str(impch),'color','w','FontSize',8);
+
+        end
+        hold off
+    axis([200 1400 150 900])
+    
+    case 7
+        xy = ceil(xy);
+        % this line has to be optimized:
+        tmp1 = zeros(size(img));
+        for cnt1 = 1:length(xy)
+            tmp1(xy(2,cnt1),xy(1,cnt1)) = data(cnt1);
+        end
+        %         tmp1 = conv2(tmp1,fspecial('disk',16),'same');
+        r = cat(3,ones(size(img)),zeros(size(img)),zeros(size(img)));
+        b = cat(3,zeros(size(img)),zeros(size(img)),ones(size(img)));
+        %         figure;
+        hold off;
+        imshow(img);
+        hold on
+        hr = imshow(r);
+        hb = imshow(b);
+        %
+        d = fspecial('disk',9);
+        tmpp = max(tmp1,0);
+        %tmpp = conv2(tmpp,d,'same').^1.33;
+         tmpp = conv2(tmpp,d,'same');
+
+        tmpn = -min(tmp1,0);
+        %tmpn = conv2(tmpn,d,'same').^1.33;
+        tmpn = conv2(tmpn,d,'same');
+
+        if isempty(maxsc)
+            mm = max(max(tmpp(:)),max(tmpn(:)));
+            %mm=max(tmpp(:));
+        else
+            mm = maxsc;
+        end
+        tmpp = tmpp/mm;
+        tmpn = tmpn/mm;
+        set(hr,'AlphaData',tmpp);
+        set(hb,'AlphaData',tmpn);
     case 3 % include the time, color codes time,
         
         xy = ceil(xy);
@@ -133,7 +300,7 @@ switch flag
         xy = ceil(xy);
         % this line has to be optimized:
         tmp1 = zeros(size(img));
-        for cnt1 = 1:length(xy)
+        for cnt1 = 1:1%length(xy)
             tmp1(xy(2,cnt1),xy(1,cnt1)) = data(1,cnt1);
         end
         %         tmp1 = conv2(tmp1,fspecial('disk',16),'same');
@@ -186,7 +353,7 @@ switch flag
         imshow(img);
         hold on
         hg= imshow(g);
-        %hb = imshow(b);
+        hb = imshow(b);
         %
         d = fspecial('disk',9);
         tmpp = max(tmp1,0);
@@ -199,8 +366,8 @@ switch flag
             mm = maxsc;
         end
         tmpp = tmpp/mm;
-        %tmpn = tmpn/mm;
+        tmpn = tmpn/mm;
         set(hg,'AlphaData',tmpp);
-        %set(hb,'AlphaData',tmpn);
+        set(hb,'AlphaData',tmpn);
 
 end

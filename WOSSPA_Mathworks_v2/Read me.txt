@@ -1,0 +1,21 @@
+List of scripts and functions:
+
+1. 'PDC_DTF_matrix.m': A function which computes the time-varying PDC and DTF measures from a multichannel signal.
+
+2. 'SimulatedModel_Connectivity_AAR.m': A script which computes the time-varying PDC and DTF plots for the simulated model
+using Adaptive AutoRegressive (AAR) modelling.
+
+3. 'SimulatedModel_Connectivity_ShortTime.m': A script which computes the time-varying PDC and DTF plots for the simulated model
+using short-time (windowing) approach.
+
+4. 'EEGData_Connectivity_ShortTime.m': A script which computes the time-varying PDC and DTF plots for the newborn EEG sample
+using short-time (windowing) approach.
+
+5. 'mvar.m', 'mvaar.m' and 'covm.m': Slightly altered versions of the BioSig toolbox functions (please see http://biosig.sourceforge.net/
+for more details and copyright license).
+
+6. 'arfit.m', 'arord.m' and 'arqr.m': Slightly altered versions of the ARFIT toolbox functions (please see http://www.gps.caltech.edu/~tapio/arfit/
+for more details and copyright license).
+
+
+Amir Omidvarnia

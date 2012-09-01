@@ -1,0 +1,33 @@
+dtpath='E:\DelayWord\EC23'
+
+wpath='E:\DelayWord\AllAnalog\broca\'
+
+expt{1}='EC23_B1'
+
+%load 'C:\Users\Angela_2\Documents\ECOGdataprocessing\Projects\DelayWordPseudoword\wordlist.mat'
+%names=cellstr(wordlist(:,1));
+evnt = ECogFindEvents(dtpath,wpath,expt,names)
+%%
+
+load([dtpath filesep expt{ex} '\Analog\allEventTimes.mat']);
+idx=strcmp(allEventTimes(:,2),'r');
+idx=strcmp(allEventTimes(:,2),'re');
+%%
+for ex=1:length(ex)
+    load([dtpath filesep expt{ex} '\Analog\allEventTimes.mat']);
+        save([dtpath filesep expt{ex} '\Analog\allEventTimes.mat_OLD'],'allEventTimes');
+
+    for e=1:length(evnt)
+        if (evnt(e).confidence<96)~=0
+
+            idx=find(strcmp(allEventTimes(:,2),names(evnt(e).ind)));
+
+            for i=1:length(idx)
+                t=findnearest(evnt(e).StartTime,allEventTimes{i,1});
+                allEventTimes{idx(i),1}=evnt(e).StartTime
+                allEventTimes{idx(i)+1,1}=evnt(e).StopTime
+            end
+        end
+    end
+end
+

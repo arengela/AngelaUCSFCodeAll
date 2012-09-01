@@ -67,7 +67,7 @@ uicontrol('Style','PushButton','String','Analog htk to wav','Position',[m1,.20*l
         for i=1:length(selectedContents)
             [subj,~]=regexp(selectedContents{i},'_','split');
             if isempty(strmatch(selectedContents{i},ls([destPath filesep subj{1}]),'exact'))
-            %quickPreprocessing_ALL([sourcePath filesep subj{1} filesep selectedContents{i}],3,0,1)
+            quickPreprocessing_ALL_TMP([sourcePath filesep subj{1} filesep selectedContents{i}],3,0,1)
                 if ~isempty(find(ismember(selectedFolders,'Analog'))) & strmatch(b,'raw')
                     %selectedFolders=selectedFolders(find(ismember(selectedContents,'Analog')));
                     try

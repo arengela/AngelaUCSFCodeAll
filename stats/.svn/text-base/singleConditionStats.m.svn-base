@@ -42,7 +42,8 @@ tmpJ=zeros([1 neps1]);
 
 for s=tmps %test each latency where values exceed delta belt
     tmp1=zscore_stack(:,s); %Get vector of all repetitions at that latency
-    m1=mean(tmp1);%Average of zscores at latency
+    m1=mean(tmp1);%Average of zscores at latencyfigure
+    
     for bi=1:nboot
         %Pick values from vector at random with replacement,
         %for each bootstrap replication, then get the mean.

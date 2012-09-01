@@ -89,7 +89,9 @@ else
             FLOATSIZE = 4;
             fseek(fid,(by/4)*ceil(start)*FLOATSIZE,'cof');
             if length(duration)>1,
-                nf  = ceil(fs*diff(duration)/1000);
+                %nf  = ceil(fs*diff(duration)/1000);
+                nf  = round(fs*diff(duration)/1000);
+
             else
                 nf = inf;
             end

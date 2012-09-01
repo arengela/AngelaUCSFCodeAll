@@ -13,6 +13,8 @@ function [ecog_out, per_out]=quickPreprocessing_ALL_TMP(pathName,flag,perFlag,in
 %      8. Test
 %      9. Output DS and periodogram data ***NOT DONE****
 %      10. No CAR
+%      11. Output DS 
+
 %perFlag= 1: Making and saving figures for periodogram and spectrograms
 %         2: Making and saving variables for periodogram and spectrograms
 %         0: No periodograms or spectrograms
@@ -67,7 +69,7 @@ switch input
         baselineDurMs=0;
         sampDur=1000/ecog.sampFreq;
         ecog=ecogRaw2EcogGUI(ecog.data,baselineDurMs,sampDur,[],ecog.sampFreq);    
-        ecog=downsampleEcog(ecog,sampFreq);
+        ecog=downsampleEcog(ecog,sampFreq,ecog.sampFreq);
         load E:\PreprocessedFiles\EC21\realgrid.mat
         g=reshape(realgrid',[1 256]);
         ecog.data=ecog.data(g,:);
@@ -103,7 +105,7 @@ if perFlag~=0
 end
 %%
 %LOAD ARTIFACT FILES
-
+try
     cd(sprintf('%s/Artifacts',pathName))
     load 'badTimeSegments.mat'
     fid = fopen('badChannels.txt');
@@ -111,7 +113,7 @@ end
     badChannels=tmp';
     fclose(fid);
     cd(pathName)
-    
+end
 %%
 %SUBTRACT CAR
 if  ~isempty(ref) 

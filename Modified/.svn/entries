@@ -26,6 +26,40 @@ Angela_2
 
 e3b95e40-31f7-a042-8bb2-7f2375390001
 
+license.txt
+file
+26
+
+
+
+2011-08-19T11:05:20.000000Z
+548a309fc33e8a8114f5ed9b7bb7db94
+2012-07-20T04:14:54.366903Z
+26
+Angela_2
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+1337
+
 ERP.m
 file
 
@@ -59,6 +93,40 @@ Angela_2
 
 
 7248
+
+pn_tc_demoData.mat
+file
+26
+
+
+
+2011-06-04T22:54:24.000000Z
+8fce872f0991ce1d02d3309c1ff1f1e9
+2012-07-20T04:14:54.366903Z
+26
+Angela_2
+has-props
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+1387
 
 make_raERPs_nback12_bootci_bse5.m
 file
@@ -94,6 +162,40 @@ Angela_2
 
 14205
 
+pn_tc_demo.m
+file
+26
+
+
+
+2011-06-07T07:15:30.000000Z
+08386f4fe62da1b5d4a295e57c43d7f0
+2012-07-20T04:14:54.366903Z
+26
+Angela_2
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+3450
+
 ecogPCANoiseRemoval_selectedChannels.m
 file
 
@@ -127,6 +229,43 @@ Angela_2
 
 
 4854
+
+html
+dir
+
+topoplot_connect.m
+file
+26
+
+
+
+2012-06-04T21:18:39.825368Z
+d6871cdf07d3813ab392c5eef378f17a
+2012-07-20T04:14:54.366903Z
+26
+Angela_2
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+7274
 
 make_ERSAs.m
 file
@@ -232,14 +371,14 @@ Angela_2
 
 PhaseAmpModulationIndex.m
 file
+26
 
 
 
-
-2011-11-04T18:27:08.000000Z
-d4749b04a717c08dc8c29a4318768ceb
-2011-11-04T18:19:07.192262Z
-1
+2012-06-21T19:09:20.320168Z
+47647bf5b203a56f6e0c0232d1c77d2a
+2012-07-20T04:14:54.366903Z
+26
 Angela_2
 
 
@@ -262,7 +401,7 @@ Angela_2
 
 
 
-1851
+1852
 
 PAC_modified.m
 file

@@ -1,11 +1,13 @@
-function [pac,ave_amp_phase]=PAC_preprocesseddata(complex_data,low_freq_band,high_freq_band)
+function [pac,ave_amp_phase]=PAC_preprocesseddata(complex_data,low_freq_band,high_freq_band,makeDistribution)
 %INPUT: 
 %complex_data: C by T by F matrix, where C=channels, T=time (in samples),
 %F= frequency band, and each element is a complex value
+% low_freq_band and high_freq_band should hold only one value
 
 %OUTPUT:
-%pac: The Phase Amplitude Coupling Index; a C by HF by HL matrix, where C=channels, HF=high frequency bands,
-%HL=low frequency bands
+%pac: The Phase Amplitude Coupling Index; a C by #HF by #HL matrix, where
+%C=channels, HF=high frequency band
+%HL=low frequency band
 %ave_amp_phase: a cell array, where each cell holds the average amplitude
 %of the high frequency bands, aligned at each phase of the low frequency
 %band
@@ -13,19 +15,22 @@ function [pac,ave_amp_phase]=PAC_preprocesseddata(complex_data,low_freq_band,hig
 %ave_amp_phase are also plotted 
 pac=[];
 ave_amp_phase=[];
+if nargin<4
+    makeDistribution=0;
+end
 
 if ~exist('low_freq_band')
     low_freq_band=8; %pick low frequency band(s) (corresponds with the 40 band output of hilbert transform-- see center frequencies) This will determine the phase for pac
 end
 
 if ~exist('high_freq_band')
-    high_freq_band=1:40;  %pick high frequency band(s); this will be the amplitude for pac
+    high_freq_band=35;  %pick high frequency band(s); this will be the amplitude for pac
 end
 
 T=size(complex_data,2);
 
 %calculates the phase amplitude coupling index 
-pac=calculatePAC(complex_data,low_freq_band,high_freq_band);
+pac=calculatePAC(complex_data,low_freq_band,high_freq_band,makeDistribution);
 
 %calculates average amplitude of high freq band at each phase of
 %low_freq_band (from -pi to pi)
@@ -93,33 +98,59 @@ H(1)=0;
 
 
 %%
-function pac=calculatePAC(complex_data,low_freq_band,high_freq_band)
+function pac=calculatePAC(complex_data,low_freq_band,high_freq_band,makeDistribution)
 %calculate PAC using preprocessed data
+numsurrogate=200;  %% number of surrogate values to compare to actual value 
 
 pac = zeros([size(complex_data, 1) size(low_freq_band, 2) size(high_freq_band, 2)]);
-
 % Calculate PAC
 for chanIt = 1:size(complex_data, 1)
     signal = complex_data(chanIt, :);
     
-    for lowIt = low_freq_band
+    for lowIt =  1:length(low_freq_band)
         %disp(['Channel ' num2str(chanIt) ' Low Frequency ' num2str(lowIt)]);
         
         % Extract low frequency analytic phase
-        low_frequency_phase{chanIt}(lowIt,:)=angle(complex_data(chanIt,:,low_freq_band));
+        low_frequency_phase{chanIt}(lowIt,:)=angle(complex_data(chanIt,:,low_freq_band(lowIt)));
         
-        for highIt = high_freq_band
+        for highIt =  1:length(high_freq_band)
             % Extract low frequency analytic phase of high frequency analytic amplitude
-            high_frequency_amplitude{chanIt}(highIt,:)=abs(complex_data(chanIt,:,highIt));
+            amplitude=abs(complex_data(chanIt,:,high_freq_band(highIt)));
+            high_frequency_amplitude{chanIt}(highIt,:)=abs(complex_data(chanIt,:,high_freq_band(highIt)));
             tmp=fft(high_frequency_amplitude{chanIt}(highIt,:));
             T=size(complex_data,2);
-            [H,h]=makeHilbWindow(T,lowIt);
+            [H,h]=makeHilbWindow(T,low_freq_band(lowIt));
             high_frequency_phase{chanIt}(lowIt,:)=angle(ifft(tmp.*(H.*h),T));
             
             % Calculate PAC
             pac(chanIt, lowIt, highIt) =...
                 abs(sum(exp(1i * (low_frequency_phase{chanIt}(lowIt,:) - high_frequency_phase{chanIt}(lowIt,:))), 'double'))...
                 / length(high_frequency_phase{chanIt}(lowIt,:));
+            
+            
+            %Make distribution
+            if makeDistribution==1
+                pacDist=zeros([size(complex_data, 1) size(low_freq_band, 2) size(high_freq_band, 2)],numsurrogate);
+                srate=400;    %% sampling rate used in this study, in Hz 
+                numpoints=size(complex_data,2);   %% number of sample points in raw signal 
+                numsurrogate=200;   %% number of surrogate values to compare to actual value 
+                minskip=srate;   %% time lag must be at least this big 
+                maxskip=numpoints-srate; %% time lag must be smaller than this 
+                skip=ceil(numpoints.*rand(numsurrogate*2,1)); 
+                skip(find(skip>maxskip))=[]; 
+                skip(find(skip<minskip))=[]; 
+                skip=skip(1:numsurrogate,1); 
+                surrogate_m=zeros(numsurrogate,1);  
+                for s=1:numsurrogate 
+                  surrogate_phase=[high_frequency_phase{chanIt}(lowIt,skip(s):end) high_frequency_phase{chanIt}(lowIt,1:skip(s)-1)]; 
+                  pacDist(chanIt, lowIt, highIt,s) =...
+                abs(sum(exp(1i * (low_frequency_phase{chanIt}(lowIt,:) - surrogate_phase)), 'double'))...
+                / length(high_frequency_phase{chanIt}(lowIt,:));
+                  %surrogate_m(s)=abs(mean(surrogate_amplitude.*exp(i*phase))); 
+                  %disp(numsurrogate-s) 
+                end
+            end
+            
         end
     end
 end
@@ -134,14 +165,14 @@ p=linspace(-pi,pi,100)
 
 for chanIt = 1:size(complex_data, 1)
     signal = complex_data(chanIt, :,:);
-    for lowIt = low_freq_band
+    for lowIt = 1:length(low_freq_band)
         % Extract low frequency analytic phase
-        low_frequency_phase{chanIt}(lowIt,:)=angle(complex_data(chanIt,:,low_freq_band));
+        low_frequency_phase{chanIt}(lowIt,:)=angle(complex_data(chanIt,:,low_freq_band(lowIt)));
         
         %use hilbert
-        for highIt = high_freq_band
+        for highIt = 1:length(high_freq_band)
             % Extract high frequency analytic amplitude
-            high_frequency_amplitude_z{chanIt}(highIt,:)=zscore(abs(complex_data(chanIt,:,highIt)));
+            high_frequency_amplitude_z{chanIt}(highIt,:)=zscore(abs(complex_data(chanIt,:,high_freq_band(highIt))));
             
         end
     end
@@ -150,7 +181,7 @@ for chanIt = 1:size(complex_data, 1)
             %get analytic amplitude of high frequency signal at every phase
             %of low frequency
             idx{i}=find(low_frequency_phase{chanIt}(lowIt,:)>p(i) & low_frequency_phase{chanIt}(lowIt,:)<p(i+1));
-            ave_amp_phase{chanIt}(j,i)=mean(high_frequency_amplitude_z{chanIt}(j,idx{i}));
+            ave_amp_phase(chanIt,j,i)=mean(high_frequency_amplitude_z{chanIt}(j,idx{i}));
         end
     end
 end

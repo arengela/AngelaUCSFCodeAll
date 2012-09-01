@@ -27,7 +27,9 @@ if isempty(timeInt)
         for i=1:elecNum
             varName1=['Wav' num2str(blockNum+1) num2str(i)];
             [data, sampFreq,tmp,chanNum] = readhtk (sprintf('%s.htk',varName1));           
-            ecog.data(chanNum,:,:)=data';        
+            %ecog.data(chanNum,:,:)=data;        
+                        ecog.data=data;        
+
             fprintf([int2str(chanNum) '.'])
         end   
 
