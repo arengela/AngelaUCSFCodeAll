@@ -39,6 +39,8 @@ switch flag
         ECogDataVis (dpath2,subject,ch,[],0,dpath);
     case  1
          ECogDataVis (dpath2,subject,ch,data,1,dpath,maxsc);
+    case  5
+         ECogDataVis (dpath2,subject,ch,data,5,dpath);
     case  7
          ECogDataVis (dpath2,subject,ch,data,7,dpath,maxsc);
     case  8 %Dots and text on brain

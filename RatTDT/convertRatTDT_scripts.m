@@ -1,9 +1,12 @@
+%Where your TDT blocks live
 mainPath='C:\Users\RatECoG_babcock\Desktop\TDT_programs\AuditoryStim_rp2_96_12ksamprate_nafi_TDT2\DataTanks\Rat7'
 cd(mainPath)
 blocks=cellstr(ls)
+
+%Where you want to copy converted files
 dest='C:\Users\RatECoG_babcock\Desktop\TDT_programs\AuditoryStim_rp2_96_12ksamprate_nafi_TDT2\DataTanks\Rat7\converted'
 
-%%
+%% Goes through blocks and converts TDT format to HTK; Save epoch data as mat files
 
 for i=[8,9,10] %length(blocks)
     rawDataPath=[mainPath '/' blocks{i}]
@@ -45,8 +48,8 @@ for i=[8,9,10] %length(blocks)
     save('ampl','ampl','-v7.3')
     save('tick','tick','-v7.3')
   
-     movefile('Stim*.htk',sprintf('%s/%s/%s',dest,blocks{i},'Epochs'));
-     movefile('Vrfy*.htk',sprintf('%s/%s/%s',dest,blocks{i},'Epochs'));
+    movefile('Stim*.htk',sprintf('%s/%s/%s',dest,blocks{i},'Epochs'));
+    movefile('Vrfy*.htk',sprintf('%s/%s/%s',dest,blocks{i},'Epochs'));
 
     cd(rawDataPath)
 end

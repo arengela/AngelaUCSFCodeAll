@@ -131,21 +131,18 @@ else
              filtered=ecogFilterTemporal(ecog,[1 200],3);
              filtered.sampFreq=ecog.sampFreq;
              fprintf('1 Hz Filter done...\n')
-             CAR=mean(filtered.data(setdiff(1:96,badChannels),:));
-             
-             ecog.data=ecog.data-repmat(CAR,[96,1]);
+             CAR=mean(filtered.data(setdiff(1:256,badChannels),:),1);             
+             ecog.data=ecog.data-repmat(CAR,[256,1]);
              clear 'filtered'
         otherwise
             if ~ismember(flag,[6,7])
                 %keyboard
-                %{
-                fprintf('\n1 Hz Filter begin...')
-                filtered=ecogFilterTemporal(ecog,[1 200],3);
-                filtered.sampFreq=ecog.sampFreq;
-                fprintf('1 Hz Filter done...\n')
-                ecog=subtractCAR_16ChanBlocks(filtered,badChannels,ecog);
-                clear 'filtered'
-                %}
+%                 fprintf('\n1 Hz Filter begin...')
+%                 filtered=ecogFilterTemporal(ecog,[1 200],3);
+%                 filtered.sampFreq=ecog.sampFreq;
+%                 fprintf('1 Hz Filter done...\n')
+%                 ecog=subtractCAR_16ChanBlocks(filtered,badChannels,ecog);
+%                 clear 'filtered'
             end
     end
 end

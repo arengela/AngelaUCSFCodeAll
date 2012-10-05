@@ -5,8 +5,11 @@ function ecog=loadHTKtoEcog_CT(filename,channelsTot,timeInt)
 
 currentPath=pwd;
 cd(filename)
-blockNum=floor(channelsTot/64);
+blockNum=ceil(channelsTot/64);
 elecNum=rem(channelsTot,64);
+if elecNum>0
+    blockNum=blockNum-1;
+end
 if isempty(timeInt)
     [data, sampFreq, tmp,chanNum] = readhtk ( 'Wav11.htk');
     handles.sampFreq=sampFreq;
@@ -27,9 +30,7 @@ if isempty(timeInt)
         for i=1:elecNum
             varName1=['Wav' num2str(blockNum+1) num2str(i)];
             [data, sampFreq,tmp,chanNum] = readhtk (sprintf('%s.htk',varName1));           
-            %ecog.data(chanNum,:,:)=data;        
-                        ecog.data=data;        
-
+             ecog.data(chanNum,:,:)=data;        
             fprintf([int2str(chanNum) '.'])
         end   
 

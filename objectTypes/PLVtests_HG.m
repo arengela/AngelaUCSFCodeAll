@@ -18,7 +18,7 @@ classdef PLVtests_HG < handle
         function handles=PLVtests_HG(n,e,ch)   
         %INITIALIZES VARIABLES  
         %OPTIONAL INPUT: n= index to blockpath
-        
+        %%
             %paths of data blocks
             handles.AllFilePaths= {
                 'E:\DelayWord\EC18\EC18_B1';
@@ -38,7 +38,19 @@ classdef PLVtests_HG < handle
                 'E:\PreprocessedFiles\EC26\EC26_B2';
                 'C:\Users\ego\Documents\UCSF\EcogData\EC24\EC24_B1';
                 'E:\DelayWord\EC16\EC16_B1';
-
+                'E:\PreprocessedFiles\EC26\EC26_B6';
+                'E:\PreprocessedFiles\EC26\EC26_B9';
+                'E:\PreprocessedFiles\EC26\EC26_B12';
+                'E:\PreprocessedFiles\EC26\EC26_B14';
+                'E:\PreprocessedFiles\EC26\EC26_B18';
+                'E:\PreprocessedFiles\EC26\EC26_B20';
+                'E:\PreprocessedFiles\EC26\EC26_B23';
+                'E:\PreprocessedFiles\EC26\EC26_B24';
+                'E:\PreprocessedFiles\EC26\EC26_B26';
+                'E:\PreprocessedFiles\EC26\EC26_B27';
+                'E:\PreprocessedFiles\EC26\EC26_B28';
+                'E:\PreprocessedFiles\EC26\EC26_B35';
+                'E:\PreprocessedFiles\EC26\EC26_B36';
                 }
             
             %path of associated baseline
@@ -53,7 +65,19 @@ classdef PLVtests_HG < handle
              handles.AllBaselinePaths{15}='E:\PreprocessedFiles\EC26\EC26_B1';
             handles.AllBaselinePaths{16}= 'C:\Users\ego\Documents\UCSF\EcogData\EC24\EC24_B1';
             handles.AllBaselinePaths{17}= 'E:\DelayWord\EC16\EC16_rest';
-
+            handles.AllBaselinePaths{18}= 'E:\PreprocessedFiles\EC26\EC26_B3';
+            handles.AllBaselinePaths{19}= 'E:\PreprocessedFiles\EC26\EC26_B3';
+            handles.AllBaselinePaths{20}= 'E:\PreprocessedFiles\EC26\EC26_B17';
+            handles.AllBaselinePaths{21}= 'E:\PreprocessedFiles\EC26\EC26_B17'; 
+            handles.AllBaselinePaths{22}= 'E:\PreprocessedFiles\EC26\EC26_B21';
+            handles.AllBaselinePaths{23}= 'E:\PreprocessedFiles\EC26\EC26_B21';
+            handles.AllBaselinePaths{24}= 'E:\PreprocessedFiles\EC26\EC26_B21';
+            handles.AllBaselinePaths{25}= 'E:\PreprocessedFiles\EC26\EC26_B21';            
+            handles.AllBaselinePaths{26}= 'E:\PreprocessedFiles\EC26\EC26_B32';
+            handles.AllBaselinePaths{27}= 'E:\PreprocessedFiles\EC26\EC26_B32';
+            handles.AllBaselinePaths{28}= 'E:\PreprocessedFiles\EC26\EC26_B38';
+            handles.AllBaselinePaths{29}= 'E:\PreprocessedFiles\EC26\EC26_B38';            
+            
             
             %load('E:\DelayWord\wordgroups')
             %load('E:\DelayWord\brocawords')
@@ -84,10 +108,13 @@ classdef PLVtests_HG < handle
             
         
         function ChooseBlock(handles,n,ch)
+        %%    
         %%CHOOSE WHICH BLOCK OF DATA TO LOAD    
             handles.UserChoice=n;
             handles.FilePath=handles.AllFilePaths{handles.UserChoice};
-            handles.BaselinePath=handles.AllBaselinePaths{handles.UserChoice};
+            try
+                handles.BaselinePath=handles.AllBaselinePaths{handles.UserChoice};
+            end
             [a,b,c]=fileparts(handles.FilePath);
             [a,b,c]=fileparts(a);
             handles.SubjectID=b;
@@ -112,7 +139,6 @@ classdef PLVtests_HG < handle
             seg=handles.SegmentTypes;            
             test=SegmentedData([handles.FilePath '/HilbAA_70to150_8band']);        
             
-            %test=SegmentedData([handles.FilePath '/HilbReal_4to200_40band']);              
 
             test.usechans=handles.ActiveCh;
             test.channelsTot=length(test.usechans)
@@ -122,7 +148,7 @@ classdef PLVtests_HG < handle
 
             %Calc baseline
             try
-                test.loadBaselineFolder([handles.BaselinePath '/HilbAA_70to150_8band']);%load baseline files
+                %test.loadBaselineFolder([handles.BaselinePath '/HilbAA_70to150_8band']);%load baseline files
             end
             %test.loadBaselineFolder([handles.BaselinePath '/HilbReal_4to200_40band'],'phase');%load baseline files
 
@@ -133,9 +159,11 @@ classdef PLVtests_HG < handle
             test.Params.sorttrials=0;%1 to sort trials, 0 to skip sorting
             %test.segmentedDataEvents40band(seg(:,handles.EventIdx),{[2000 2000]},'keep',[],'phase',1:40)%load data segments
 
-            test.segmentedDataEvents40band(seg(:,handles.EventIdx),{[2000 2000]},'keep',[],'aa',31:38)%load data segments
-            %test.calcZscore;%calculate zscore
-            handles.Data=test;%save data object in handles
+            test.segmentedDataEvents40band_2({[1:50;1:50]},{[2000 2000]},'keep',[],'aa',31:38)
+            %test.segmentedDataEvents40band(seg(:,handles.EventIdx),{[2000 2000]},'keep',[],'aa',31:38)%load data segments
+            
+            test.calcZscore;%calculate zscore
+            handles.Data=test;%save data object in handles                                                                          
         end       
         
 %         function handles=OtherCommands(handles)

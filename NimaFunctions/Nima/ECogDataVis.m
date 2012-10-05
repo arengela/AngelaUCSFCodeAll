@@ -18,6 +18,8 @@ if isempty(imname)
     imname=[dpath filesep 'brain.jpg'];
 end
 [xy,img] = eCogImageRegister(imname,0);
+allxy=xy;
+
 try
     xy = xy(:,elects);
 end
@@ -79,10 +81,26 @@ switch flag
         set(hr,'AlphaData',tmpp);
         set(hb,'AlphaData',tmpn);
         
-        
-     
-        
-        
+      case 5
+        corners = round(allxy(:,[1 16 241 256]));
+        tmp = zeros(16);
+        tmp(elects) = data;
+        t = maketform('affine',[16 16 1;16 1 16]',corners(:,1:3)');
+        R = makeresampler('cubic','bound');
+        tmp2 = imtransform(tmp,t,R,'XYScale',1);
+        tmp2 = rot90(tmp2,2);
+        tmp2 = tmp2*0.999/max(max(abs(tmp2)));
+        tmp3 = zeros(size(img));
+        tmp3(min(corners(2,:)):min(corners(2,:))+size(tmp2,1)-1,min(corners(1,:)):min(corners(1,:))+size(tmp2,2)-1) = tmp2;
+        hold off;
+        imshow(img);
+        hold on
+        r = cat(3,ones(size(img)),zeros(size(img)),zeros(size(img)));
+        b = cat(3,zeros(size(img)),zeros(size(img)),ones(size(img)));
+        hb = imshow(b);
+        hr = imshow(r);
+        set(hb,'AlphaData',max(-tmp3,0));
+        set(hr,'AlphaData',max(tmp3,0));   
     case 8 
         xy = ceil(xy);
         % this line has to be optimized:

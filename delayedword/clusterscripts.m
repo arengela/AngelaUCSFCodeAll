@@ -2,33 +2,133 @@ n=12
 T=PLVtests(n)
 test=T.Data
 ch2=test.usechans
+%%
+knum=2
+D=squeeze(test.segmentedEcog(1).zscore_separate(ch,:,:,[indices.cond1 indices.cond2]));
+D=permute(D,[3,1,2]);
+D2=reshape(D,size(D,1),[]);
+[kgroup,c]=kmeans(D2,knum,'Distance','distance');
+
+group=zeros(size(test.segmentedEcog(1).zscore_separate,1),1);
+group(indices.cond1)=1;
+group(indices.cond2)=2;
+group=group(group~=0)
+C=confusionmat(group,kgroup)
+
+
 %% cluster data
 knum=10
-D=mean(mean(test.segmentedEcog(1).zscore_separate,3),4);
-kgroup=kmeans(D,knum)
+%D=mean(mean(test.segmentedEcog(1).zscore_separate,3),4);
+usechans=setdiff(T.Data.usechans,T.Data.Artifacts.badChannels)
+D=mean(test.segmentedEcog(1).zscore_separate(usechans,:,:,:),4);
+for i=1:size(D,1)
+    Dds(i,:)=resample(D(i,:),1,4);
+    Dsmooth(i,:)=smooth(Dds(i,:));
+end
+
+
+D2=reshape(D,length(usechans),[]);
+[kgroup,c]=kmeans(D2,knum,'Distance','correlation');
+subset1=1:length(usechans);
+kgroup1=kgroup;
+
+%% cluster data round 2
+knum=5
+kidx=[2 4]
+kgroup1=kgroup;
+subset2=find(ismember(kgroup1,kidx));
+D2=D(subset2,:,:);
+D2=reshape(D2,length(subset2),[]);
+[kgroup,c]=kmeans(D2,knum,'Distance','correlation');
+
+%% view centroids
+figure
+for i=1:knum
+    subplot(1,knum,i)
+    imagesc(flipud(reshape(c(i,:),1600,40)'))
+end
+
+figure
+for i=1:knum
+    subplot(1,knum,i)
+    plot(c(i,:))
+end
+
 %% plot all groups and locations
-for i=1:knum,
-    subplot(2,knum,i);
-    plot(D(find(kgroup==i),:)');
+figure
+for k=1:knum,
+    subplot(3,knum,k);
+    idx=find(kgroup==k);
+
+    plot(D(idx,:)');
+    %imagesc(flipud(squeeze(mean(D(subset(idx),:,:),1))'))
+    colormap(jet)
     line([800 800],[ -1 3]);
-    axis tight; 
-    
-    %subplot(2,knum,i+knum);
-    %visualizeGrid(0,['E:\General Patient Info\'  '\brain.jpg'],test.usechans(find(kgroup==i)));,
+    freezeColors
+    axis tight;
+    subplot(3,knum,k+knum);
+    visualizeGrid(0,['E:\General Patient Info\' test.patientID '\brain.jpg'],usechans(subset1(idx)));
+
+    Rmat(k).mat=zeros(length(idx));
+    for i=1:length(idx)
+        for j=i:length(idx)
+            a=squeeze(D(subset1(idx(i)),:,:));
+            b=squeeze(D(subset1(idx(j)),:,:));
+            tmp=corrcoef(a,b);
+            Rmat(k).mat(i,j)=tmp(1,2);
+        end
+    end
+    subplot(3,knum,k+knum*2)
+    imagesc(Rmat(k).mat)
+    colormap(jet);freezeColors;
+end
+
+%%
+
+%% plot all groups and locations: ROUND 2
+figure
+for k=1:knum,
+    subplot(3,knum,k);
+    idx=find(kgroup==k);
+    plot(D2(idx,:)');
+    %imagesc(flipud(squeeze(mean(D(subset(idx),:,:),1))'))
+    colormap(jet)
+    line([800 800],[ -1 3]);
+    freezeColors
+    axis tight;
+    subplot(3,knum,k+knum);
+    visualizeGrid(0,['E:\General Patient Info\' test.patientID '\brain.jpg'],usechans(subset1(subset2(idx))));
+
+    Rmat(k).mat=zeros(length(idx));
+    for i=1:length(idx)
+        for j=i:length(idx)
+            a=squeeze(D(subset2(idx(i)),:,:));
+            b=squeeze(D(subset2(idx(j)),:,:));
+            tmp=corrcoef(a,b);
+            Rmat(k).mat(i,j)=tmp(1,2);
+        end
+    end
+    subplot(3,knum,k+knum*2)
+    imagesc(Rmat(k).mat)
+    colormap(jet);freezeColors;
 end
 %% plot groups and locations one at a time
 powerpoint_object=SAVEPPT2('test','init')
 figure
 for i=1:knum,
     subplot(2,1,1);
-    plot(D(find(kgroup==i),:)');
+    %plot(D(find(kgroup==i),:)');
+    imagesc(flipud(squeeze(mean(D(find(kgroup==i),:,:),1))'))
+    colormap(jet)
+    axis tight
+    freezeColors
     line([800 800],[ -1 3]);
     title(int2str(i))
     axis tight; subplot(2,1,2);   
-    visualizeGrid(0,['E:\General Patient Info\' test.patientID '\brain.jpg'],ch2(find(kgroup==i)));
+    visualizeGrid(0,['E:\General Patient Info\' test.patientID '\brain.jpg'],test.usechans(find(kgroup==i)));
 
     %visualizeGrid(2,['E:\General Patient Info\' test.patientID '\brain.jpg'],ch2(find(kgroup==i)));
-    SAVEPPT2('ppt',powerpoint_object,'stretch','off');
+    %SAVEPPT2('ppt',powerpoint_object,'stretch','off');
     input('n'),
 end
 %%
@@ -248,3 +348,63 @@ for s=1:4
 end
 save('E:\DelayWord\areamap','areamap')
 
+%% get pk times for each cluster
+figure
+usek=[3 5]
+for k1=1:length(usek)
+    %%
+    figure(5)
+    k=usek(k1)
+    idx=find(kgroup==k);
+    ch=usechans(subset1(subset2(idx)))
+    %pkidx=zeros(length(ch),size(T.Data.segmentedEcog.zscore_separate,4));
+     pkidx=zeros(length(ch),51);
+   
+    for c=1:length(ch)
+        D3=squeeze(T.Data.segmentedEcog.zscore_separate(ch(c),:,:,:))';
+        for r=1:size(D3,1)
+            pr=prctile(reshape(D3(r,800:end),1,[]),95,2);
+            %kGroup(k).pkidx(c,r)=pr;%max amp
+            [~,kGroup(k).pkidx(c,r)]=find(D3(r,800:end)>=pr,1,'first');%max pk time
+            kGroup(k).percWord(c,r)=kGroup(k).pkidx(c,r)/sounds(r).length;
+        end
+    end
+    subplot(2,3,[1 2]+(k1-1)*3)
+    %boxplot(kGroup(k).pkidx)
+    stmp1=[ste(kGroup(k).pkidx(:,[indices.cond1]),2)';ste(kGroup(k).pkidx(:,[indices.cond2]),2)']
+    mtmp1=[median(kGroup(k).pkidx(:,indices.cond1),2)';median(kGroup(k).pkidx(:,indices.cond2),2)'];
+    
+    stmp=[ste(kGroup(k).percWord(:,[indices.cond1]),2)';ste(kGroup(k).percWord(:,[indices.cond2]),2)']
+    mtmp=[median(kGroup(k).percWord(:,indices.cond1),2)';median(kGroup(k).percWord(:,indices.cond2),2)'];
+    [~,sortidx]=sort(mean(diff(mtmp,1),1));
+    %barwitherr(stmp(:,sortidx)',mtmp(:,sortidx)')
+    errorarea(mtmp(:,sortidx)',stmp(:,sortidx)')
+    colormap(summer)
+    axis tight
+    axis([1 40 0 1])
+    set(gca,'XTick',1:size(D3,1),'XTickLabel',usechans(subset1(subset2((idx(sortidx))))))
+    %set(gca,'YTickLabel',(0:50:400)/.4)
+   
+    figure(k1)
+    %subplot(2,1,k1)
+    %subplot(2,3,3+(k1-1)*3)
+    visualizeGrid(9,['E:\General Patient Info\' test.patientID '\brain.jpg'],usechans(subset1(subset2((idx)))),mean(mtmp(:,sortidx),1),[],mean(mtmp(:,sortidx),1));
+    %visualizeGrid(5,['E:\General Patient Info\' test.patientID '\brain.jpg'],usechans(subset1(subset2((idx)))),mean(mtmp(:,sortidx),1));
+end
+%%
+thidx=find(mean(diff(mtmp,1),1)>40)
+
+visualizeGrid(5,['E:\General Patient Info\' test.patientID '\brain.jpg'],usechans(subset1(subset2(idx(thidx)))),ones(1,length(thidx)));
+%%
+figure
+for k=usek
+    kGroup(k).meanIdx1=mean(kGroup(k).pkidx(:,indices.cond1),2)
+    kGroup(k).meanIdx2=mean(kGroup(k).pkidx(:,indices.cond2),2)
+
+    kGroup(k).tag=repmat(k,size(kGroup(k).meanIdx,1),1);
+    stmp(:,k)=[ste([ kGroup(k).meanIdx1],1); ste([ kGroup(k).meanIdx2],1)];
+    mtmp(:,k)=[mean([ kGroup(k).meanIdx1],1); mean([ kGroup(k).meanIdx2],1)];
+end
+%boxplot(vertcat(kGroup(usek).meanIdx),vertcat(kGroup(usek).tag))
+barwitherr(stmp(:,usek)',mtmp(:,usek)')
+colormap(summer)

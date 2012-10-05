@@ -1,0 +1,364 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html><head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   <!--
+This HTML was auto-generated from MATLAB code.
+To make changes, update the MATLAB code and republish this document.
+      --><title>distancesMatrices</title><meta name="generator" content="MATLAB 7.13"><link rel="schema.DC" href="http://purl.org/dc/elements/1.1/"><meta name="DC.date" content="2012-09-30"><meta name="DC.source" content="distancesMatrices.m"><style type="text/css">
+
+body {
+  background-color: white;
+  margin:10px;
+}
+
+h1 {
+  color: #990000; 
+  font-size: x-large;
+}
+
+h2 {
+  color: #990000;
+  font-size: medium;
+}
+
+/* Make the text shrink to fit narrow windows, but not stretch too far in 
+wide windows. */ 
+p,h1,h2,div.content div {
+  max-width: 600px;
+  /* Hack for IE6 */
+  width: auto !important; width: 600px;
+}
+
+pre.codeinput {
+  background: #EEEEEE;
+  padding: 10px;
+}
+@media print {
+  pre.codeinput {word-wrap:break-word; width:100%;}
+} 
+
+span.keyword {color: #0000FF}
+span.comment {color: #228B22}
+span.string {color: #A020F0}
+span.untermstring {color: #B20000}
+span.syscmd {color: #B28C00}
+
+pre.codeoutput {
+  color: #666666;
+  padding: 10px;
+}
+
+pre.error {
+  color: red;
+}
+
+p.footer {
+  text-align: right;
+  font-size: xx-small;
+  font-weight: lighter;
+  font-style: italic;
+  color: gray;
+}
+
+  </style></head><body><div class="content"><h2>Contents</h2><div><ul><li><a href="#4">plot data</a></li><li><a href="#5">PCA</a></li><li><a href="#6">PLOT PCS AND WEIGHTS</a></li><li><a href="#7">plot mean per trial vs freq and length</a></li><li><a href="#8">distance</a></li><li><a href="#9">mds</a></li><li><a href="#10">decorrelated frequency and length</a></li><li><a href="#11">PARTIAL CORRELATION</a></li><li><a href="#15">CLASSIFY</a></li></ul></div><pre class="codeinput">badtr=[29 45]
+usetr=setdiff(1:size(T.Data.segmentedEcog.zscore_separate,4),badtr)
+</pre><pre class="codeoutput">
+badtr =
+
+    29    45
+
+
+usetr =
+
+  Columns 1 through 16
+
+     1     2     3     4     5     6     7     8     9    10    11    12    13    14    15    16
+
+  Columns 17 through 32
+
+    17    18    19    20    21    22    23    24    25    26    27    28    30    31    32    33
+
+  Columns 33 through 48
+
+    34    35    36    37    38    39    40    41    42    43    44    46    47    48    49    50
+
+  Column 49
+
+    51
+
+</pre><pre class="codeinput"><span class="comment">%Labels=Labels(usetrials,:)</span>
+load(<span class="string">'E:\DelayWord\brocawords.mat'</span>);
+load(<span class="string">'E:\DelayWord\frequencybands'</span>);
+</pre><pre class="codeoutput">Error using load
+Unable to read file E:\DelayWord\brocawords.mat: permission denied.
+
+Error in distancesMatrices (line 6)
+load('E:\DelayWord\brocawords.mat');
+</pre><pre class="codeinput">Labels=T.Data.segmentedEcog.event(usetr,8);
+clear <span class="string">wordLength</span> <span class="string">wordFreq</span>
+<span class="keyword">for</span> i=1:length(Labels)
+    idx=find(strcmp(Labels(i), {brocawords.names}'))
+    <span class="keyword">if</span> isempty(idx)
+        wordProp.l{i}=0;
+        wordProp.f{i}=0;
+        wordProp.rp{i}=brocawords(idx).realpseudo;
+        wordProp.ed{i}=brocawords(idx).difficulty;
+        wordProp.sl{i}=brocawords(idx).lengthtype;
+    <span class="keyword">else</span>
+        wordProp.l{i}=brocawords(idx).lengthval;
+        wordProp.f{i}=brocawords(idx).logfreq_HAL;
+        wordProp.rp{i}=brocawords(idx).realpseudo;
+        wordProp.ed{i}=brocawords(idx).difficulty;
+        wordProp.sl{i}=brocawords(idx).lengthtype;
+    <span class="keyword">end</span>
+<span class="keyword">end</span>
+wordLength=cell2mat(wordProp.l);
+wordFreq=cell2mat(wordProp.f);
+</pre><h2>plot data<a name="4"></a></h2><pre class="codeinput">imagesc(reshape(permute(T.Data.segmentedEcog.zscore_separate(:,usesamp,1,usetr),[4 1 2 3]),length(usetr),[]))
+</pre><h2>PCA<a name="5"></a></h2><pre class="codeinput">usechan=setdiff(T.Data.usechans,T.Data.Artifacts.badChannels)
+usesamp=800:1400
+D=squeeze(T.Data.segmentedEcog.zscore_separate(usechan,usesamp,:,:));
+L=1:length(usetr);
+
+D_sm=zeros(length(usechan),length(usesamp),length(L));
+<span class="keyword">for</span> ch=1:length(usechan)
+    <span class="keyword">for</span> tr=1:length(L)
+        D_sm(ch,:,tr)=smooth(D(ch,:,tr),10);
+    <span class="keyword">end</span>
+<span class="keyword">end</span>
+D=D_sm;
+avgData = zeros(size(D,1),size(D,2),length(unique(L)));
+<span class="keyword">for</span> i = 1:size(avgData,3)
+    avgData(:,:,i) = mean(D(:,:,L==i),3);
+<span class="keyword">end</span>
+dat = [];
+<span class="keyword">for</span> i = 1:size(avgData,3)
+    dat = [dat; avgData(:,:,i)'];
+<span class="keyword">end</span>
+[eigcoeff, eigvec] = pca(dat);
+pcnum=20
+[eigcoeff, eigvec] = pca(dat,pcnum);
+
+<span class="keyword">for</span> i=1:length(L)
+    pc.data(:,:,i)=eigvec'*mean(D(:,:,i),3);
+<span class="keyword">end</span>
+</pre><h2>PLOT PCS AND WEIGHTS<a name="6"></a></h2><pre class="codeinput">indices=T.Data.findTrials(<span class="string">'1'</span>,<span class="string">'n'</span>,<span class="string">'n'</span>)
+figure
+<span class="keyword">for</span> i=1:pcnum
+    subplot(4,5,i)
+    plot(mean(pc.data(i,:,find(ismember(usetr,indices.cond1))),3),<span class="string">'b'</span>)
+    hold <span class="string">on</span>
+
+    plot(mean(pc.data(i,:,find(ismember(usetr,indices.cond2))),3),<span class="string">'r'</span>)
+<span class="keyword">end</span>
+figure
+<span class="keyword">for</span> i=1:pcnum
+   subplot(4,5,i)
+   <span class="keyword">try</span>
+        visualizeGrid(5,[<span class="string">'E:\General Patient Info\'</span> T.Data.patientID <span class="string">'\brain.jpg'</span>],usechan,eigvec(:,i));
+   <span class="keyword">catch</span>
+       weights=zeros(1,256);
+       weights(usechan)=eigvec(:,i)';
+       imagesc(reshape(weights,16,16)')
+   <span class="keyword">end</span>
+<span class="keyword">end</span>
+</pre><h2>plot mean per trial vs freq and length<a name="7"></a></h2><pre class="codeinput">scatter(wordLength,12-wordFreq,300,median(mean(pc.data(:,:,:),1),2),<span class="string">'filled'</span>)
+text(wordLength,12-wordFreq,T.Data.segmentedEcog.event(usetr,8))
+</pre><h2>distance<a name="8"></a></h2><pre class="codeinput">p=pdist(squeeze(mean(pc.data(:,:,:),2))')
+imagesc(squareform(p),[0 10])
+set(gca,<span class="string">'YTick'</span>,1:length(usetr))
+set(gca,<span class="string">'YTickLabel'</span>,Labels)
+</pre><h2>mds<a name="9"></a></h2><pre class="codeinput">x=mdscale(squareform(p),3);
+scatter3(x(:,1),x(:,2),x(:,3),<span class="string">'filled'</span>)
+text(x(:,1),x(:,2),x(:,3),T.Data.segmentedEcog.event(usetr,8))
+</pre><h2>decorrelated frequency and length<a name="10"></a></h2><pre class="codeinput">w=[wordLength wordFreq]'
+[~,eigvec]=pca(w')
+w_pc=eigvec(:,1)'*w
+plot(1,w_pc,<span class="string">'.'</span>)
+text(repmat(1,1,51)',w_pc,T.Data.segmentedEcog.event(:,8))
+</pre><h2>PARTIAL CORRELATION<a name="11"></a></h2><pre class="codeinput"><span class="keyword">for</span> pcidx=1:20
+    ecog=squeeze(mean(max(pc.data(pcidx,:,:),[],2),1));
+    R=partialcorr([ecog cell2mat(wordProp.f)'],cell2mat(wordProp.l)',<span class="string">'type'</span>,<span class="string">'Spearman'</span>);
+    Rall(pcidx)=R(1,2);
+<span class="keyword">end</span>
+figure
+plot(Rall)
+</pre><pre class="codeinput">ecog=squeeze(mean(max(pc.data([ 4],:,:),[],2),1));
+R=partialcorr([ecog cell2mat(wordProp.l)'],cell2mat(wordProp.f)',<span class="string">'type'</span>,<span class="string">'Spearman'</span>)
+</pre><pre class="codeinput">R=corr(ecog ,cell2mat(wordProp.l)',<span class="string">'type'</span>,<span class="string">'Spearman'</span>)
+</pre><h2>CLASSIFY<a name="15"></a></h2><pre class="codeinput">Labels=T.Data.segmentedEcog.event(:,8);
+<span class="keyword">for</span> i=1:10
+</pre><pre class="codeinput">    testIdx=ceil(rand(1,round(length(usetr)*.75))*length(usetr));
+    trainIdx=setdiff(1:length(usetr),testIdx);
+    tmp=permute(pc.data(:,:,:),[3 1 2]);
+    tmp=mean(tmp,3);
+    D=reshape(tmp,length(usetr),[]);
+    <span class="keyword">try</span>
+        group=grp2idx(wordProp.sl);
+    <span class="keyword">catch</span>
+        group=grp2idx(cell2mat(wordProp.l));
+    <span class="keyword">end</span>
+    [bestc, bestg, bestcv, model, predicted_label, accuracy, decision_values] =<span class="keyword">...</span>
+        svm(D(trainIdx,:), group(trainIdx),D(testIdx,:),group(testIdx));
+
+    svmOut(i).bestc=bestc;
+    svmOut(i).bestg=bestg;
+    svmOut(i).bestcv=bestcv;
+    svmOut(i).model=model;
+    svmOut(i).predicted_label=predicted_label;
+    svmOut(i).accuracy=accuracy(1);
+    svmOut(i).decision_values=decision_values;
+</pre><pre class="codeinput"><span class="keyword">end</span>
+
+gscatter(x(testIdx,1),x(testIdx,2),predicted_label)
+</pre><p class="footer"><br>
+      Published with MATLAB&reg; 7.13<br></p></div><!--
+##### SOURCE BEGIN #####
+badtr=[29 45]
+usetr=setdiff(1:size(T.Data.segmentedEcog.zscore_separate,4),badtr)
+%%
+
+%Labels=Labels(usetrials,:)
+load('E:\DelayWord\brocawords.mat');
+load('E:\DelayWord\frequencybands');
+%%
+Labels=T.Data.segmentedEcog.event(usetr,8);
+clear wordLength wordFreq
+for i=1:length(Labels)
+    idx=find(strcmp(Labels(i), {brocawords.names}'))
+    if isempty(idx)
+        wordProp.l{i}=0;
+        wordProp.f{i}=0;
+        wordProp.rp{i}=brocawords(idx).realpseudo;
+        wordProp.ed{i}=brocawords(idx).difficulty;
+        wordProp.sl{i}=brocawords(idx).lengthtype;
+    else
+        wordProp.l{i}=brocawords(idx).lengthval;
+        wordProp.f{i}=brocawords(idx).logfreq_HAL;
+        wordProp.rp{i}=brocawords(idx).realpseudo;
+        wordProp.ed{i}=brocawords(idx).difficulty;
+        wordProp.sl{i}=brocawords(idx).lengthtype;
+    end
+end
+wordLength=cell2mat(wordProp.l);
+wordFreq=cell2mat(wordProp.f);
+
+%% plot data
+
+imagesc(reshape(permute(T.Data.segmentedEcog.zscore_separate(:,usesamp,1,usetr),[4 1 2 3]),length(usetr),[]))
+%% PCA
+usechan=setdiff(T.Data.usechans,T.Data.Artifacts.badChannels)
+usesamp=800:1400
+D=squeeze(T.Data.segmentedEcog.zscore_separate(usechan,usesamp,:,:));
+L=1:length(usetr);
+
+D_sm=zeros(length(usechan),length(usesamp),length(L));
+for ch=1:length(usechan)
+    for tr=1:length(L)
+        D_sm(ch,:,tr)=smooth(D(ch,:,tr),10);
+    end
+end
+D=D_sm;
+avgData = zeros(size(D,1),size(D,2),length(unique(L)));
+for i = 1:size(avgData,3)
+    avgData(:,:,i) = mean(D(:,:,L==i),3);    
+end
+dat = [];
+for i = 1:size(avgData,3)
+    dat = [dat; avgData(:,:,i)'];
+end
+[eigcoeff, eigvec] = pca(dat);
+pcnum=20
+[eigcoeff, eigvec] = pca(dat,pcnum);
+
+for i=1:length(L)
+    pc.data(:,:,i)=eigvec'*mean(D(:,:,i),3);
+end
+%% PLOT PCS AND WEIGHTS
+indices=T.Data.findTrials('1','n','n')
+figure
+for i=1:pcnum
+    subplot(4,5,i)
+    plot(mean(pc.data(i,:,find(ismember(usetr,indices.cond1))),3),'b')
+    hold on
+    
+    plot(mean(pc.data(i,:,find(ismember(usetr,indices.cond2))),3),'r')
+end
+figure
+for i=1:pcnum
+   subplot(4,5,i)
+   try
+        visualizeGrid(5,['E:\General Patient Info\' T.Data.patientID '\brain.jpg'],usechan,eigvec(:,i));
+   catch
+       weights=zeros(1,256);
+       weights(usechan)=eigvec(:,i)';
+       imagesc(reshape(weights,16,16)')
+   end
+end
+%% plot mean per trial vs freq and length
+scatter(wordLength,12-wordFreq,300,median(mean(pc.data(:,:,:),1),2),'filled')
+text(wordLength,12-wordFreq,T.Data.segmentedEcog.event(usetr,8))
+%% distance
+
+p=pdist(squeeze(mean(pc.data(:,:,:),2))')
+imagesc(squareform(p),[0 10])
+set(gca,'YTick',1:length(usetr))
+set(gca,'YTickLabel',Labels)
+%% mds
+x=mdscale(squareform(p),3);
+scatter3(x(:,1),x(:,2),x(:,3),'filled')
+text(x(:,1),x(:,2),x(:,3),T.Data.segmentedEcog.event(usetr,8))
+%% decorrelated frequency and length
+w=[wordLength wordFreq]'
+[~,eigvec]=pca(w')
+w_pc=eigvec(:,1)'*w
+plot(1,w_pc,'.')
+text(repmat(1,1,51)',w_pc,T.Data.segmentedEcog.event(:,8))
+%% PARTIAL CORRELATION
+for pcidx=1:20
+    ecog=squeeze(mean(max(pc.data(pcidx,:,:),[],2),1));
+    R=partialcorr([ecog cell2mat(wordProp.f)'],cell2mat(wordProp.l)','type','Spearman');
+    Rall(pcidx)=R(1,2);
+end
+figure
+plot(Rall)
+%%
+ecog=squeeze(mean(max(pc.data([ 4],:,:),[],2),1));
+R=partialcorr([ecog cell2mat(wordProp.l)'],cell2mat(wordProp.f)','type','Spearman')
+
+%%
+    %%
+R=corr(ecog ,cell2mat(wordProp.l)','type','Spearman')
+
+%% CLASSIFY
+Labels=T.Data.segmentedEcog.event(:,8);
+for i=1:10
+    %%
+    testIdx=ceil(rand(1,round(length(usetr)*.75))*length(usetr));
+    trainIdx=setdiff(1:length(usetr),testIdx);
+    tmp=permute(pc.data(:,:,:),[3 1 2]);
+    tmp=mean(tmp,3);
+    D=reshape(tmp,length(usetr),[]);
+    try
+        group=grp2idx(wordProp.sl);
+    catch
+        group=grp2idx(cell2mat(wordProp.l));
+    end
+    [bestc, bestg, bestcv, model, predicted_label, accuracy, decision_values] =...
+        svm(D(trainIdx,:), group(trainIdx),D(testIdx,:),group(testIdx));
+    
+    svmOut(i).bestc=bestc;
+    svmOut(i).bestg=bestg;
+    svmOut(i).bestcv=bestcv;
+    svmOut(i).model=model;
+    svmOut(i).predicted_label=predicted_label;
+    svmOut(i).accuracy=accuracy(1);
+    svmOut(i).decision_values=decision_values;
+end
+
+gscatter(x(testIdx,1),x(testIdx,2),predicted_label)
+
+##### SOURCE END #####
+--></body></html>

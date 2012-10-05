@@ -11,9 +11,9 @@ scale = spdiags(1./max(instanceMatrix,[],1)',...
 instanceMatrixNorm = instanceMatrix*scale;
 %% find best parameters
 bestcv = 0;
-for log2c = -5:10
-  for log2g = -10:10
-    cmd = ['-q -b 1 -v 5 -c ', num2str(2^log2c), ' -g ', num2str(2^log2g)];
+for log2c = 1000
+  for log2g =  5000
+    cmd = ['-t 2 -q -b 1 -v 5 -c ', num2str(2^log2c), ' -g ', num2str(2^log2g)];
     cv = svmtrain(labelVector, instanceMatrixNorm, cmd);
     if (cv >= bestcv),
       bestcv = cv; bestc = 2^log2c; bestg = 2^log2g;
@@ -22,7 +22,7 @@ for log2c = -5:10
   end
 end
 %% train
-cmd = ['-q -b 1 -c ', num2str(bestc), ' -g ', num2str(bestg)];
+cmd = ['-t 2 -q -b 1 -c ', num2str(bestc), ' -g ', num2str(bestg)];
 model = svmtrain(labelVector, instanceMatrixNorm, cmd);
 
 %% test

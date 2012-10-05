@@ -26,7 +26,8 @@ while ~isempty(w)
 end
 %% TEST A VARIOUS LAGS OF NEURAL DATA
 lagset=0:40:400
-for l=1:length(lagset)
+test_adjust=T.Data
+for l=10%:length(lagset)
     lag=lagset(l);
 %% get audio and ecog training data
     eidx=1
@@ -340,4 +341,24 @@ for i=1:N
             plot(mean(stackXR));
             input('n')
     end
+end
+%%
+
+for i=1:N
+    for s=1:size(rstim{i},2)
+            tmp=corrcoef(rstim{i}(:,s),aud{i}(s,:)')
+            rTime(s)=tmp(1,2)
+    end
+    subplot(2,2,1)
+    imagesc(rstim{i})
+    title(Labels{i})
+    subplot(2,2,2)
+    imagesc(aud{i}')
+    subplot(2,2,3)
+    plot(rTime)
+    hold on
+    plot(mean(rstim{i}),'r')
+    plot(mean(aud{i}'),'g')
+    hold off
+    input('n')
 end

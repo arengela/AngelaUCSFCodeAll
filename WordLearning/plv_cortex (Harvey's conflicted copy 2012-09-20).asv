@@ -1,0 +1,298 @@
+%load('/home/angela/Documents/runtrials.mat')
+load('E:\PreprocessedFiles\EC26\runtrials.mat')
+
+load('E:\PreprocessedFiles\EC26\ePositions.mat')
+
+%%
+x=[x{:}];
+%%
+%x=[209:214 97:102]
+contents=dir('E:\PreprocessedFiles\EC26\PLV_4000post')
+%%
+for run=1:12
+    %test=SegmentedData(['/data_store/human/prcsd_data/EC26/EC26_B' int2str(runtrials(2,run)) '/HilbReal_4to200_40band'])
+%    test=SegmentedData(['E:\PreprocessedFiles\EC26\EC26_B' int2str(runtrials(2,run)) '/HilbReal_4to200_40band'])
+    test=SegmentedData(['E:\DelayWord\EC18\EC18_B1\HilbReal_4to200_40band'])
+    %%
+    if strcmp(test.patientID,'EC26')
+        load gridlayout
+        gridch=reshape(gridlayout',[1 256])
+        %y=x(find(gridch(x)~=0));
+        %test.usechans=gridch(y);
+        test.usechans=1:256;
+    else
+            gridch=1:256
+            test.usechans=1:256;
+            x=1:256
+    end
+    test.channelsTot=length(test.usechans)
+    test.Artifacts.badChannels=[];
+    test.Artifacts.badTimeSegments=[];
+    test.Params.sortidx=0;
+    test.BaselineChoice='PreEvent';%use rest block as baseline
+    test.Params.baselineMS=[500 1000];%time of pre-event baseline (ms)
+    test.Params.indplot=0;%do not plot individual channels
+    test.Params.sorttrials=0;%1 to sort trials, 0 to skip sorting
+    lh=1:40%load all words            
+    seg={[repmat([41],[1 length(lh)]);lh],[lh;repmat([42],[1 length(lh)])],[repmat([42],[1 length(lh)]);lh],[repmat([43],[1 length(lh)]);lh],[repmat([44],[1 length(lh)]);lh],[45;41]};
+            
+    test.segmentedDataEvents40band(seg(run),{[2000 2000]},'keep',[],'phase',1:40)%
+    %test.segmentedDataEvents40band_2({[1:50;1:50]},{[2000 4000]},'keep',[],'phase',1:40)
+    indices=test.findTrials('4','n','n');
+    %% Choose Pairs of electrodes
+    posPair=nchoosek(x,2)
+    for idx=1:size(posPair,1)
+        usechan=[gridch(posPair(idx,1)) gridch(posPair(idx,2))];
+        if ismember(0,usechan)
+            continue
+        end
+        pos=posPair(idx,:);
+%         if ~isempty(find(~cellfun(@isempty,regexp({contents.name}',[int2str(chanNum(1)) '_' int2str(chanNum(2)) '_']))))
+%             continue
+%         end
+        plvdata=zeros(40,size(test.segmentedEcog.phase,2));
+        for type=1:2
+            for f=1:40
+                tmpPLV=pn_eegPLV_modified(squeeze(test.segmentedEcog(1).phase(usechan,:,f,eval(['indices.cond' int2str(type)]))),400,[],[]);
+                plvdata(f,:)=tmpPLV(:,1,2)';
+            end
+            if type==1
+                save([test.MainPath '\PLV\PLV_run' int2str(runtrials(1,run)) '_epos' int2str(pos(1)) '_' int2str(pos(2)) '_re'],'plvdata','-v7.3')
+            else
+                save([test.MainPath '\PLV\PLV_run' int2str(runtrials(1,run)) '_epos' int2str(pos(1)) '_' int2str(pos(2)) '_ps'],'plvdata','-v7.3')
+            end
+        end
+    end
+end
+
+%% LOAD and plot PLV
+for run=1:12
+    %%    
+    % test=SegmentedData(['E:\PreprocessedFiles\EC26\EC26_B' int2str(runtrials(2,run)) '/HilbReal_4to200_40band'])
+    test=SegmentedData(['E:\DelayWord\EC18\EC18_B1\HilbReal_4to200_40band'])
+    %%
+    try
+        load gridlayout
+        gridch=reshape(gridlayout',[1 256])
+        y=x(find(gridch(x)~=0));
+        test.usechans=gridch(y);
+    catch
+        y=1:256;
+        test.usechans=y;
+    end
+    
+    C2=nchoosek(y,2);
+    C2(:,3)=C2(:,2)-C2(:,1);
+    sigch=C2;
+    [Xs,SortVec]=unique(sigch(:,1),'first');
+    clear UV
+    UV(SortVec) = ([1; diff(Xs)] ~= 0);
+    uniqueCh=sigch(UV);
+    %plvAll(run).pseudMat=NaN(length(sigch),length(sigch),40);
+    %plvAll(run).pseudMat_post=NaN(length(sigch),400,40);
+    %plvAll(run).pseudMat_pre=NaN(length(sigch),400,40);
+
+    %%
+   matidx=1;
+   plvAll(run).pseudMat_ratio=NaN(256,256,40);
+
+    for firstCh=1:length(uniqueCh)
+        [curIdx]=find(sigch(:,1)==uniqueCh(firstCh));
+
+        for ch=1:length(curIdx)
+            try
+                pos=sigch(curIdx(ch),:);
+                plvAll(run).posPair(ch,1:2)=pos(1:2);
+                %load(['E:\PreprocessedFiles\EC26\PLV_4000post\PLV_run' int2str(runtrials(1,run)) '_epos' int2str(pos(1)) '_' int2str(pos(2)) '_re'])
+                %plvAll(run).real(ch,:,:)=plvdata';
+                load([test.MainPath '\PLV\PLV_run' int2str(runtrials(1,run)) '_epos' int2str(pos(1)) '_' int2str(pos(2)) '_ps']);
+                %plvAll(run).pseud(ch,:,:)=plvdata';
+                %plvAll(run).pseudMat_post(matidx,:,:)=plvdata(:,801:1200)';
+                %plvAll(run).pseudMat_pre(matidx,:,:)=plvdata(:,401:800)';
+                plvAll(run).pseudMat_ratio(pos(1),pos(2),:)=mean(plvdata(:,800:1200),2)./mean(plvdata(:,400:600),2);
+            catch
+                printf('no file')
+            end
+            matidx=matidx+1;
+        end
+%         secondCh=sigch(curIdx,2);
+%         for idx=1:size(secondCh,1)
+%             plotGridPosition(secondCh(idx));
+%             imagesc(flipud(squeeze(plvAll(run).pseud(idx,:,:))'),[0 1])
+%             hl=line([800 800],[0 40]); set(hl,'Color','k');
+%         end
+%         keyboard
+%         clf
+%         [uV sV] = memory
+%         if sV.PhysicalMemory.Available/sV.PhysicalMemory.Total<.1
+%             break
+%         end
+    end    
+end
+%% PLOT PRE AND POST PLV
+for f=1:25   
+    %plot grid
+    f=frange{f}
+    pr =prctile(prctile(mean(plvAll(run).pseudMat_ratio(:,:,f),3),98),98);  
+    [a,b]=find(mean(plvAll(run).pseudMat_ratio(:,:,f),3)>pr)% & ste(plvAll(run).pseudMat_ratio(:,:,f),3)<.3);
+    sigch=[a b];
+    %%
+    [Xs,SortVec]=unique(sigch(:,1),'first');
+    clear UV
+    UV(SortVec) = ([1; diff(Xs)] ~= 0);
+    uniqueCh=sigch(UV);
+    plvAll(run).pseudMat=NaN(length(sigch),length(sigch),40);    
+     matidx=1;
+    for firstCh=1:length(uniqueCh)
+        [curIdx]=find(sigch(:,1)==uniqueCh(firstCh));
+        plvAll(run).pseud=NaN(length(sigch),1600,40);
+        plvAll(run).real=NaN(length(sigch),1600,40);
+        for ch=1:length(curIdx)
+            try
+                pos=sigch(curIdx(ch),:);
+                plvAll(run).posPair(ch,1:2)=pos;
+                %load(['E:\PreprocessedFiles\EC26\PLV_4000post\PLV_run' int2str(runtrials(1,run)) '_epos' int2str(pos(1)) '_' int2str(pos(2)) '_re'])
+                %plvAll(run).real(ch,:,:)=plvdata';
+                try
+                    load([test.MainPath '\PLV\PLV_run' int2str(runtrials(1,run)) '_epos' int2str(pos(1)) '_' int2str(pos(2)) '_ps']);
+                catch
+                    load([test.MainPath '\PLV\PLV_run' int2str(runtrials(1,run)) '_epos' int2str(pos(2)) '_' int2str(pos(1)) '_ps']);
+                end
+                    %plvAll(run).pseud(ch,:,:)=plvdata';
+                plvAll(run).pseudMat_post(matidx,:,:)=plvdata(:,801:1200)';
+                plvAll(run).pseudMat_pre(matidx,:,:)=plvdata(:,401:800)';
+                plvAll(run).pseudMat_ratio(pos(1),pos(2),:)=mean(plvdata(:,800:1200),2)./mean(plvdata(:,400:600),2);
+            catch
+                printf('no file')
+            end
+            matidx=matidx+1;
+        end
+    end 
+    
+    for i=1:length(sigch)
+        subplot(1,3,1)
+        imagesc(flipud(squeeze(plvAll(run).pseudMat_pre(i,:,:))'),[0 1])
+        title(int2str(f))
+        subplot(1,3,2)
+        imagesc(flipud(squeeze(plvAll(run).pseudMat_post(i,:,:))'),[0 1])
+        title(int2str(sigch(i,:)))
+        
+        subplot(1,3,3)
+        blankgrid=ones(16,16);
+        blankgrid(sigch(i,:))=0;
+        imagesc(blankgrid')
+        
+            Locations={'L-Front','L-Par','L-Cent1','L-Cent','L-Lat','L-Subtmp','L-Depth','L-Micro'...
+                'R-Front','R-Par','R-Cent1','R-Cent2','R-Lat','R-Subtmp','R-Depth','R-Micro'}
+        set(gca,'YTick',1:16,'YTickLabel',Locations)
+        saveppt2('ppt',powerpoint_object,'driver','bitmap','stretch','off');
+        %input('n')
+    end
+end
+
+
+
+%% PLOT PLV CONNECTIONS
+%figure
+load('E:\DelayWord\frequencybands.mat')
+ gridlayout=reshape(1:256,[16 16])'
+ 
+ F= fieldnames(frequencybands)
+ for i=1:5
+     frange{i}=getfield(frequencybands,F{i+1})
+ end
+     
+% frange={[1:5],[5:10],[10:15],[15:20]}
+% frange={[1:3],[4:6],[7:9],[10:12],[13:15],[16:18],[19:21],[22:24],[25:28]}
+
+for f=1:5   
+    %plot grid
+    f=frange{f}
+    blankgrid=ones(16,16);
+    imagesc(blankgrid)
+    colormap(gray)
+    axis tight
+    set(gca,'XGrid','on')
+    set(gca,'YGrid','on')
+    set(gca,'XTick',[1.5:16.5])
+    set(gca,'YTick',[1.5:(16+.5)])
+    set(gca,'XTickLabel',[])
+    set(gca,'YTickLabel',[])
+    for c=1:16
+        for r=1:16
+            text(c,r,num2str((r-1)*16+c))
+        end
+    end
+    
+    hold on
+    %plot plv connections
+    %pr =prctile(prctile(plvAll(run).pseudMat_ratio(:,:,f),99.1),99.1); 
+    try        
+        %[a,b]=find(plvAll(run).pseudMat_ratio(:,:,f)<.3 & plvAll(run).pseudMat_ratio(:,:,f)>0);
+        %[a,b]=find(mean(plvAll(run).pseudMat_ratio(:,:,f),3)<.5 & mean( plvAll(run).pseudMat_ratio(:,:,f),3)>0);
+        %plvConnect([a b],gridlayout,'b')
+        %[a,b]=find(plvAll(run).pseudMat_ratio(:,:,f)>pr);
+        pr =prctile(prctile(mean(plvAll(run).pseudMat_ratio(:,:,f),3),97),97);  
+        [a,b]=find(mean(plvAll(run).pseudMat_ratio(:,:,f),3)>pr)% & ste(plvAll(run).pseudMat_ratio(:,:,f),3)<1);
+        blankgrid(a)=0;
+        blankgrid(b)=0;
+        imagesc(blankgrid')
+        plvConnect([a b],gridlayout)
+    end
+    title(int2str(f))
+    view(2)
+    Locations={'L-Front','L-Par','L-Cent1','L-Cent','L-Lat','L-Subtmp','L-Depth','L-Micro'...
+                'R-Front','R-Par','R-Cent1','R-Cent2','R-Lat','R-Subtmp','R-Depth','R-Micro'}
+     set(gca,'YTickLabel',Locations)
+    hold off
+    %input('next')
+    saveppt2('ppt',powerpoint_object,'driver','bitmap','stretch','off');
+    clf
+end
+
+
+%% PLOT PLV PER CHANNEL TO ALL OTHER CHANNELS
+
+for i=1:5
+    f=frange{i};
+    for c=1:256
+        tmp1=mean(plvAll(run).pseudMat_ratio(c,:,f),3);
+        tmp2=mean(plvAll(run).pseudMat_ratio(:,c,f),3)';
+        plvOneChan=nansum([tmp1;tmp2]);
+        h=plotGridPosition(c);
+        imagesc(reshape(plvOneChan,[16 16])',[-1.5 1.5])
+        hold on
+        m=floor(c/16)+1;
+        n=rem(c,16);
+        if n==0
+            n=16;
+        end
+        plot(n,m,'k*','LineWidth',2)
+    end
+    test.resetCLimPlot
+    saveppt2('ppt',powerpoint_object,'driver','bitmap','stretch','off');
+    clf
+end
+
+%%
+depthPair=nchoosek(x,2)
+plvAllCat=mean(cat(4,plvAll.data),4);
+%%
+for run=1:12
+    %%
+    figure
+    for c=1:size(depthPair,1)
+        c
+        pos=depthPair(c,:);
+        load(['E:\PreprocessedFiles\EC26\PLV_4000post\PLV_run' int2str(runtrials(1,run)) '_epos' int2str(pos(1)) '_' int2str(pos(2)) '_ps'])
+        plvAll(run).data(c,:,:)=plvdata;
+        row=find(x==pos(1));
+        col=find(x==pos(2));
+        subplot(12,12,(row-1)*12+col)
+        plv_zscore=(plvdata-repmat(mean(plvdata(:,1:800),2),1,size(plvdata,2)))./repmat(std(plvdata(:,1:800),[],2),1,size(plvdata,2));
+        plv_zscore=plvdata;
+        %imagesc(flipud(squeeze(plvAllCat(c,:,:))),[0 1])
+        imagesc(flipud(plv_zscore),[0 1])
+        line([800 800],[0 40])
+    end
+end

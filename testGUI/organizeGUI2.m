@@ -67,7 +67,7 @@ uicontrol('Style','PushButton','String','Analog htk to wav','Position',[m1,.20*l
         for i=1:length(selectedContents)
             [subj,~]=regexp(selectedContents{i},'_','split');
             if isempty(strmatch(selectedContents{i},ls([destPath filesep subj{1}]),'exact'))
-            quickPreprocessing_ALL_TMP([sourcePath filesep subj{1} filesep selectedContents{i}],3,0,1)
+                %quickPreprocessing_ALL_TMP([sourcePath filesep subj{1} filesep selectedContents{i}],3,0,1)
                 if ~isempty(find(ismember(selectedFolders,'Analog'))) & strmatch(b,'raw')
                     %selectedFolders=selectedFolders(find(ismember(selectedContents,'Analog')));
                     try
@@ -102,14 +102,10 @@ uicontrol('Style','PushButton','String','Analog htk to wav','Position',[m1,.20*l
             if strcmp(subj{1},'EC20')
                 quickPreprocessing_ALL([sourcePath filesep subj{1} filesep selectedContents{i}],2,0,1)
             else
-                quickPreprocessing_ALL_TMP([sourcePath filesep subj{1} filesep selectedContents{i}],2,0,1)
-            end
-            
-        end
-        
+                 quickPreprocessing_ALL([sourcePath filesep subj{1} filesep selectedContents{i}],3,0,1)
+            end            
+        end        
     end
-
-
 %%
     function convertButton(varargin)
         List = get(BlockListBox, 'String');
@@ -121,31 +117,39 @@ uicontrol('Style','PushButton','String','Analog htk to wav','Position',[m1,.20*l
         for i=1:length(selectedContents)
             [subj,~]=regexp(selectedContents{i},'_','split');
             cd([sourcePath filesep subj{1} filesep selectedContents{i}])
-            ecogTDTData2MatlabConvertMultTags(pwd,selectedContents{i});
+            try
+                ecogTDTData2MatlabConvertMultTags(pwd,selectedContents{i});
+            catch
+                continue
+            end
             destinationPath=[destPath filesep subj{1} filesep selectedContents{i}];
             
-            mkdir(sprintf('%s/%s/%s',destinationPath,selectedContents{i},'RawHTK'))
-            mkdir(sprintf('%s/%s/%s',destinationPath,selectedContents{i},'Analog'))
-            movefile('Wav*.htk',sprintf('%s/%s/%s',destinationPath,selectedContents{i},'RawHTK'));
+            mkdir(sprintf('%s/%s',destinationPath,'RawHTK'))
+            mkdir(sprintf('%s/%s/%s',destinationPath,'Analog'))
+            movefile('Wav*.htk',sprintf('%s/%s',destinationPath,'RawHTK'));
             try
-                movefile('ANIN*.htk',sprintf('%s/%s/Analog',destinationPath,selectedContents{i}));
+                movefile('ANIN*.htk',sprintf('%s/Analog',destinationPath));
             catch
                 fprintf('No Analog')
             end
             
             try
-                movefile('Trck*.htk',sprintf('%s/%s/VideoTracking',destinationPath,selectedContents{i}));
+                movefile('Trck*.htk',sprintf('%s/VideoTracking',destinationPath));
             catch
                 fprintf('No Video')
             end
             
             try
-                movefile('LFP*.htk',sprintf('%s/%s',destinationPath,selectedContents{i}));
+                movefile('LFP*.htk',sprintf('%s',destinationPath));
             end
             
-            mkdir(sprintf('%s/%s/Artifacts',destinationPath,selectedContents{i}))
-            mkdir(sprintf('%s/%s/Figures',destinationPath,selectedContents{i}))
-            cd(sprintf('%s/%s/Analog',destinationPath,selectedContents{i}))
+            try
+                movefile('*.htk',sprintf('%s',destinationPath));
+            end
+            
+            
+            mkdir(sprintf('%s/Artifacts',destinationPath))
+            cd(sprintf('%s/Analog',destinationPath))
             
             try
                 [data1,sampFreq]= readhtk ('ANIN1.htk');

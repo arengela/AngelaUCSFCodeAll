@@ -5,63 +5,55 @@ step=10
 lagidx=1
 
 
-%[~,fs]=readhtk('E:\DelayWord\EC23\EC23_B1\Analog\ANIN1.htk');
+[~,fs]=readhtk('E:\DelayWord\EC23\EC23_B1\Analog\ANIN1.htk');
 loadload;close;
+test=T.Data
+usechan=setdiff(T.Data.usechans,T.Data.Artifacts.badChannels)
+%%
+            D=T.Data.segmentedEcog.zscore_separate(usechan,:,:,:);
+            L=1:size(D,3)
+            avgData = zeros(size(D,1),size(D,2),length(unique(L)));
+            for i = 1:size(avgData,3)
+                avgData(:,:,i) = mean(D(:,:,L==i),3);    
+            end
 
-for lag=round([0:10:400])
+            dat = [];
+            for i = 1:size(avgData,3)
+                dat = [dat; avgData(:,:,i)'];
+            end
+            [eigcoeff, eigvec] = pca(dat);
+            pcnum=20
+            [eigcoeff, eigvec] = pca(dat,pcnum);
+            %%
+
+
+timeset=200:350;
+for lag=10%round([0:10:400])
     idx=1;
-    for ch=1%:length(ch2)%100:150%0:test.channelsTot
-        for tr=1:27%setdiff(1:size(test.segmentedEcog(eidx).event,1),badtrials)     
-            %[PC,S,L]=princomp(mean(test.segmentedEcog(eidx).zscore_separate(:,:,:,tr),3)');
-            for t=1:30%1:(size(test.segmentedEcog(eidx).zscore_separate,2)-200)/step
-                timeset=[2:.05:3.5];
-                timeStart=timeset(t);
-                %initiate matrix
-                %regvar2(ch).trial(tr).matrix(t,:)=zeros(1,10+28+length(ch2)+size(test.segmentedEcog(eidx).zscore_separate,2)/step);
-                %output ecog
+    for ch=1
+        for tr=1:size(test.segmentedEcog(eidx).zscore_separate,4)
+            dataE=eigvec'*test.segmentedEcog(eidx).zscore_separate(usechan,:,:,tr);       
+            %dataE=mean(mean(test.segmentedEcog(eidx).zscore_separate(usechan,:,:,tr),3),4);
+            dataA=squeeze(test.segmentedEcog(eidx).analog24Hz(2,:,:,tr));
+            dataA=resample(dataA,16000,round(fs));
+            audSpec= wav2aud6oct(dataA)';
+            for c=1:size(dataE,1)
+                data100{tr}(c,:)= resample(dataE(c,:),1,4);
+            end
+            for t=1:150
+                %timeStart=timeset(t);
                 %Y is analog signal at all frequencies
-                usesamps=floor(timeStart*fs:(timeStart+.05)*fs);
-                dataA=squeeze(test.segmentedEcog(eidx).analog24Hz(2,usesamps,:,tr));
-                dataA=resample(dataA,16000,round(fs));
-                aud{tr}= mean(wav2aud6oct(dataA)',2);
-                regvar2(ch).trial(tr).yout(t,:)=reshape(aud{tr}',1, []);
-                usesamps=floor((timeStart+lag/1000)*400:(timeStart+lag/1000+.05)*400);
-                
-                %data downsampled to 100Hz
-                dataE=mean(mean(test.segmentedEcog(eidx).zscore_separate(:,usesamps,:,tr),3),4);
-                for c=1:size(dataE,1)
-                    data100{tr}(c,:)= mean(resample(dataE(c,:),1,4));
-                end
-                regvar2(ch).trial(tr).matrix(t,:)=reshape(data100{tr},1,[]);
-                %regvar2(ch).trial(tr).matrix(t,:)=mean(mean(test.segmentedEcog(eidx).zscore_smoothed(:,(t-1)*step+1+lag:t*step+lag,:,tr),3),2);%mean zscore ecog
-                %regvar2(ch).trial(tr).matrix(t,:)=mean(S((t-1)*step+1+lag:t*step+lag,1:50)',2);
-                %regvar2(ch).trial(tr).yout(t,1)=mean(mean(test.segmentedEcog(eidx).analog(1,(t-1)*step+1:t*step,:,tr),3),2);%mean analog
-                %regvar2(ch).trial(tr).loadings=PC(:,1:50);
-                %regvar2(ch).trial(tr).matrix(t,2)=diff([test.segmentedEcog(eidx).event{tr,[7,9]}]);
-                %%word length
-                %             try
-                %                 idx=find(strcmp({brocawords.names}',test.segmentedEcog(eidx).event{tr,8}));
-                %                  idx2=find(strcmp({brocawords(idx).difficulty},{'easy','hard'}));
-                %                 regvar2(ch).trial(tr).matrix(t,3+idx2)=1;
-                %                 idx2=find(strcmp({brocawords(idx).realpseudo}',{'real','pseudo'}));
-                %                 regvar2(ch).trial(tr).matrix(t,5+idx2)=1;
-                %                 regvar2(ch).trial(tr).matrix(t,7)=brocawords(idx).freq_HAL;
-                %                 regvar2(ch).trial(tr).matrix(t,7)=brocawords(idx).logfreq_HAL;
-                %                 regvar2(ch).trial(tr).matrix(t,8)=diff([test.segmentedEcog(eidx).event{tr,[11,13]}]);%response times
-                %                 regvar2(ch).trial(tr).matrix(t,9+idx)=1;%the word presented
-                %                 regvar2(ch).trial(tr).matrix(t,9+28+t)=1;
-                %                 regvar2(ch).trial(tr).matrix(t,9+28+size(test.segmentedEcog(eidx).zscore_separate,2)/step+ch)=1;
-                %
-                %             catch
-                %                 continue
-                %             end
+                %usesamps=floor(timeStart*100:(timeStart+.05)*100);
+                usesamps=timeset(t);
+                regvar2(ch).trial(tr).yout(t,:)=reshape(mean(audSpec(:,usesamps),2)',1, []);
+                regvar2(ch).trial(tr).matrix(t,:)=reshape(data100{tr}(:,usesamps),1,[]);
             end
         end
     end
     %%
-
-    for testtrials=1:length(regvar2(1).trial)
-        traintrials=setdiff(1:length(regvar2(1).trial),testtrials);
+    numTrials=length(regvar2(1).trial);
+    for testtrials=1:numTrials
+        traintrials=setdiff(1:numTrials,testtrials);
         for c=1:length(regvar2)
             %Get Training and test variables
             X=vertcat(regvar2(c).trial(traintrials).matrix);
@@ -81,8 +73,7 @@ for lag=round([0:10:400])
             regvar2(c).trial(testtrials).R=R(1,2);
             R2(idx)=R(1,2);
             regvar2(c).trial(testtrials).beta=beta;
-            regvar2(c).trial(testtrials).ypred=Ypred2;  
-            
+            regvar2(c).trial(testtrials).ypred=Ypred2;              
             
             
             %Corr to non-matches
@@ -93,13 +84,6 @@ for lag=round([0:10:400])
             end
             regvar2(c).trial(testtrials).R_other=R_other;
             R_other2(idx,:)=R_other;
-            
-            
-            %plot(Ytest)
-            %hold on
-            %plot(Ypred,'r')
-            %hold off
-            idx=idx+1;
             %input('n')
         end
     end
@@ -108,15 +92,64 @@ for lag=round([0:10:400])
      Rotherall{lagidx}=R_other2;
      lagidx=lagidx+1;
 end
+%% visualize beta
+for f=1:5:100
+    %if used pc
+    for pcnum=1:20
+        tmp=eigvec(:,pcnum);
+        weights(pcnum,:)=regvar2(c).trial(testtrials).beta(pcnum,f)*tmp';
+    end       
+    if 1
+        visualizeGrid(5,['E:\General Patient Info\' test.patientID '\brain.jpg'],usechan,mean(weights));
+    else
+        weights2=zeros(1,256);
+        weights2(usechan)=mean(weights,1);
+        tmp=reshape(weights2,16,16)';
+        imagesc(tmp)
+    end
+    title(int2str(f))
+    input('n')
+    clf
+ end
+
 
 %% plot R distribution
-for testtrials=1:27
+for testtrials=1:length(regvar2.trial)
     hist(regvar2(c).trial(testtrials).R_other)
     hold on
     plot(regvar2(c).trial(testtrials).R,1,'r*')
     hold off
     input('n')
 end
-
-
-
+%% PLOT SPECTROGRAMS, CORR ACROSS TIME
+for t=1:length(regvar2.trial)
+    figure(1)
+    subplot(2,2,1)
+    imagesc(regvar2.trial(t).yout')
+    title(Labels{t})
+    subplot(2,2,2)
+    imagesc(regvar2.trial(t).ypred')
+    for s=1:150
+        R=corrcoef(regvar2.trial(t).yout(s,:),regvar2.trial(t).ypred(s,:));
+        rtime(s)=R(1,2);
+    end
+    subplot(2,2,3)
+    plot(rtime)
+    hold on
+    plot(mean(regvar2.trial(t).yout,2),'r')
+    plot(mean(regvar2.trial(t).ypred,2),'g')
+    title(regvar2.trial(t).R)   
+    hold off
+    
+    for f=1:100
+        R=corrcoef(regvar2.trial(t).yout(:,f),regvar2.trial(t).ypred(:,f));
+        rfreq(f)=R(1,2);
+    end
+    
+    subplot(2,2,4)
+    plot(rfreq)
+    
+    
+    input('n')
+    clf
+end

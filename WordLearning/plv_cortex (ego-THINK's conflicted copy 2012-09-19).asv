@@ -1,0 +1,41 @@
+load('/home/angela/Documents/runtrials.mat')
+for run=[1:6 7:13]    
+    %test=SegmentedData(['/data_store/human/prcsd_data/EC26/EC26_B' int2str(runtrials(2,run)) '/HilbReal_4to200_40band'])
+    
+    test=SegmentedData(['E:\PreprocessedFiles\EC26\EC26_B' int2str(runtrials(2,run)) '/HilbReal_4to200_40band'])
+    load gridlayout
+    gridch=reshape(gridlayout',[1 256])
+    test.usechans=gridch(x);
+    test.channelsTot=length(test.usechans)
+    test.Artifacts.badChannels=[];
+    test.Artifacts.badTimeSegments=[];
+    test.Params.sortidx=0;
+    test.BaselineChoice='PreEvent';%use rest block as baseline
+    test.Params.baselineMS=[500 1000];%time of pre-event baseline (ms)
+    test.Params.indplot=0;%do not plot individual channels
+    test.Params.sorttrials=0;%1 to sort trials, 0 to skip sorting
+    test.segmentedDataEvents40band_2({[1:50;1:50]},{[2000 2000]},'keep',[],'phase',1:40)
+    %% Choose Pairs of electrodes
+    x=[209:214 97:102]
+    for i=1:length(x)
+        depthch(i)=test.gridlayout.usechans(x(i));
+    end
+    C2=nchoosek(depthch,2)
+    C2(:,3)=C2(:,2)-C2(:,1);
+    sigch=C2;
+    for ch=1:size(sigch,1)
+        usechan=[ find(test.usechans==sigch(ch,1)) find(test.usechans==sigch(ch,2))];
+        chanNum=sigch(ch,:);
+        sigdata=zeros(40,1600);
+        plvdata=zeros(40,1600);
+        for f=1:40
+            stack1=squeeze(test.segmentedEcog(1).phase(usechan(1),:,:,:));
+            stack2=squeeze(test.segmentedEcog(1).phase(usechan(2),:,:,:));
+            tmpPLV=pn_eegPLV_modified([stack1;stack2],400,[],[]);            
+            plvdata(f,:)=tmpPLV;
+        end    
+    end
+    pos=x([find(depthch==usechan(1)) find(depthch==usechan(2))])
+    mkdir('/home/angela/Documents/WordLearning/PLV')
+    save(['/home/angela/Documents/WordLearning/PLV/PLV_run' int2str(runtrials(1,run)) '_epos' int2str(pos(1)) '_' int2str(pos(2))])
+end

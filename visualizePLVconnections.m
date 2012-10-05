@@ -1,15 +1,15 @@
 function visualizePLVconnections(dataplv,ch,C2)
 connectStrength=zeros(1,size(C2,1));
-load('E:\General Patient Info\EC23\regdata.mat')
+%load('E:\General Patient Info\EC23\regdata.mat')
 cM= jet
 ELECTRODE_HEIGHT=2;
 bounds=[.2 -.3]
 boundcolors={'g' 'r','b'}
-subplot(1,2,1)
-visualizeGrid(2,'E:\General Patient Info\EC23\brain.jpg',ch)
-tmp3=squeeze(mean(dataplv(1:400,:,:),1))-squeeze(mean(dataplv(401:800,:,:),1));
+% subplot(1,2,1)
+% %visualizeGrid(2,'E:\General Patient Info\EC23\brain.jpg',ch)
+% tmp3=squeeze(mean(dataplv(1:400,:,:),1))-squeeze(mean(dataplv(401:800,:,:),1));
 for i=1:size(C2,1)
-    connectStrength(1,i)=tmp3(C2(i,1),C2(i,2));
+    connectStrength(1,i)=dataplv(C2(i,1),C2(i,2));
 end
 for idx=1
     Y=bounds(idx);

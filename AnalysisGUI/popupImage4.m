@@ -6,14 +6,14 @@ hFig = get(hObject, 'parent');
 %disp('do something')
 tmp=get(gca,'Children')
 %set(gca,'Color','y')
-figure
+newFig=figure;
 subplot(3,1,1);
 
 for child=1:length(tmp)
     y=get(findobj(tmp(child)))    
     hold on
     if isfield(y,'CData')
-        imagesc(y.CData,[-1 2])
+        imagesc(flipud(y.CData))
         %colormap(flipud(gray))
         %freezeColors;
     elseif isfield(y,'XData')
@@ -50,4 +50,5 @@ try
 end
 %uiwait
 set(hObject,'Color','w')
+set(newFig,'Position',[100 200 200 400])
 %end

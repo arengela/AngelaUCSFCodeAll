@@ -48,12 +48,15 @@ if ~exist('timeInt')
     timeInt=[];
 end
 
-if ~exist('channelsTot') 
-    channelsTot=256;
-end
 
-if isempty(channelsTot)
-    channelsTot=256;
+if ~exist('channelsTot') 
+    cd('RawHTK')
+    channelsTot=length(ls)-2;   
+    cd ..
+elseif isempty(channelsTot)
+    cd('RawHTK')
+    channelsTot=length(ls)-2;    
+    cd ..
 end
 
 if ~exist('ref')

@@ -36,5 +36,5 @@ if nargin==1,
 end
   
 
-n = size(find(~isnan(x)),dim);
+n = size(x,dim)-length(find(isnan(x(1,1,:))));
 y = nanstd(x,[],dim) / sqrt(n);

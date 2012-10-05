@@ -5,7 +5,7 @@ analogueChannels2Use=regexp(a,' ','split');
 analogueChannels2Use=analogueChannels2Use(1:end-1);
 
 %intervalStartEndSeconds=[1 1220];% defines the interval of data to use (in seconds)
-minThresh=repmat(0.01,1,length(analogueChannels2Use)); %An event is triggered when this value is exceeded. One entry for each analogue channel
+minThresh=repmat(.9,1,length(analogueChannels2Use)); %An event is triggered when this value is exceeded. One entry for each analogue channel
 %minDurOfStimulusInSeconds=repmat(0.7,1,length(analogueChannels2Use)); % That is the duration of the event.This is a "dead time" after an event was detected. Other events happening during this interval are ignored.
 minDurOfStimulusInSeconds=repmat(.5,1,length(analogueChannels2Use)); % That is the duration of the event.This is a "dead time" after an event was detected. Other events happening during this interval are ignored.
 
@@ -118,7 +118,7 @@ for k=1:length(analogueChannels2Use)
         BadTimesConverterGUI2 (times,sprintf('transcript_AN%d.lab',handles.soundCardChNum))
     else
     load('trialslog_sounds.mat')
-    BadTimesConverterGUI3 (E_times,trialslog,sprintf('transcript_AN%d.lab',handles.soundCardChNum))
+    BadTimesConverterGUI3 (E_times,trialslog(:,1),sprintf('transcript_AN%d.lab',handles.soundCardChNum))
 
     fprintf('Check events in Wavesurfer. Type return to continue\n')
     keyboard

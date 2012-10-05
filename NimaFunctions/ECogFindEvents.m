@@ -37,9 +37,12 @@ for cnt10 = 1:length(expt)
     w = resample(w,round(fr),round(f));
     f = fr;
     w = w-mean(w);
-    t1 = abs(w)>(.05*std(w));
+    t1 = abs(w)>(.02*std(w));
     t0 = sort(w);
-    t1 = abs(w)>(.135*t0(end-500));
+    t1 = abs(w)>(.02*t0(end-500));
+    
+    
+    
     t2 = find(t1);
     t3 = diff(t2)>(4*std(diff(t2)));
     t4 = find(t3);
@@ -74,8 +77,12 @@ for cnt10 = 1:length(expt)
             tmp1 = resample(w(ind(cnt1):ind(cnt1)+length(wo{cnt2})-1),1,10);
             tmp1 = conv(abs(tmp1),ones(1,10),'same');
             %             cc(cnt1,cnt2) = corrnum(tmp1,tmp2);
+            %tmp1 = [zeros(201,1); tmp1; zeros(201,1)];
             tmp1 = [zeros(201,1); tmp1; zeros(201,1)];
             for cnt3 = 1:length(tmpind)
+                %[q,lag]=xcorr(tmp1,circshift(tmp2,tmpind(cnt3)));
+                %[tmp3(cnt3),idx]=max(q);
+                
                 tmp3(cnt3) = corrnum(tmp1,circshift(tmp2,tmpind(cnt3)));
             end
             [cc(cnt1,cnt2), ci(cnt1,cnt2)] = max(tmp3);
@@ -127,8 +134,8 @@ for cnt10 = 1:length(expt)
     end
     %% check:
     if 0
-        %         ssind = ceil(sqrt(length(evnt)));
-        for n = 1%:length(evnt)
+                 ssind = ceil(sqrt(length(evnt)));
+        for n = 1:length(evnt)
             subplot(ssind,ssind,n);
             disp(evnt(n).wname);
             wtmp = w(ceil(f*(evnt(n).StartTime-.25)):ceil(f*(evnt(n).StopTime+.25)));
@@ -144,11 +151,11 @@ for cnt10 = 1:length(expt)
         %% check 2
         hold off; n = 13;
         w1 = w((evnt(n).StartTime-.25)*f:(evnt(n).StopTime+.25)*f);
-        plotm1(w1,'g');
+        %plotm1(w1,'g');
         hold on
         [w2,fs] = wavread([wpath evnt(n).name]);
         w2 = resample(w2,f,fs);
-        w2 = [zeros(f*.25,1); w2 ;zeros(f*0.25,1)];
-        plotm1(w2,'k');
+        %w2 = [zeros(f*.25,1); w2 ;zeros(f*0.25,1)];
+        %plotm1(w2,'k');
     end
 end
