@@ -1,4 +1,4 @@
-function ECogDataVis (dpath, subject, elects, data, flag, imname,maxsc,data2,impch,colormat,showImFlag)
+function ECogDataVis (dpath, subject, elects, data, flag, imname,maxsc,data2,impch,colormat)
 %
 %
 %{
@@ -19,16 +19,12 @@ if isempty(imname)
 end
 [xy,img] = eCogImageRegister(imname,0);
 allxy=xy;
+
 try
     xy = xy(:,elects);
 end
 G=real2rgb(img,'gray');
-if nargin<10
-    showImFlag=1;
-end
-if showImFlag==1
-    cla
-end
+cla
 switch flag
     case 0
         %figure;
@@ -39,18 +35,12 @@ switch flag
         %figure;
         %imagesc(img);
         %colormap(gray);
-        if showImFlag
-            hi=imagesc(G);
-        end
+        hi=imagesc(G);
         %set(hi,'AlphaData',.7)
         axis tight
         hold on;
         %plot(xy(1,:),xy(2,:),'r.','LineWidth',100);
-        s=scatter(xy(1,:),xy(2,:),200,'filled','r');
-
-        if ~isempty(colormat)
-             set(s,'MarkerFaceColor',colormat)
-        end
+        scatter(xy(1,:),xy(2,:),200,'filled','r')
         for cnt1 = 1:size(xy,2)
             text(xy(1,cnt1)+3,xy(2,cnt1),num2str(elects(cnt1)),'color','y','FontSize',15);
         end
@@ -66,6 +56,7 @@ switch flag
         r = cat(3,ones(size(img)),zeros(size(img)),zeros(size(img)));
         b = cat(3,zeros(size(img)),zeros(size(img)),ones(size(img)));
         %         figure;
+        hold off;
         imshow(img);
         hold on
         hr = imshow(r);
@@ -90,8 +81,7 @@ switch flag
         tmpn = tmpn/mm;
         set(hr,'AlphaData',tmpp);
         set(hb,'AlphaData',tmpn);
-        
-      case 5
+    case 51
         corners = round(allxy(:,[1 16 241 256]));
         tmp = zeros(16);
         tmp(elects) = data;
@@ -102,24 +92,67 @@ switch flag
         tmp2 = tmp2*0.999/max(max(abs(tmp2)));
         tmp3 = zeros(size(img));
         tmp3(min(corners(2,:)):min(corners(2,:))+size(tmp2,1)-1,min(corners(1,:)):min(corners(1,:))+size(tmp2,2)-1) = tmp2;
-        if showImFlag
-            imshow(img);
-        end
+        hold off;
+        
+         R = makeresampler('linear','bound');
+        tmp = imtransform(tmp,t,R,'XYScale',1);
+        tmp2 = rot90(tmp2,2);
+        tmp2 = tmp2*0.999/max(max(abs(tmp2)));
+        tmp5 = zeros(size(img));
+        tmp5(min(corners(2,:)):min(corners(2,:))+size(tmp2,1)-1,min(corners(1,:)):min(corners(1,:))+size(tmp2,2)-1) = tmp2;
+        hold off;
+        
+        
+        %axes('visible','off'); 
+         ha = axes('units','normalized', ...
+ 'position',[0 0 1 1]);
+        imshow(real2rgb(img,'gray'));   
+        %freezeColors
+         set(ha,'handlevisibility','off', ...
+'visible','off')
+        zeroMat=zeros(size(img));
         hold on
-        if nargin<8 | isequal(colormat,0)
-            r = cat(3,ones(size(img)),zeros(size(img)),zeros(size(img)));
-        else
-            r = cat(3,ones(size(img))*colormat(1),ones(size(img))*colormat(2),ones(size(img))*colormat(3));
-        end
+        %imshow(zeroMat);
+        %a=axis;
+        hold on
+        %colormap(gray)
+        %freezeColors
+        
+         axes('position',[0 0 1 1])
+        imshow(tmp3,[min(data)./max(data) 1])
+        %imshow(tmp5)
+        %imagesc(tmp3)
+        tmp3(find(tmp3<0))=0;
+        %imagesc(tmp3,[min(data)./max(data) 1])
+        tmp4=tmp3;
+        %tmp4=double(tmp3>.4);
+        
+        %tmp4(find(tmp3>prctile(reshape(tmp3,1,[]),99.9)))=.7;
+        alpha(tmp4)
+        %alpha(tmp3);
+        %axis(a)
+        colormap(jet)
+      case 5
+        corners = round(allxy(:,[1 16 241 256]));
+        tmp = zeros(16);
+        tmp(elects) = data;
+        t = maketform('affine',[16 16 1;16 1 16]',corners(:,1:3)');
+        R = makeresampler('cubic','bound');
+        tmp2 = imtransform(tmp,t,R,'XYScale',1);
+        tmp2 = rot90(tmp2,2);
+        tmp2 = tmp2*0.999/max(max(abs(tmp2)));
+        tmp3 = zeros(size(img));
+        tmp3(min(corners(2,:)):min(corners(2,:))+size(tmp2,1)-1,min(corners(1,:)):min(corners(1,:))+size(tmp2,2)-1) = tmp2;
+        hold off;
+        imshow(img);
+        hold on
+        r = cat(3,ones(size(img)),zeros(size(img)),zeros(size(img)));
         b = cat(3,zeros(size(img)),zeros(size(img)),ones(size(img)));
-        %hb = imshow(b);
+        hb = imshow(b);
         hr = imshow(r);
-        %tmp3=tmp3.^2;
-        tmp3=tmp3./2;
-        %set(hb,'AlphaData',max(-tmp3,0));
-        tmp3=tmp3;
-        set(hr,'AlphaData',max(tmp3,0));           
-    case 8 
+        set(hb,'AlphaData',max(-tmp3,0));
+        set(hr,'AlphaData',max(tmp3,0));
+     case 8 
         xy = ceil(xy);
         % this line has to be optimized:
         tmp1 = zeros(size(img));
@@ -129,6 +162,7 @@ switch flag
         %         tmp1 = conv2(tmp1,fspecial('disk',16),'same');
         %r = cat(3,ones(size(img)),zeros(size(img)),zeros(size(img)));
         color=rgb('red');
+
         r = cat(3,ones(size(img))*(color(1)),ones(size(img))*(color(2)),ones(size(img))*(color(3)));
         b = cat(3,zeros(size(img)),zeros(size(img)),ones(size(img)));
         %         figure;
@@ -173,6 +207,8 @@ switch flag
 
      case 11 
         xyHold=xy;
+
+        hold off;
         imshow(img);
         freezeColors;
         hold on
@@ -187,6 +223,8 @@ switch flag
         for i=1:length(groups)
             groups1{i}=num2str(groups(i))
         end
+        
+        
         for i=1:length(elects)
             xy = xyHold(:,elects{i});
             xy = ceil(xy);
@@ -202,10 +240,12 @@ switch flag
 %                 %text(xy(1,cnt1)+5,xy(2,cnt1),num2str(cnt1),'color','w','FontSize',7);
 %             end
         end
+
         %legend(groups1)
         set(gca,'FontSize',15)       
         axis off       
-        axis(a)        
+        axis(a)
+        
     case 9 
         xy = ceil(xy);
         % this line has to be optimized:
@@ -217,6 +257,7 @@ switch flag
         r = cat(3,ones(size(img)),zeros(size(img)),zeros(size(img)));
         b = cat(3,zeros(size(img)),zeros(size(img)),ones(size(img)));
         %         figure;
+        hold off;
         imshow(img);
         freezeColors;
         hold on
@@ -259,16 +300,21 @@ switch flag
         axis(a)
         
     case 10
-        xyHold=xy;        
-        xy = xyHold(:,elects);        
+        xyHold=xy;
+        
+        xy = xyHold(:,elects);
+        
         xy = ceil(xy);
         % this line has to be optimized:
         tmp1 = zeros(size(img));
         for cnt1 = 1:length(xy)
             tmp1(xy(2,cnt1),xy(1,cnt1)) = data(cnt1);
         end
+        hold off;
         imshow(img);
-        hold on               
+        hold on
+
+               
         if isempty(impch)
             xy = xyxyHold(:,elects);
 
@@ -285,6 +331,9 @@ switch flag
                 set(hc,'FaceVertexAlphaData',.3)
 
             end
+
+           
+            
             colormap(jet)
             colorbar
             for cnt1 = 1:size(xy,2)
@@ -298,10 +347,16 @@ switch flag
             idx=find(elects==impch)
             scatter(xy(1,idx),xy(2,idx),50,'filled','r')
             text(xy(1,idx)+6,xy(2,idx),num2str(impch),'color','w','FontSize',8);
+
         end
+        
+        
+        %axis([200 1400 150 900])
+        
         set(colorbar,'YTick',linspace(1,256,6))
         set(colorbar,'YTickLabel',linspace(mindata,maxex,6))
-        set(gca,'FontSize',15)        
+        set(gca,'FontSize',15)
+        
         hold off
     case 7
         xy = ceil(xy);
@@ -314,6 +369,7 @@ switch flag
         r = cat(3,ones(size(img)),zeros(size(img)),zeros(size(img)));
         b = cat(3,zeros(size(img)),zeros(size(img)),ones(size(img)));
         %         figure;
+        hold off;
         imshow(img);
         hold on
         hr = imshow(r);
@@ -377,6 +433,7 @@ switch flag
         m = cat(3,zeros(size(img)),zeros(size(img)),ones(size(img)));
         r = cat(3,zeros(size(img)),ones(size(img)),zeros(size(img)));
         %         figure;
+        hold off;
         imshow(img);
         hold on
         
@@ -417,6 +474,7 @@ switch flag
         r = cat(3,ones(size(img)),zeros(size(img)),zeros(size(img)));
         b = cat(3,zeros(size(img)),zeros(size(img)),ones(size(img)));
         %         figure;
+        hold off;
         imshow(img);
         hold on
         hr = imshow(r);
@@ -458,6 +516,7 @@ switch flag
         g = cat(3,zeros(size(img)),ones(size(img)),zeros(size(img)));
              %b = cat(3,zeros(size(img)),zeros(size(img)),ones(size(img)));
         %         figure;
+        hold off;
         imshow(img);
         hold on
         hg= imshow(g);
@@ -477,4 +536,5 @@ switch flag
         tmpn = tmpn/mm;
         set(hg,'AlphaData',tmpp);
         set(hb,'AlphaData',tmpn);
+
 end

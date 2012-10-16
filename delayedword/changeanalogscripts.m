@@ -41,6 +41,7 @@ for i=1:length(evnt)
         tmp{idx,3}=evnt(i).name
         if strcmp(evnt(i).name,{'Electronic_Chime-KevanGC-495939803'})
             tmp{idx,2}='beep';
+            tmp{idx,3}=evnt(i).name
         elseif ~strcmp(evnt(i).name,'slide')
             %keyboard
             idx=idx+1;

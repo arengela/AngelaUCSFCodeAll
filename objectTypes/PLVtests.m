@@ -32,9 +32,9 @@ classdef PLVtests < handle
                 'E:\DelayWord\EC21\EC21_B1';
                 'E:\DelayWord\EC22\EC22_B1';
                 'E:\DelayWord\EC23\EC23_B1';
-                'E:\DelayWord\EC25\EC24_B2';
                 'E:\DelayWord\EC24\EC24_B1';
-                'E:\DelayWord\EC24\EC24_B3';
+                'E:\DelayWord\EC24\EC24_B2';
+                'E:\DelayWord\EC25\EC25_B1';
                 '\data_store\human\prcsd_data\EC23\EC23_B1';
                 'E:\PreprocessedFiles\EC26\EC26_B2';
                 'C:\Users\ego\Documents\UCSF\EcogData\EC24\EC24_B1';
@@ -61,15 +61,21 @@ classdef PLVtests < handle
                 'E:\DelayWord\EC28\EC28_B29\'
                 'E:\DelayWord\EC28\EC28_B49\'
                 'E:\DelayWord\EC28\EC28_B50\'
+                'E:\PreprocessedFiles\EC28\EC28_B33'
+                'E:\PreprocessedFiles\EC28\EC28_B45'
+                'E:\PreprocessedFiles\EC28\EC28_B33'
+
                 }
             
             %path of associated baseline
             handles.AllBaselinePaths{1}='E:\DelayWord\EC18\EC18_rest'
             handles.AllBaselinePaths{2}='E:\DelayWord\EC18\EC18_rest'
+            handles.AllBaselinePaths{3}='E:\DelayWord\EC20\EC20_B18'
+
             handles.AllBaselinePaths{8}=    'E:\DelayWord\EC21\EC21_B2';
             handles.AllBaselinePaths{9}='E:\DelayWord\EC22\EC22_B2'
             handles.AllBaselinePaths{10}= 'E:\DelayWord\EC23\EC23_B2';
-            handles.AllBaselinePaths{11}='E:\DelayWord\EC24\EC24_B3'
+            handles.AllBaselinePaths{11}='E:\DelayWord\EC24\EC24_B2'
             handles.AllBaselinePaths{12}='E:\DelayWord\EC24\EC24_B2'
             handles.AllBaselinePaths{14}= 'data_store\human\prcsd_data\EC23\EC23_B2';
              handles.AllBaselinePaths{15}='E:\PreprocessedFiles\EC26\EC26_B1';
@@ -95,8 +101,11 @@ classdef PLVtests < handle
             handles.AllBaselinePaths{35}='E:\DelayWord\EC28\EC28_B17';
             handles.AllBaselinePaths{36}='E:\DelayWord\EC28\EC28_B17';
             handles.AllBaselinePaths{37}='E:\DelayWord\EC28\EC28_B17';
-            handles.AllBaselinePaths{38}='E:\DelayWord\EC28\EC28_B26';
-            handles.AllBaselinePaths{39}='E:\DelayWord\EC28\EC28_B26';
+            handles.AllBaselinePaths{38}='E:\PreprocessedFiles\EC28\EC28_B44';
+            handles.AllBaselinePaths{39}='E:\PreprocessedFiles\EC28\EC28_B44';
+            handles.AllBaselinePaths{40}='E:\PreprocessedFiles\EC28\EC28_B33';
+            handles.AllBaselinePaths{41}='E:\PreprocessedFiles\EC28\EC28_B44';
+            handles.AllBaselinePaths{42}='E:\PreprocessedFiles\EC28\EC28_B35';
 
             
             lh=1:40%load all words            
@@ -169,7 +178,7 @@ classdef PLVtests < handle
                     freqband=31:38;
                 case {'phase','aa40'}
                     folder='HilbReal_4to200_40band';
-                    freqband=1:40;
+                    freqband=30:37;
                     output='aa';
                 case 'ds'
                     folder='Downsampled400';
@@ -183,8 +192,8 @@ classdef PLVtests < handle
             %test.BaselineChoice='PreEvent';%use specified pre-event segment as baseline
             test.Params.baselineMS=[500 1000];%time of pre-event baseline (ms)            
             sorttrials=0;%1 to sort trials, 0 to skip sorting
-            test.segmentedDataEvents40band(seg(:,handles.EventIdx),{[2000 2000]},[],'aa',1:40,sorttrials,handles.TaskType)%load data segments
-            test.calcZscore(1);%calculate zscore
+            test.segmentedDataEvents40band(seg(:,handles.EventIdx),{[2000 2000]},[],'aa',freqband,sorttrials,handles.TaskType)%load data segments
+            test.calcZscore(1,1);%calculate zscore
             handles.Data=test;%save data object in handles
         end  
     end

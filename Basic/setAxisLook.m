@@ -1,0 +1,5 @@
+function setAxisLook(h)
+set(h,'Box','off')
+set(gcf,'Color','w')
+set(h,'YColor','w')
+%set(h,'XColor','k')

@@ -21,9 +21,10 @@ knum=10
 %D=mean(mean(test.segmentedEcog(1).zscore_separate,3),4);
 usechans=setdiff(T.Data.usechans,T.Data.Artifacts.badChannels)
 D=mean(test.segmentedEcog(1).zscore_separate(usechans,:,:,:),4);
+
 for i=1:size(D,1)
     Dds(i,:)=resample(D(i,:),1,4);
-    Dsmooth(i,:)=smooth(Dds(i,:));
+    %Dsmooth(i,:)=smooth(Dds(i,:));
 end
 
 
@@ -34,7 +35,7 @@ kgroup1=kgroup;
 
 %% cluster data round 2
 knum=5
-kidx=[2 4]
+kidx=[1 6 7 9 10]
 kgroup1=kgroup;
 subset2=find(ismember(kgroup1,kidx));
 D2=D(subset2,:,:);
@@ -45,7 +46,7 @@ D2=reshape(D2,length(subset2),[]);
 figure
 for i=1:knum
     subplot(1,knum,i)
-    imagesc(flipud(reshape(c(i,:),1600,40)'))
+    imagesc(flipud(reshape(c(i,:)',[],50)))
 end
 
 figure

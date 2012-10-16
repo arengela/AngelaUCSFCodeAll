@@ -1,4 +1,4 @@
-function visualizeGrid(flag,dpath,ch,data,maxsc,data2,impch,colormat,showImFlag)
+function visualizeGrid(flag,dpath,ch,data,maxsc,data2,impch,colormat)
 %INPUT dpath = C:\Users\Angela_2\Dropbox\ChangLab\General Patient Info\GP31\brain_3Drecon.jpg
 %flag= 4: register points
 % 0:show electrodes
@@ -22,10 +22,6 @@ end
 if nargin<8
     colormat=[];
 end
-
-if nargin<9
-    showImFlag=1;
-end
 % 
 % if nargin<6
 %     data2=repmat(70,[1 size(data,2)]);
@@ -44,7 +40,11 @@ switch flag
     case  1
          ECogDataVis (dpath2,subject,ch,data,1,dpath,maxsc);
     case  5
-         ECogDataVis (dpath2,subject,ch,data,5,dpath,[],[],[],colormat,showImFlag);
+         ECogDataVis (dpath2,subject,ch,data,5,dpath);
+    case  51
+         ECogDataVis (dpath2,subject,ch,data,51,dpath);
+   
+    
     case  7
          ECogDataVis (dpath2,subject,ch,data,7,dpath,maxsc);
     case  8 %Dots and text on brain
@@ -55,13 +55,11 @@ switch flag
     case  10 %Scatterplot on brain, colormapped
          ECogDataVis (dpath2,subject,ch,data,10,dpath,maxsc,data2,impch);
     case  11 %Scatterplot on brain, colormapped
-         ECogDataVis (dpath2,subject,ch,[],11,dpath,maxsc,data2,impch,colormat,showImFlag);
+         ECogDataVis (dpath2,subject,ch,[],11,dpath,maxsc,data2,impch,colormat);
     case 2 %Show numbers on brains
-        ECogDataVis (dpath2,subject,ch,[],2,dpath,[],[],[],colormat,showImFlag);
+        ECogDataVis (dpath2,subject,ch,[],2,dpath);
     case 3
         ECogDataVis (dpath2,subject,ch,data,3,dpath,maxsc);
     case 5 %Show pos and neg electrodes
         ECogDataVis (dpath2,subject,ch,data,5,dpath,maxsc);
 end
-set(gca,'visible','off')
-set(gca,'box','off')

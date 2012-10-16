@@ -1,7 +1,7 @@
 blocks(1,:)=[6 9 12 14 18 20 24 26 27 28 35 36]
 blocks(2,:)=[1:6 8:13]
 wpath='E:\PreprocessedFiles\EC26\stimuli_norm_db\'
-dtpath='E:\PreprocessedFiles\EC26'
+dtpath='E:\DelayWord\EC28'
 cd(wpath)
 wordlist=cellstr(ls);
 wordlist=wordlist(3:end);
@@ -11,8 +11,8 @@ for i=1:length(tmp)
 end
 names=names'
 %%
-for i=11:size(blocks,2)
-    expt{1}=['EC26_B' int2str(blocks(1,i))]
+for i=1:2
+    expt{1}=['EC28_B' int2str(blocks(1,i))]
     try
         evnt = ECogFindEvents(dtpath,wpath,expt,names)
     catch
@@ -21,7 +21,7 @@ for i=11:size(blocks,2)
     clear tmp
     idx=1;
     for j=1:length(evnt) 
-        if evnt(j).confidence>.90 & ~ismember(evnt(j).name,{'correct','incorrect'})
+        if evnt(j).confidence>.80 & ~ismember(evnt(j).name,{'correct','incorrect'})
             tmp{idx,1}=evnt(j).StartTime
             tmp{idx,2}=evnt(j).name
             idx=idx+1;

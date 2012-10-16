@@ -66,7 +66,7 @@ classdef SegmentedData < handle
             handles.FrequencyBands.alpha=[9 10 11 12 13];
             handles.FrequencyBands.beta=[14 15 16 17 18 19 20 21 22];
             handles.FrequencyBands.gamma=[23 24 25 26 27 28 29];
-            handles.FrequencyBands.hg=[30 31 32 33 34 35 36 37 38];
+            handles.FrequencyBands.hg=[30 31 32 33 34 35 36 37];
             handles.Params.indplot=0;
         end
                 
@@ -178,6 +178,7 @@ classdef SegmentedData < handle
                         printf([int2str(c) '\n'])
                         chanNum=handles.usechans(c);
                         cd(handles.BaselineChoice)
+                        tmp=fileparts(handles.BaselineChoice);
                         switch output
                             case 'aa'
                                 if strmatch(handles.folderType,'HilbAA_70to150_8band')
@@ -185,16 +186,18 @@ classdef SegmentedData < handle
                                     data=mean(data,1);
                                     freqband=1;
                                 else
-                                    [R,I]=loadHTKtoEcog_onechan_complex_real_imag(handles.MainPath,chanNum,[]);
+                                    [R,I]=loadHTKtoEcog_onechan_complex_real_imag(tmp,chanNum,[]);
                                     data=complex(R,I);
                                 end
+                                handles.ecogBaseline.data(c,:,:)=abs(data(freqband,:)');
+                                handles.ecogBaseline.zscore_separate(c,:,:)=zscore(abs(data(freqband,:)),[],2)';
                                 handles.ecogBaseline.mean(c,1,:)=mean(abs(data(freqband,:)'),1);
                                 handles.ecogBaseline.std(c,1,:)=std(abs(data(freqband,:)'),[],1);
                             case {'ds','filtered'}
                                 data=loadHTKtoEcog_onechan(chanNum,[]);
                                 handles.ecogBaseline.data(c,:,1,1)=mean(data,2);
                             case 'phase'
-                                [R,I]=loadHTKtoEcog_onechan_complex_real_imag(handles.MainPath,chanNum,[]);
+                                [R,I]=loadHTKtoEcog_onechan_complex_real_imag(tmp,chanNum,[]);
                                 data=complex(R,I);
                                 handles.ecogBaseline.data(c,:,:,1)=angle(data(freqband,:))';
                         end
@@ -934,14 +937,28 @@ classdef SegmentedData < handle
             cd([handles.MainPath '/Analog'])
         end
         
-        function calcZscore(handles,onechan)
+        function calcZscore(handles,onechan,collapseFreq)
             %% CALCULATE ZSCOREAT A TIME USING BASELINE SPEFICIED
             %% onechan: flag (1== calc one channel at a time, 0= calc all at once)
+            %% collapseFreq: flag (1== ave all frequency bands before calculating zScore)
             if nargin<2
                 onechan=0;
             end
+            
+            
+            if nargin<3
+                collapseFreq=0;
+            end
             for i=1:length(handles.segmentedEcog)
                 datalength=size(handles.segmentedEcog(1).data,2);
+                
+                if collapseFreq
+                    handles.segmentedEcog(i).data=mean(handles.segmentedEcog(i).data,3);
+                    handles.ecogBaseline.data=mean(handles.ecogBaseline.data,3);
+                    handles.ecogBaseline.mean=mean(handles.ecogBaseline.data,2);
+                    handles.ecogBaseline.std=std(handles.ecogBaseline.data,[],2);
+                end               
+                
                 handles.segmentedEcog(i).zscore_separate=zeros(handles.channelsTot,datalength,size(handles.segmentedEcog(i).data,3),size(handles.segmentedEcog(i).data,4));
                 for c=1:handles.channelsTot;
                     if onechan==0
@@ -1049,6 +1066,8 @@ classdef SegmentedData < handle
                 if ~exist('r2')
                     r2=input('Use long words only? (y/[n])','s');
                 end
+            else
+                r2='n';
             end
             
             switch r
@@ -1065,7 +1084,7 @@ classdef SegmentedData < handle
                         try
                             wordidx=find(strcmp(Labels{i},{brocawords.names}));
                             all_label1(i)=find(strcmp({'','','','short','long'},brocawords(wordidx).lengthtype));
-                            all_label2(i)=find(strcmp({'easy','','hard'},brocawords(wordidx).difficulty));
+                            all_label2(i)=find(strcmp({'easy','pseudo','hard'},brocawords(wordidx).difficulty));
                             all_label3(i)=brocawords(wordidx).logfreq_HAL;
                             all_label4(i)=wordidx;
                             all_label5(i)=find(strcmp({'real','pseudo'},brocawords(wordidx).realpseudo));
@@ -1076,6 +1095,8 @@ classdef SegmentedData < handle
                     end
                     if strcmp(r2,'y')
                         useidx=find(all_label1==5)%only long words
+                    elseif strcmp(r,'1')
+                        useidx=find(all_label5==1)%only real words
                     else
                         useidx=1:length(Labels);
                     end
@@ -1102,14 +1123,14 @@ classdef SegmentedData < handle
             
             switch r
                 case '1'
-                    all_label=all_label1(useidx);
+                    all_label=all_label1;
                     conditions=[4 5];
                 case '2'
-                    all_label=all_label2(useidx);
+                    all_label=all_label2;
                     conditions=[1 3];
                 case '3'
-                    all_label(find(all_label3(useidx)<8))=2;%frequent vs less frequent
-                    all_label(find(all_label3(useidx)>9))=1;
+                    all_label(find(all_label3<8))=2;%frequent vs less frequent
+                    all_label(find(all_label3>9))=1;
                     conditions=[1 2];
                 case '4'
                     all_label(find(strcmp('LD',all_label1) | strcmp('LE',all_label1) | strcmp('SE',all_label1) | strcmp('SD',all_label1)))=1;
@@ -1120,9 +1141,9 @@ classdef SegmentedData < handle
                     conditions=[1 0];
                 case '6'
                     all_label=all_label5;
-                    conditions=[1 0];
+                    conditions=[1 2];
                 otherwise
-                    all_label=all_label1(useidx);
+                    all_label=all_label1;
                     conditions=[4 5];
             end
             

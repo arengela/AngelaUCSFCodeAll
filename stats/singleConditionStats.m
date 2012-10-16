@@ -22,7 +22,7 @@ else
 end
 ps=repmat(NaN,[1,size(zscore_stack,2)]); 
 %set number of bootstrap iterations
-nboot=20000;
+nboot=10000;
 boot_means=zeros([1 nboot]);
 
 %make delta (good enough belt) using bootstrap distribution of baseline

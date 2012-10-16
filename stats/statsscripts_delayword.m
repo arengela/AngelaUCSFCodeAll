@@ -18,7 +18,7 @@ baseline{1}='E:\DelayWord\EC18\EC18_rest'
 
 baseline{2}='E:\DelayWord\EC18\EC18_rest'
 baseline{8}=    'E:\DelayWord\EC21\EC21_B2';
-    baseline{9}='E:\DelayWord\EC22\EC22_B2'
+baseline{9}='E:\DelayWord\EC22\EC22_B2'
 
 %seg={[repmat(41,[1 40]);1:40],[1:40;repmat(42,[1 40])],[42;43],[43;44],[44;45]}
 seg={[repmat([41;0],[1 length(lh)]);lh],[lh;repmat([42;0],[1 length(lh)])],[repmat([42;0],[1 length(lh)]);lh],[repmat([43;0],[1 length(lh)]);lh],[repmat([44;0],[1 length(lh)]);lh]}

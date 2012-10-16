@@ -10,5 +10,6 @@ p(1)=6*(n-1)/100+.03;
 p(2)=6.2*(15-m)/100+0.01;
 p(3)=.055;
 p(4)=.055;
-
 h=subplot('Position',p);
+text(0,0,int2str(epos));
+hold on

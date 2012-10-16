@@ -13,7 +13,7 @@ instanceMatrixNorm = instanceMatrix*scale;
 bestcv = 0;
 for log2c = 1000
   for log2g =  5000
-    cmd = ['-t 2 -q -b 1 -v 5 -c ', num2str(2^log2c), ' -g ', num2str(2^log2g)];
+    cmd = ['-t 0 -q -b 1 -v 5 -c ', num2str(2^log2c), ' -g ', num2str(2^log2g)];
     cv = svmtrain(labelVector, instanceMatrixNorm, cmd);
     if (cv >= bestcv),
       bestcv = cv; bestc = 2^log2c; bestg = 2^log2g;
@@ -22,12 +22,12 @@ for log2c = 1000
   end
 end
 %% train
-cmd = ['-t 2 -q -b 1 -c ', num2str(bestc), ' -g ', num2str(bestg)];
+cmd = ['-t 0 q -b 1 -c ', num2str(bestc), ' -g ', num2str(bestg)];
 model = svmtrain(labelVector, instanceMatrixNorm, cmd);
 
 %% test
 testinstanceMatrixNorm = testinstanceMatrix*scale;
 
-cmd = [' -b 1'];
+cmd = [' -b 0'];
 [predicted_label, accuracy, decision_values] = svmpredict(testlabelVector, testinstanceMatrixNorm, model, cmd);
 

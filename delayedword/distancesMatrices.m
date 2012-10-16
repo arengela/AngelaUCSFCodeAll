@@ -16,9 +16,6 @@ for i=1:length(Labels)
 end
 %%
 
-
-
-
 badtr=[27 29  39 41 45]
 badtr=[];
 usetr=setdiff(1:size(T.Data.segmentedEcog.zscore_separate,4),badtr)
@@ -59,29 +56,103 @@ imagesc(reshape(permute(T.Data.segmentedEcog.zscore_separate(:,usesamp,1,usetr),
 
 
 
-%% PCA
-clear D pc dat D_sm
-usechan=setdiff(T.Data.usechans,T.Data.Artifacts.badChannels)
-usesamp=400:1400
-D=squeeze(T.Data.segmentedEcog.zscore_separate(usechan,usesamp,:,:));
-L=1:length(usetr);
+    %% PCA of time
+    clear D pc dat D_sm
+    usechan=setdiff(T.Data.usechans,T.Data.Artifacts.badChannels)
+    usesamp=800:1400
+    D=squeeze(T.Data.segmentedEcog.zscore_separate(usechan,usesamp,:,:));
+    L=1:length(usetr);
 
-D_sm=zeros(length(usechan),length(usesamp),length(L));
-for ch=1:length(usechan)
-    for tr=1:length(L)
-        D_sm(ch,:,tr)=smooth(D(ch,:,tr),10);
+    D_sm=zeros(length(usechan),length(usesamp),length(L));
+    for ch=1:length(usechan)
+        for tr=1:length(L)
+            D_sm(ch,:,tr)=smooth(D(ch,:,tr),10);
+        end
     end
-end
 D=D_sm;
-D=permute(D_sm,[3,2,1])
-avgData = D(:,:,ch);
+D=permute(D_sm,[3,2,1]);
+dat = D(:,:,ch);
 
-[eigcoeff, eigvec] = pca(dat);
+%[eigcoeff, eigvec] = pca(dat);
 pcnum=20
 [eigcoeff, eigvec] = pca(dat,pcnum);
 
-for i=1:length(L)
-    pc.data(:,:,i)=eigvec'*mean(D(:,:,i),3);
+%% plot PC
+indices=T.Data.findTrials('6','n','n')
+idx1=find(ismember(usetr,indices.cond1));
+idx2=find(ismember(usetr,indices.cond2));
+for c=1:length(usechan)
+    for i=1:pcnum
+        pc.data(c,:,:)=(eigvec'*mean(D(:,:,c),3)')';
+        pc.data1(c,:,:)=(eigvec'*mean(D(idx1,:,c),3)')';
+        pc.data2(c,:,:)=(eigvec'*mean(D(idx2,:,c),3)')';
+    end
+end
+%% plot PC
+indices=T.Data.findTrials('6','y','n')
+idx1=find(ismember(usetr,indices.cond1));
+idx2=find(ismember(usetr,indices.cond2));
+figure
+meanDiff=zeros(1,256)
+for s=1:10:length(usesamp)
+    samp=usesamp(s);
+    for c=1:length(usechan)
+        %plotGridPosition(usechan(c));
+        for i=1%:pcnum
+              %barwitherr([ste(pc.data(c,idx1,i),2);ste(pc.data(c,idx2,i),2)],[mean(pc.data(c,idx1,i),2);mean(pc.data(c,idx2,i),2)]);
+
+              tmp1=squeeze(mean(T.Data.segmentedEcog.zscore_separate(c,samp+10,:,idx1),2))';
+              tmp2=squeeze(mean(T.Data.segmentedEcog.zscore_separate(c,samp+10,:,idx2),2))';
+              %barwitherr([ste(tmp1,2);ste(tmp2,2)],[mean(tmp1,2);mean(tmp2,2)]);
+              meanDiff(usechan(c),s)=mean(tmp1,2)-mean(tmp2,2);
+        end
+    end
+    imagesc(reshape(meanDiff(:,s)',16,16)')
+    title(samp)
+    input('n')
+end
+%%
+figure
+for c=usechan
+    plotGridPosition(c);
+    plot(meanDiff(c,:))
+end
+%% TTEST
+for c=1:length(usechan)
+    for s=1:10:length(usesamp)-10
+        %samp=usesamp(s);
+        samp=s;
+        [h(c,s),p(c,s)]=ttest(mean(D_sm(c,samp+10,realIdx),2),mean(D_sm(c,samp+10,psIdx),2),0.05);
+    end
+end
+dd=cumsum(h,2);
+d=zeros(1,256);
+d(usechan)=dd(:,end);
+imagesc(reshape(d,16,16))
+visualizeGrid(1,['E:\General Patient Info\' T.Data.patientID '\brain.jpg'],usechan,dd(:,end)');
+%%
+idx=1
+figure
+for  s=1:25:length(usesamp)
+    %samp=usesamp(s);
+    %imagesc(reshape(meanDiff(:,s)',16,16)')    
+%     d=meanDiff(:,s)';
+%     d(find(meanDiff(:,s)<.5))=0;
+    subplot(5,8,idx)
+    hold on
+    d=sum(h(:,s:s+25),2)';
+    d2=zeros(1,256);
+    d2(usechan)=d;
+    dz=d2;
+    %dz(find(d2<2))=0
+    imagesc(flipud(reshape(dz,16,16)'),[0 5])
+    axis tight
+    %visualizeGrid(1,['E:\General Patient Info\' T.Data.patientID '\brain.jpg'],usechan,dz);
+    %axis([200 1300 100 1000])
+    title(usesamp(s))
+    %input('n')
+    %clf
+    idx=idx+1;
 end
 
 %% PCA
@@ -106,7 +177,6 @@ dat = [];
 for i = 1:size(avgData,3)
     dat = [dat; avgData(:,:,i)'];
 end
-[eigcoeff, eigvec] = pca(dat);
 pcnum=20
 [eigcoeff, eigvec] = pca(dat,pcnum);
 
@@ -145,6 +215,8 @@ plot(pc.ps(i,:),'r')
 
 %% PLOT PCS 
 indices=T.Data.findTrials('6','y','n')
+indices=T.Data.findTrials('6','n','n')
+
 idx1=find(ismember(usetr,indices.cond1));
 idx2=find(ismember(usetr,indices.cond2));
 figure
@@ -193,12 +265,17 @@ plot(anEnv(realIdx,:)'-anEnv(psIdx,:)')
 %% PLOT ACOUSTICALLY MATCHED WORDS
 figure
 for i=1:length(realIdx)
-    for p=1:20
-        subplot(4,5,p)
-        plot(mean(pc.data(p,:,realIdx(i)),1))
+    for p=usechan%1:20
+        %subplot(4,5,p)
+        plotGridPosition(p);
+        %plot(mean(pc.data(p,:,realIdx(i)),1))
+        plot(T.Data.segmentedEcog.zscore_separate(p,:,1,realIdx(i)))
         hold on
+        plot(T.Data.segmentedEcog.zscore_separate(p,:,1,psIdx(i)),'Color','r')
+
+        
         %plot(zscore(anEnv(realIdx(i),800:end))')
-        plot(mean(pc.data(p,:,psIdx(i)),1),'r')
+        %plot(mean(pc.data(p,:,psIdx(i)),1),'r')
         %plot(zscore(anEnv(psIdx(i),800:end))','r')
         hold off
     end
@@ -217,11 +294,14 @@ end
 figure
 for i=1:256
     plotGridPosition(i);
-    plot(squeeze(T.Data.segmentedEcog.zscore_separate(i,:,1,realIdx)),'b')
+    hold on
+    errorarea(squeeze(mean(T.Data.segmentedEcog.zscore_separate(i,:,1,realIdx),4)),squeeze(ste(T.Data.segmentedEcog.zscore_separate(i,:,1,realIdx),4)))
     hold on    
-    plot(squeeze(T.Data.segmentedEcog.zscore_separate(i,:,1,psIdx)),'r')
-    plot(squeeze(T.Data.segmentedEcog.zscore_separate(i,:,1,realIdx)),'b')
-
+    [hl,hp]=errorarea(squeeze(mean(T.Data.segmentedEcog.zscore_separate(i,:,1,psIdx),4)),squeeze(ste(T.Data.segmentedEcog.zscore_separate(i,:,1,psIdx),4)))
+    set(hl,'Color','r')
+    set(hp,'FaceColor','r')
+    axis([0 1600 -3 5])
+   % plot(squeeze(mean(T.Data.segmentedEcog.zscore_separate(i,:,1,realIdx),4))-squeeze(mean(T.Data.segmentedEcog.zscore_separate(i,:,1,psIdx),4)))
 end
 %%
 figure
@@ -301,14 +381,39 @@ figure
 plot(Rall)
 %%
 %% PARTIAL CORRELATION CHANNELS: Length and Freq
-for c=1:256
-    ecog=squeeze(mean(max(T.Data.segmentedEcog.zscore_separate(c,400:1400,:),[],2),1));
-    %R=partialcorr([ecog cell2mat(wordProp.l)'],cell2mat(wordProp.f)','type','Spearman');
-    R=corrcoef([ecog cell2mat(wordProp.f)']);
-    Rall(c)=R(1,2);
+sidx=1
+for s=1:25:length(usesamp)-25
+    for c=1:length(usechan)
+        ecog=squeeze(mean(mean(D_sm(c,s+25,idx1),2),1));
+        [R,p]=partialcorr([ecog cell2mat(wordProp.l(idx1))'],cell2mat(wordProp.f(idx1))','type','Spearman');
+        %[R,p]=corrcoef([ecog cell2mat(wordProp.f(idx1))']);
+        Rall.R(c,sidx)=R(1,2);
+        Rall.p(c,sidx)=p(1,2);
+    end
+    sidx=sidx+1;
 end
 figure
-plot(Rall)
+plot(Rall.R)
+imagesc(Rall.R)
+%% plot significant correlation
+figure
+sidx=1
+for s=1:25:length(usesamp)-25
+    subplot(5,8,sidx)
+    idx=find(Rall.p(:,sidx)<=0.05);
+    d=zeros(1,256);
+    d(usechan(idx'))=Rall.R(idx,sidx);
+    imagesc(flipud(reshape(d',16,16)),[-1 1])
+    %visualizeGrid(1,['E:\General Patient Info\' T.Data.patientID '\brain.jpg'],usechan,d);
+    title(usesamp(s))
+    sidx=sidx+1;
+end
+%% PLOT R OVER TIME
+figure
+for c=1:length(usechan)
+    plotGridPosition(usechan(c))
+    errorarea(Rall.R(c,:),Rall.p(c,:))
+end
 %%
 Rall2=Rall;
 Rall2(find(Rall<.4))=0
@@ -322,49 +427,56 @@ R=partialcorr([ecog cell2mat(wordProp.l)'],cell2mat(wordProp.f)','type','Spearma
 R=corr(ecog ,cell2mat(wordProp.l)','type','Spearman')
 
 %% CLASSIFY
+usetr2=[realIdx psIdx]
 try
     group=grp2idx(wordProp.rp(usetr2));
 catch
     group=grp2idx(cell2mat(wordProp.l));
 end
-g1=find(group(1:length(usetr))==1);
-g2=find(group(1:length(usetr))==2);
+%g1=find(group(1:length(usetr))==1);
+%g2=find(group(1:length(usetr))==2);
 %%
-usetr2=([g1(1:16); g2(1:15)])'
+%usetr2=([g1(1:16); g2(1:15)])'
 %usetr=usetr(1:28)
 Labels=T.Data.segmentedEcog.event(usetr2,8);
 usetr=usetr2
 %%
-for i=1:20
-    %%
-    clear tmp2
-    testIdx=ceil(rand(1,round(length(usetr)*.8))*length(usetr));
-    trainIdx=setdiff(1:length(usetr),testIdx);
-    tmp=permute(pc.data(:,:,usetr),[3 1 2]);
-    for j=1:length(usetr)
-       tmp3=dct(squeeze(tmp(j,:,:)));
-       tmp2(j,:,:)=tmp3(:,1:3);
-    end
-    tmp2=max(tmp,[],3);
-    D=reshape(tmp2,length(usetr),[]);
-
-    [bestc, bestg, bestcv, model, predicted_label, accuracy, decision_values] =...
-        svm(D(trainIdx,:), group(trainIdx),D(testIdx,:),group(testIdx));
-    
-    svmOut(i).bestc=bestc;
-    svmOut(i).bestg=bestg;
-    svmOut(i).bestcv=bestcv;
-    svmOut(i).model=model;
-    svmOut(i).predicted_label=predicted_label;
-    svmOut(i).accuracy=accuracy(1);
-    svmOut(i).decision_values=decision_values;
-    svmOut(i).testIdx=testIdx;
-    svmOut(i).actual_label=group(testIdx);
-end
 figure
-plot([svmOut.accuracy])
-hist([svmOut.accuracy])
-title(mean([svmOut.accuracy]))
+sidx=1
+for s=1:50:length(usesamp)-100
+    for i=1:20
+        %%
+        clear tmp2
+        testIdx=ceil(rand(1,round(length(usetr)*.8))*length(usetr));
+        trainIdx=setdiff(1:length(usetr),testIdx);
+        %tmp=permute(pc.data(:,:,usetr),[3 1 2]);
+        tmp=permute(D_sm(:,s:s+100,usetr),[3 1 2]);
+        for j=1:length(usetr)
+           tmp3=dct(squeeze(tmp(j,:,:)));
+           tmp2(j,:,:)=tmp3(:,1:3);
+        end
+        tmp2=max(tmp,[],3);
+        D=reshape(tmp2,length(usetr),[]);
+
+        [bestc, bestg, bestcv, model, predicted_label, accuracy, decision_values] =...
+            svm(D(trainIdx,:), group(trainIdx),D(testIdx,:),group(testIdx));
+
+        svmOut(i).bestc=bestc;
+        svmOut(i).bestg=bestg;
+        svmOut(i).bestcv=bestcv;
+        svmOut(i).model=model;
+        svmOut(i).predicted_label=predicted_label;
+        svmOut(i).accuracy=accuracy(1);
+        svmOut(i).decision_values=decision_values;
+        svmOut(i).testIdx=testIdx;
+        svmOut(i).actual_label=group(testIdx);
+    end
+    subplot(4,5,sidx)
+    plot([svmOut.accuracy])
+    hist([svmOut.accuracy])
+    title([usesamp(s)  mean([svmOut.accuracy])])
+    sidx=sidx+1;
+end
 %%
 gscatter3(x(testIdx,1),x(testIdx,2),x(testIdx,3),predicted_label,{'b','r'})
 %%
