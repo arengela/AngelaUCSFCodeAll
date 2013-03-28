@@ -1,4 +1,3 @@
-function map = hot(varargin)
 %HOT  Black-red-yellow-white colormap
 %
 % Examples:
@@ -27,8 +26,8 @@ function map = hot(varargin)
 %         inter-color bins.
 %   B - size(A)x3 truecolor array.
 
-% $Id: hot.m,v 1.2 2009/04/10 13:00:32 ojw Exp $
 % Copyright: Oliver Woodford, 2009
 
+function map = hot(varargin)
 map = [0 0 0 3; 1 0 0 3; 1 1 0 2; 1 1 1 0];
 map = colormap_helper(map, varargin{:});

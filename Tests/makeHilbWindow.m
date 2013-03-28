@@ -1,4 +1,4 @@
-function [H,h]=makeHilbWindow_1200(T,f)
+function [H,h]=makeHilbWindow(T,f)
 %Creates gaussian window for hilbert transform
 a=[log10(.39); .5];
 frange=[4 200];

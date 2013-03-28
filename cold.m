@@ -1,4 +1,3 @@
-function map = cold(varargin)
 %COLD  Black-blue-cyan-white colormap
 %
 % Examples:
@@ -29,5 +28,6 @@ function map = cold(varargin)
 % Copyright: Oliver Woodford, 2009
 % Based on a colormap by Joseph Kirk, FEX ID: 23865
 
+function map = cold(varargin)
 map = [0 0 0; 0 0 1; 0 1 1; 1 1 1];
 map = colormap_helper(map, varargin{:});

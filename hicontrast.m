@@ -1,4 +1,3 @@
-function map = hicontrast(varargin)
 %HICONTRAST  Black-blue-red-magenta-green-cyan-yellow-white colormap
 %
 % Examples:
@@ -28,9 +27,9 @@ function map = hicontrast(varargin)
 %         inter-color bins.
 %   B - size(A)x3 truecolor array.
 
-% $Id: hicontrast.m,v 1.2 2009/04/10 13:00:32 ojw Exp $
 % Copyright: Oliver Woodford, 2009
 
+function map = hicontrast(varargin)
 map = [0 0 0 114; 0 0 1 185; 1 0 0 114; 1 0 1 174;...
        0 1 0 114; 0 1 1 185; 1 1 0 114; 1 1 1 0];
 map = colormap_helper(map, varargin{:});

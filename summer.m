@@ -1,4 +1,3 @@
-function map = summer(varargin)
 %SUMMER  Green-yellow colormap
 %
 % Examples:
@@ -25,8 +24,8 @@ function map = summer(varargin)
 %   map - (len)x3 colormap table.
 %   B - size(A)x3 truecolor array.
 
-% $Id: summer.m,v 1.2 2009/04/10 13:00:33 ojw Exp $
 % Copyright: Oliver Woodford, 2009
 
+function map = summer(varargin)
 map = [0 0.5 0.4; 1 1 0.4];
 map = colormap_helper(map, varargin{:});

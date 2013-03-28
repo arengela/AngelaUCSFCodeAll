@@ -1,4 +1,3 @@
-function map = temp(varargin)
 %TEMP  Blue-pale-dark red colormap
 %
 % Examples:
@@ -25,7 +24,7 @@ function map = temp(varargin)
 %   map - (len)x3 colormap table.
 %   B - size(A)x3 truecolor array.
 
-% $Id: temp.m,v 1.3 2009/04/10 13:00:33 ojw Exp $
+% Copyright: Oliver Woodford, 2009
 
 % Reference:
 % A. Light & P.J. Bartlein, "The End of the Rainbow? Color Schemes for
@@ -33,6 +32,7 @@ function map = temp(varargin)
 % Union, Vol. 85, No. 40, 5 October 2004.
 % http://geography.uoregon.edu/datagraphics/EOS/index.htm
 
+function map = temp(varargin)
 map = [0.142 0 0.850; 0.097 0.112 0.970; 0.160 0.342 1;...
        0.24 0.531 1; 0.34 0.692 1; 0.46 0.829 1;...
        0.6 0.92 1; 0.74 0.978 1; 0.92 1 1; 1 1 0.92;...

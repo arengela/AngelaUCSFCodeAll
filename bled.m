@@ -1,4 +1,3 @@
-function map = bled(varargin)
 %BLED  Black to red variation of the hsv colormap
 %
 % Examples:
@@ -25,8 +24,8 @@ function map = bled(varargin)
 %   map - (len)x3 colormap table.
 %   B - size(A)x3 truecolor array.
 
-% $Id: bled.m,v 1.2 2009/04/10 13:00:32 ojw Exp $
 % Copyright: Oliver Woodford, 2009
 
+function map = bled(varargin)
 map = [0 0 0; 1 1 0; 0 2 0; 0 3 3; 0 0 4; 5 0 5; 6 0 0] / 6;
 map = colormap_helper(map, varargin{:});

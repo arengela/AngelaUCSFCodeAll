@@ -33,7 +33,15 @@ fprintf('Block: %s',blockName)
 
 ecog_out=[];
 per_out=[];
-
+if ~exist('channelsTot') 
+    cd('RawHTK')
+    channelsTot=length(ls)-2;   
+    cd ..
+elseif isempty(channelsTot)
+    cd('RawHTK')
+    channelsTot=length(ls)-2;    
+    cd ..
+end
 %%
 %Set default Values
 switch flag
@@ -70,9 +78,9 @@ switch input
         sampDur=1000/ecog.sampFreq;
         ecog=ecogRaw2EcogGUI(ecog.data,baselineDurMs,sampDur,[],ecog.sampFreq);    
         ecog=downsampleEcog(ecog,sampFreq,ecog.sampFreq);
-        load E:\PreprocessedFiles\EC21\realgrid.mat
-        g=reshape(realgrid',[1 256]);
-        ecog.data=ecog.data(g,:);
+        %load E:\PreprocessedFiles\EC21\realgrid.mat
+        %g=reshape(realgrid',[1 256]);
+        %ecog.data=ecog.data(g,:);
     case 2 %Downsampled ecog
          ecog=loadHTKtoEcog_CT(sprintf('%s/%s',pathName,'ecogDS'),channelsTot,timeInt);
     case 3 %Rat ecog

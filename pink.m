@@ -1,4 +1,3 @@
-function map = pink(len, varargin)
 %PINK  Black-pink-white colormap
 %
 % Examples:
@@ -23,9 +22,9 @@ function map = pink(len, varargin)
 %   map - (len)x3 colormap table.
 %   B - size(A)x3 truecolor array.
 
-% $Id: pink.m,v 1.2 2009/04/10 13:00:33 ojw Exp $
 % Copyright: Oliver Woodford, 2009
 
+function map = pink(len, varargin)
 if nargin < 1
    len = size(get(gcf, 'Colormap'), 1);
 end

@@ -10,13 +10,13 @@ end
 names=names'
 evnt = ECogFindEvents(dtpath,wpath,expt,names)
 %% paths
-dtpath='E:\DelayWord\EC28'
+dtpath='E:\DelayWord\EC29'
 dtpath='E:\PreprocessedFiles\EC22'
 wpath='C:\Users\Angela_2\Documents\ECOGdataprocessing\TaskFiles\syllables_6\'
 wpath='E:\DelayWord\AllAnalog\broca\'
 wpath='C:\Users\Angela_2\Dropbox\ChangLab\Users\Matt\tasks\wordlearning\stimuli_norm_db\'
 
-expt{1}='EC22_B1'
+expt={'EC29_B2','EC29_B4'}
 expt{1}='EC26_B2'
 expt{1}='EC26_B6'
 
@@ -25,87 +25,152 @@ names{42}='Electronic_Chime-KevanGC-495939803'
 names{43}='slide'
 cd(wpath)
 
-
-
+%% paths
+dtpath='E:\DelayWord\EC18'
+wpath='E:\DelayWord\AllAnalog\broca\'
+expt={'EC18_B1','EC18_B2','EC28_B29','EC28_B50','EC28_B57','EC28_B58'}
+load 'C:\Users\Angela_2\Documents\ECOGdataprocessing\Projects\DelayWordPseudoword\wordlist.mat'
+names{42}='Electronic_Chime-KevanGC-495939803'
+names{43}='slide'
+cd(wpath)
 %% find events
-evnt = ECogFindEvents(dtpath,wpath,expt,names)
-
-
-%% convert transcripts to evnts found
-clear tmp
-idx=1;
-for i=1:length(evnt)
-    if evnt(i).confidence>.80
-        tmp{idx,1}=evnt(i).StartTime
-        tmp{idx,2}=evnt(i).name
-        tmp{idx,3}=evnt(i).name
-        if strcmp(evnt(i).name,{'Electronic_Chime-KevanGC-495939803'})
-            tmp{idx,2}='beep';
+for e=1
+    evnt = ECogFindEvents(dtpath,wpath,expt(e),names)
+    cd([dtpath filesep expt{e} filesep 'Analog'])
+    %% convert transcripts to evnts found
+    clear tmp
+    idx=1;
+    for i=1:length(evnt)
+        if evnt(i).confidence>.80
+            tmp{idx,1}=evnt(i).StartTime
+            tmp{idx,2}=evnt(i).name
             tmp{idx,3}=evnt(i).name
-        elseif ~strcmp(evnt(i).name,'slide')
-            %keyboard
-            idx=idx+1;
-            tmp{idx,1}=evnt(i).StopTime
-            tmp{idx,2}='we'
-            tmp{idx,3}=evnt(i).name
-        end
-         idx=idx+1;
-    end
-end
-tmp2=tmp(:,[1,2]);
-E_times=cell2mat(tmp2(:,1))
-trialslog=tmp2(:,2)
-BadTimesConverterGUI3 (E_times,trialslog,sprintf('transcript_AN%d.lab',2))
-%%
-load([dtpath filesep expt{ex} '\Analog\allEventTimes.mat']);
-idx=strcmp(allEventTimes(:,2),'r');
-idx=strcmp(allEventTimes(:,2),'re');
-%%
-for ex=1:length(ex)
-    load([dtpath filesep expt{ex} '\Analog\allEventTimes.mat']);
-    save([dtpath filesep expt{ex} '\Analog\allEventTimes.mat_OLD'],'allEventTimes');
-    for e=1:length(evnt)
-        if (evnt(e).confidence<96)~=0
-            idx=find(strcmp(allEventTimes(:,2),names(evnt(e).ind)));
-            for i=1:length(idx)
-                t=findnearest(evnt(e).StartTime,allEventTimes{i,1});
-                allEventTimes{idx(i),1}=evnt(e).StartTime
-                allEventTimes{idx(i)+1,1}=evnt(e).StopTime
+            if strcmp(evnt(i).name,{'Electronic_Chime-KevanGC-495939803'})
+                tmp{idx,2}='beep';
+                tmp{idx,3}=evnt(i).name
+            elseif ~strcmp(evnt(i).name,'slide')
+                %keyboard
+                idx=idx+1;
+                tmp{idx,1}=evnt(i).StopTime
+                tmp{idx,2}='we'
+                tmp{idx,3}=evnt(i).name
             end
+             idx=idx+1;
         end
     end
+    tmp2=tmp(:,[1,2]);
+    E_times=cell2mat(tmp2(:,1))
+    trialslog=tmp2(:,2)
+    BadTimesConverterGUI3 (E_times,trialslog,sprintf('transcript_AN%d.lab',2))    
+    %% Add third column of associated word to AllEventsTimes file
+    makeCombinedEventFiles({sprintf('transcript_AN%d.lab',2)})
+    load allEventTimes
+    load E:\DelayWord\brocawords.mat
+    wordlist={brocawords.names}
+    for i=1:size(allEventTimes,1)
+        if ~isempty(find(strcmp(allEventTimes{i,2},wordlist)))
+            currentword=allEventTimes{i,2};
+            if strmatch(allEventTimes{i-1,2},'slide')
+                allEventTimes{i+1,3}=currentword;
+            end
+        elseif strmatch(allEventTimes{i,2},'slide')
+                currentword= allEventTimes{i+1,2};
+        end
+        allEventTimes{i,3}=currentword;
+    end
+    cd([dtpath filesep expt{e} filesep 'Analog'])
+    save('allEventTimes')
+    copyfile('E:\DelayWord\EC28\EC28_B5\Analog\AllConditions.mat',[dtpath filesep expt{e} filesep 'Analog'])
 end
-%% add columns to event files
-cd('C:\Users\Angela_2\Dropbox\ChangLab\General Patient Info\EC26\logfiles\word_learning')
-contents=cellstr(ls)
-for i=3:length(contents)-1
-    t=importdata(contents{i});
-    allEventTimes(:,2:3)=t.textdata(3:end,1:2)
-    allEventTimes(:,4:7)=num2cell(t.data);
-end
-      
+%%
+for e=1:6
+    cd([dtpath filesep expt{e} filesep 'Analog'])
+    try
+        makeCombinedEventFiles({sprintf('transcript_AN%d.lab',1)})        
+        load allEventTimes
+        load E:\DelayWord\brocawords.mat
+        wordlist={brocawords.names}
+         for i=1:size(allEventTimes,1)
+            if ~isempty(find(strcmp(allEventTimes{i,2},wordlist)))
+                currentword=allEventTimes{i,2};
+                if strmatch(allEventTimes{i-1,2},'slide')
+                    allEventTimes{i+1,3}=currentword;
+                end
+            elseif strmatch(allEventTimes{i,2},'slide')
+                    currentword= allEventTimes{i+1,2};
+            end
+            allEventTimes{i,3}=currentword;
 
-%%d
-for i=1:size(trialslog)
-    word(i).name=trialslog{i,1}
-    word(i).type=trialslog{i,2}
-end
-    
-    
-%% Add third column of associated word to AllEventsTimes file
-for i=1:size(allEventTimes,1)
-    if ~isempty(find(strcmp(allEventTimes{i,2},wordlist)))
-        currentword=allEventTimes{i,2};
-        if strmatch(allEventTimes{i-1,2},'slide')
-            allEventTimes{i+1,3}=currentword;
-        end
-    elseif strmatch(allEventTimes{i,2},'slide')
-            currentword= allEventTimes{i+1,2};
+            cd([dtpath filesep expt{e} filesep 'Analog'])
+            save('allEventTimes')
+            copyfile('E:\DelayWord\EC28\EC28_B5\Analog\AllConditions.mat',[dtpath filesep expt{e} filesep 'Analog'])
+         end
     end
+end
+%%
+for e=1
+    evnt = ECogFindEvents(dtpath,wpath,expt(e),names)
+    cd([dtpath filesep expt{e} filesep 'Analog'])
+    %% convert transcripts to evnts found
+    clear tmp
+    idx=1;
+    for i=1:length(evnt)
+        if evnt(i).confidence>.80
+            tmp{idx,1}=evnt(i).StartTime
+            tmp{idx,2}=evnt(i).name
+            tmp{idx,3}=evnt(i).name
+            if strcmp(evnt(i).name,{'Electronic_Chime-KevanGC-495939803'})
+                tmp{idx,2}='beep';
+                tmp{idx,3}=evnt(i).name
+            elseif ~strcmp(evnt(i).name,'slide')
+                %keyboard
+                idx=idx+1;
+                tmp{idx,1}=evnt(i).StopTime
+                tmp{idx,2}='we'
+                tmp{idx,3}=evnt(i).name
+            end
+             idx=idx+1;
+        end
+    end
+    tmp2=tmp(:,[1,2]);
+    E_times=cell2mat(tmp2(:,1))
+    trialslog=tmp2(:,2)
+    BadTimesConverterGUI3 (E_times,trialslog,sprintf('transcript_AN%d.lab',2)) 
+    cd([dtpath filesep expt{e} filesep 'Analog'])
+    makeCombinedEventFiles({'transcript_all.lab'})     
+    load('allEventTimes')
+    for j=1:length(evnt)
+        if strcmp(evnt(j).name,'Electronic_Chime-KevanGC-495939803')
+            evnt(j).name='beep';
+        end
+   
+        idx=find(strcmp(evnt(j).name,allEventTimes(:,2)));        
+        if isempty(idx)
+            continue
+        end
         
-
-    allEventTimes{i,3}=currentword;
+        useidx=idx(findNearest(evnt(j).StartTime,cell2mat(allEventTimes(idx,1))));
+        allEventTimes{useidx,1}=evnt(j).StartTime;
+        if ~strcmp('beep',evnt(j).name)
+            allEventTimes{useidx+1,1}=evnt(j).StopTime;
+        end
+    end    
+    
+    load E:\DelayWord\brocawords.mat
+    wordlist={brocawords.names}
+    for i=1:size(allEventTimes,1)
+        if ~isempty(find(strcmp(allEventTimes{i,2},wordlist)))
+            currentword=allEventTimes{i,2};
+            if strmatch(allEventTimes{i-1,2},'slide')
+                allEventTimes{i+1,3}=currentword;
+            end
+        elseif strmatch(allEventTimes{i,2},'slide')
+            currentword= allEventTimes{i+1,2};
+        end
+        allEventTimes{i,3}=currentword;
+    end
+    
+    cd([dtpath filesep expt{e} filesep 'Analog'])
+    save('allEventTimes')
+    copyfile('E:\DelayWord\EC28\EC28_B5\Analog\AllConditions.mat',[dtpath filesep expt{e} filesep 'Analog'])
 end
-save('allEventTimes','allEventTimes')
-
-

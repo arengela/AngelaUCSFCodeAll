@@ -1,4 +1,3 @@
-function map = earth(varargin)
 %EARTH  Black-green-white colormap
 %
 % Examples:
@@ -26,9 +25,9 @@ function map = earth(varargin)
 %   map - (len)x3 colormap table.
 %   B - size(A)x3 truecolor array.
 
-% $Id: earth.m,v 1.2 2009/04/10 13:00:32 ojw Exp $
 % Copyright: Oliver Woodford, 2009
 
+function map = earth(varargin)
 map = [0 0 0; 0 0.1104 0.0583; 0.1661 0.1540 0.0248; 0.1085 0.2848 0.1286;...
        0.2643 0.3339 0.0939; 0.2653 0.4381 0.1808; 0.3178 0.5053 0.3239;...
        0.4858 0.5380 0.3413; 0.6005 0.5748 0.4776; 0.5698 0.6803 0.6415;...

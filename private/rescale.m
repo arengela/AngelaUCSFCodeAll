@@ -21,8 +21,9 @@ function [B lims] = rescale(A, lims, out_lims)
 %   lims - 1x2 array of saturation limits used on A. Equal to the input
 %          lims, if given.
 
-% $Id: rescale.m,v 1.2 2009/04/05 15:09:11 ojw Exp $
-% Copyright: Oliver Woodford, 2009
+% Copyright: Oliver Woodford, 2009 - 2011
+
+% 14/01/11 Fixed a bug brought to my attention by Ming Wu (Many thanks!).
 
 if nargin < 3
     out_lims = [0 1];
@@ -36,6 +37,7 @@ if nargin < 2 || isempty(lims)
     else
         lims = [min(A(M)) max(A(M))];
         B = normalize(A, lims, out_lims);
+        B = min(max(B, out_lims(1)), out_lims(2));
     end
     clear M
 else

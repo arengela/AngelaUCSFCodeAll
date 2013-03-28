@@ -1,4 +1,3 @@
-function map = gray(varargin)
 %GRAY  Black-white colormap
 %
 % Examples:
@@ -27,8 +26,8 @@ function map = gray(varargin)
 %         inter-color bins.
 %   B - size(A)x3 truecolor array.
 
-% $Id: gray.m,v 1.2 2009/04/10 13:00:32 ojw Exp $
 % Copyright: Oliver Woodford, 2009
 
+function map = gray(varargin)
 map = [0 0 0; 1 1 1];
 map = colormap_helper(map, varargin{:});

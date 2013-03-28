@@ -22,22 +22,22 @@ for r=1:2
     end
 end
 %%
-subplot(1,2,1)
+subplot(2,1,1)
 bar(squeeze(sum(errorrates(regions{1},1:3,:),1))','stacked')
 ylim([0 3])
 set(gca,'XTickLabel',{'Pres','Delay','Prod'})
 set(gca,'Box','off')
-rotateticklabel(gca,40)
+%rotateticklabel(gca,40)
 
 title('mSTG')
 
-subplot(1,2,2)
+subplot(2,1,2)
 bar(squeeze(sum(errorrates(regions{2},1:3,:),1))','stacked')
 ylim([0 3])
-colormap(hot)
+colormap(pink)
 legend({'perc','phon','none'})
 set(gca,'XTickLabel',{'Pres','Delay','Prod'})
-rotateticklabel(gca,40)
+%rotateticklabel(gca,40)
 title('pSTG')
 
 set(gca,'Box','off')

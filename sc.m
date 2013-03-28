@@ -1,4 +1,3 @@
-function [I limits map] = sc(I, varargin)
 %SC  Display/output truecolor images with a range of colormaps
 %
 % Examples:
@@ -57,6 +56,9 @@ function [I limits map] = sc(I, varargin)
 %               images.
 %      'prob_jet' - first channel is plotted as jet colormap, and the other
 %                   channels modulate intensity.
+%      'gray_jet' - first channel is plotted as jet colormap, second
+%                   channel as gray, and third channel as alpha between the
+%                   two.
 %      'diff' - intensity values are marked blue for > 0 and red for < 0.
 %               Darker colour means larger absolute value. For multi-
 %               channel images, the L2 norm of the other channels sets
@@ -67,6 +69,8 @@ function [I limits map] = sc(I, varargin)
 %                   variance.
 %      'contrast' - apply the CONTRAST function to create an approximately
 %                   equal intensity distribution.
+%      'complex' - display a complex matrix as hue for argument and
+%                  intensity for magnitude (darker = larger).
 %      'flow' - display two channels representing a 2d Cartesian vector as
 %               hue for angle and intensity for magnitude (darker colour
 %               indicates a larger magnitude).
@@ -108,6 +112,7 @@ function [I limits map] = sc(I, varargin)
 
 % Copyright: Oliver Woodford, 2007-2010
 
+function [I limits map] = sc(I, varargin)
 %% Check for arguments
 if nargin == 0
     % If there are no input arguments then run the demo
@@ -203,10 +208,17 @@ end
 return
 
 %% Colormap switch
-function [I limits map] = colormap_switch(A, cmap, limits)
+function [I, limits, map] = colormap_switch(A, cmap, limits)
+% Convert complex planes to new colour planes
+[y, x, c] = size(A);
+A = full(double(A));
+if ~isreal(A)
+    A = reshape(A, y, x, 1, c);
+    A = cat(3, real(A), imag(A));
+    c = c * 2;
+end
 % Reshape
-[y x c] = size(A);
-I = full(real(double(reshape(A, y*x, 1, c))));
+I = reshape(A, y*x, 1, c);
 % If map starts with a '-' sign, invert the colormap
 reverseMap = cmap(1) == '-';
 % If the map ends with a '*', attempt to make map convert linearly to
@@ -219,7 +231,7 @@ switch lower(cmap(1+reverseMap:end-grayMap))
         % Similar to the MATLAB internal prism colormap, but only works on
         % index images, assigning each index (or rounded float) to a
         % different colour
-        [I limits] = index_im(I);
+        [I, limits] = index_im(I);
         % Generate prism colormap
         map = prism(6);
         if reverseMap
@@ -283,17 +295,29 @@ switch lower(cmap(1+reverseMap:end-grayMap))
         I = 1 - I * [1 1 0.4; 0.4 1 1; 1 0.4 1]; % (Blue/Red)
         I = min(max(I, 0), 1);
         limits = [-limits limits]; % For colorbar
-%% Flow
-    case 'flow'
+%% Flow and Complex
+    case {'flow', 'complex'}
         % Calculate amplitude and phase, and use 'phase'
         if c ~= 2
-            error('''flow'' requires two channels');
+            error('''%s'' requires two channels', cmap);
         end
+        % Compute magnitude
         A = sqrt(sum(I .^ 2, 3));
-        if isempty(limits)
-            limits = [min(A) max(A)*2];
+        % Colormap dependent stuff
+        if lower(cmap(1+reverseMap)) == 'c'
+            % Switch axes for 'complex'
+            I = cat(3, I(:,:,2), -I(:,:,1));
+            % Limits for 'complex'
+            if isempty(limits)
+                limits = [min(A) max(A)];
+            end
         else
-            limits = [0 max(abs(limits)*sqrt(2))*2];
+            % Limits for 'flow'
+            if isempty(limits)
+                limits = [min(A) max(A)*2];
+            else
+                limits = [0 max(abs(limits)*sqrt(2))*2];
+            end
         end
         I(:,1) = atan2(I(:,2), I(:,1));
         I(:,2) = A;
@@ -372,6 +396,18 @@ switch lower(cmap(1+reverseMap:end-grayMap))
         cmap2(reverseMap+(1:5)) = [];
         [I limits] = real2rgb(I, cmap2, limits);
         I = rescale(A + I, [0.2 1.8]);
+%% Gray_jet
+    case 'gray_jet'
+        % Plot first channel as 'jet', second channel as 'gray', and third
+        % channel as alpha between the two.
+        if c ~= 3
+            error('gray_jet requires a 3 channel image');
+        end
+        J = real2rgb(I(:,:,1), 'jet', limits);
+        G = real2rgb(I(:,:,2), 'gray', limits);
+        A = real2rgb(I(:,:,3), 'gray', limits);
+        I = J .* A + G .* (1 - A);
+        limits = [];
 %% Compress
     case 'compress'
         % Compress to RGB, maximizing variance
@@ -639,7 +675,7 @@ return
 %% Index images
 function [J limits num_vals] = index_im(I)
 % Returns an index image
-if size(I, 2) ~= 1
+if size(I, 3) ~= 1
     error('Index maps only work on single channel images');
 end
 J = round(I);

@@ -1,4 +1,3 @@
-function map = hsv(varargin)
 %HSV  Red-yellow-green-cyan-blue-magenta-red colormap
 %
 % Examples:
@@ -27,8 +26,8 @@ function map = hsv(varargin)
 %         inter-color bins.
 %   B - size(A)x3 truecolor array.
 
-% $Id: hsv.m,v 1.2 2009/04/10 13:00:32 ojw Exp $
 % Copyright: Oliver Woodford, 2009
 
+function map = hsv(varargin)
 map = [1 0 0; 1 1 0; 0 1 0; 0 1 1; 0 0 1; 1 0 1; 1 0 0];
 map = colormap_helper(map, varargin{:});

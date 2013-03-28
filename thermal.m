@@ -1,4 +1,3 @@
-function map = thermal(varargin)
 %THERMAL  Black-purple-red-yellow-white colormap
 %
 % Examples:
@@ -24,8 +23,8 @@ function map = thermal(varargin)
 %   map - (len)x3 colormap table.
 %   B - size(A)x3 truecolor array.
 
-% $Id: thermal.m,v 1.2 2009/04/10 13:00:33 ojw Exp $
 % Copyright: Oliver Woodford, 2009
 
+function map = thermal(varargin)
 map = [0 0 0; 0.3 0 0.7; 1 0.2 0; 1 1 0; 1 1 1];
 map = colormap_helper(map, varargin{:});

@@ -1,4 +1,3 @@
-function [B lims map] = real2rgb(A, cmap, lims)
 %REAL2RGB  Converts a real-valued matrix into a truecolor image
 %
 % Examples:
@@ -45,11 +44,12 @@ function [B lims map] = real2rgb(A, cmap, lims)
 %          given.
 %   map - 256x3 colormap similar to that used to generate B.
 
-% Copyright: Oliver Woodford, 2009-2010
+% Copyright: Oliver Woodford, 2009-2011
 
 % Thank you to Peter Nave for reporting a bug whereby colormaps larger than
 % 256 entries long are returned.
 
+function [B lims map] = real2rgb(A, cmap, lims)
 % Don't do much if A is wrong size
 [y x c] = size(A);
 if c > 1
@@ -134,8 +134,13 @@ else
 end
 
 % Compute the output image
-B = B(:,[1 1 1]);
-B = map(ind,1:3) .* (1 - B) + map(ind+1,1:3) .* B;
+try
+    B = bsxfun(@times, map(ind,1:3), 1 - B) + bsxfun(@times, map(ind+1,1:3), B);
+catch
+    % If no bsxfun
+    B = B(:,[1 1 1]);
+    B = map(ind,1:3) .* (1 - B) + map(ind+1,1:3) .* B;
+end
 B = min(max(B, 0), 1); % Rounding errors can make values slip outside bounds
 B = reshape(B, y, x, 3);
 

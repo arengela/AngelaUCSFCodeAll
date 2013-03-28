@@ -1,4 +1,3 @@
-function map = hsv2(varargin)
 %HSV2  Black to red variation of the hsv colormap
 %
 % Examples:
@@ -24,8 +23,8 @@ function map = hsv2(varargin)
 %   map - (len)x3 colormap table.
 %   B - size(A)x3 truecolor array.
 
-% $Id: hsv2.m,v 1.2 2009/04/10 13:00:32 ojw Exp $
 % Copyright: Oliver Woodford, 2009
 
+function map = hsv2(varargin)
 map = [0 0 0; 0.5 0 0.5; 0 0 0.9; 0 1 1; 0 1 0; 1 1 0; 1 0 0];
 map = colormap_helper(map, varargin{:});

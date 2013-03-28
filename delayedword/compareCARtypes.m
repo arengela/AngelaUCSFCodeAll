@@ -1,0 +1,147 @@
+colorcell{1}='k'
+colorcell{2}='r'
+colorcell{3}='g'
+numSet=[1 17 9 10 11 43 ]
+cartype{1}='HilbAA_70to150_8band_noCAR'
+cartype{2}='HilbAA_70to150_8band_16ChCAR'
+cartype{3}='HilbAA_70to150_8band_256ChCAR'
+
+for n=numSet(1:end)%1 43
+    %%
+    for car=3
+        if n~=17 & p~=2
+            ch=1:256;
+            events=[2 4 5]
+
+        else
+            ch=1:128;
+            events=[2 4 5]
+        end
+         
+        if ismember(n,[43 2])
+            blockNum=2
+        else
+            blockNum=1
+        end
+        %load(['E:\DelayWord\Figure1\Tall_' patients{p} '_B1'])
+        %load(['E:\DelayWord\Figure1\E_' patients{p} '_B1'])
+        p=find(numSet==n)
+        cd(['E:\DelayWord\' patients{p} filesep patients{p} '_B' int2str(blockNum)])
+        
+        movefile([pwd filesep cartype{car}],[pwd filesep 'HilbAA_70to150_8band'],'f')
+%         [Tall,E]=analyzeData(n,ch,[],events)
+    end
+end
+%%
+        cd(['E:\DelayWord\' patients{p} filesep patients{p} '_B' int2str(blockNum)])
+        movefile([pwd filesep 'HilbAA_70to150_8band'],[pwd filesep cartype{car}],'f')
+        AllCAR{car}.Tall=Tall;
+       Tall=AllCAR{car}.Tall;
+
+        events=[2 4 5]
+        for eidx=events
+            figure(eidx)
+            for c=ch
+                plotGridPosition(c);
+                hold on
+                plot(mean(Tall{eidx}.Data.segmentedEcog.smoothed100(c,:,:,:),4),colorcell{car},'LineWidth',1)
+                line([200 200],[-1 5])
+                axis tight
+            end
+            %Tall{eidx}.Data.plotData('line',1,'1','n','n')
+        end       
+
+    end
+    %%
+    for eidx=events
+        saveppt2('ppt',powerpoint_object,'stretch','off');
+        set(gcf,'units','normalized','outerposition',[0 0 1 1])
+    end
+    close all
+end
+%%
+newFile='E:\DelayWord'
+for p=2:length(patients)-1%n=[1 17 9 11 10 34 43 ]%1 43
+    cd(['E:\DelayWord\' patients{p} filesep patients{p} '_B1'])
+     movefile([pwd filesep 'HilbAA_70to150_8band'],[newFile filesep patients{p} filesep patients{p} '_B1' filesep cartype{3}],'f')
+
+    %movefile([pwd filesep 'HilbAA_70to150_8band_noCAR'],[newFile filesep patients{p} filesep patients{p} '_B1' filesep 'HilbAA_70to150_8band'],'f')
+    %quickPreprocessing_ALL(pwd,3,0,1,[],[],[],256)
+end
+%%
+
+figure
+c=3
+for car=1:3
+ plot(mean(AllCAR{car}.Tall{2}.Data.segmentedEcog.smoothed100(c,:,:,:),4),colorcell{car})
+ hold on
+end
+%%
+events=[2 4 5]
+        for eidx=2
+            figure(7)
+            for c=ch
+                for car=1:3
+                    plotGridPosition(c);
+                    plot(mean(AllCAR{car}.Tall{eidx}.Data.segmentedEcog.smoothed100(c,:,:,:),4),colorcell{car},'LineWidth',1)
+                   hold on
+                    line([200 200],[-1 5])
+                    axis tight
+                    
+                end
+                %input('n')
+                %clf
+            end
+            %Tall{eidx}.Data.plotData('line',1,'1','n','n')
+        end  
+%%
+numSet=[ 1 17 9 10 11 43 ]% 1 17
+for n=numSet(3:end)%1 43
+    %%
+    for car=1:3
+        if n~=17 & p~=2
+            ch=1:256;
+            events=[2 4 5]
+
+        else
+            ch=1:128;
+            events=[2 4 5]
+        end
+         
+        if ismember(n,[43 2])
+            blockNum=2
+        else
+            blockNum=1
+        end
+        %load(['E:\DelayWord\Figure1\Tall_' patients{p} '_B1'])
+        %load(['E:\DelayWord\Figure1\E_' patients{p} '_B1'])
+        p=find(numSet==n)
+        cd(['E:\DelayWord\' patients{p} filesep patients{p} '_B' int2str(blockNum)])
+       quickPreprocessing_ALL_TMP(pwd,3,0,1);
+        movefile([pwd filesep 'HilbAA_70to150_8band'],[pwd filesep cartype{1}],'f')
+        
+        quickPreprocessing_ALL(pwd,3,0,1,[],[],[],16)
+        movefile([pwd filesep 'HilbAA_70to150_8band'],[pwd filesep cartype{2}],'f')
+        
+       quickPreprocessing_ALL(pwd,3,0,1,[],[],[],256)
+        movefile([pwd filesep 'HilbAA_70to150_8band'],[pwd filesep cartype{3}],'f')
+        
+    end
+end
+%%
+for n=[9 11 10 34 43 ],
+    %%
+    cd([handles.AllBaselinePaths{n} '/HilbAA_70to150_8band'])
+    ecog=loadHTKtoEcog_CT(pwd,length(ls)-2,[]);
+    for c=1:size(ecog.data,1)
+        idx=find(zscore(mean(ecog.data(c,:,:),3),[],2)<7);
+        newIdx=ceil(rand(1,10000)*length(idx));
+        newEcog.data(c,:,:)=ecog.data(c,idx(newIdx),:);
+    end
+    newEcog.sampFreq=ecog.sampFreq;
+    cd([handles.AllBaselinePaths{n}])
+    movefile('HilbAA_70to150_8band','HilbAA_70to150_8band_original')
+    saveEcogToHTK('HilbAA_70to150_8band',newEcog)
+    %%
+    %quickPreprocessing_ALL(handles.AllBaselinePaths{n},3,0,1,[],[],[],256),
+end

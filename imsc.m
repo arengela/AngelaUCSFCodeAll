@@ -6,10 +6,12 @@
 %   h = imsc(...)
 %
 % IN:
-%    x - 1x2 vector of x-axis bounds. If x(1) > x(2) the image is flipped
-%        left-right. Default: [1 size(I, 2)].
-%    y - 1x2 vector of y-axis bounds. If y(1) > y(2) the image is flipped
-%        up-down. Default: [1 size(I, 1)].
+%    x - 1xJ vector of x-axis bounds. If x(1) > x(2) the image is flipped
+%        left-right. If J > 2 then only the first and last values are used.
+%        Default: [1 size(I, 2)].
+%    y - 1xK vector of y-axis bounds. If y(1) > y(2) the image is flipped
+%        up-down. If K > 2 then only the first and last values are used.
+%        Default: [1 size(I, 1)].
 %    I - MxNxC input image.
 %    varargin - Extra input parameters passed to SC. See SC's help for more
 %               information.
@@ -24,11 +26,11 @@
 function h = imsc(varargin)
 
 % Check for x, y as first two inputs
-if numel(varargin{1}) == 2 && numel(varargin{2}) == 2
+if nargin > 2 && isvector(varargin{1}) && numel(varargin{1}) > 1 && isvector(varargin{2}) && numel(varargin{2}) > 1
     % Render
     [I clim map] = sc(varargin{3:end});
     % Display
-    h = image(varargin{1}, varargin{2}, I);
+    h = image(varargin{1}([1 end]), varargin{2}([1 end]), I);
 else
     % Render
     [I clim map] = sc(varargin{:});

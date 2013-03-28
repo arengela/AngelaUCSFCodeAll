@@ -1,4 +1,3 @@
-function map = dusk(varargin)
 %DUSK  Black-blue-green-gray-red-yellow-white colormap
 %
 % Examples:
@@ -30,5 +29,6 @@ function map = dusk(varargin)
 
 % Copyright: Oliver Woodford, 2009
 
+function map = dusk(varargin)
 map = [0 0 0 114; 0 0 0.5 587; 0 0.5 0.5 299; 0.5 0.5 0.5 299; 1 0.5 0.5 587; 1 1 0.5 114; 1 1 1 0];
 map = colormap_helper(map, varargin{:});

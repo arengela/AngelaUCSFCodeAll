@@ -1,4 +1,4 @@
-function [ecog_out, per_out]=quickPreprocessing_ALL(pathName,flag,perFlag,input,ref,timeInt,channelsTot)
+function [ecog_out, per_out]=quickPreprocessing_ALL(pathName,outFlag,perFlag,input,ref,timeInt,channelsTot,CARflag)
 %Preprocesses ecog block. 
 %Block must have folders "RawHTK","Artifacts"
 %There must be appropriate files in "Artifacts"
@@ -22,7 +22,13 @@ function [ecog_out, per_out]=quickPreprocessing_ALL(pathName,flag,perFlag,input,
 %       4: Run broadband linux hilbert
 %       5: Downsampled Rat data 
 %ref=   reference electrode # (optional)
-        
+%timeInt= time in ms to load from RawHTK (optional)
+%channelsTot= total number of channels
+%CAR flag= #ofChannels: use entire grid for CAR
+%          16: CAR in blocks of 16
+%          1:  Use reference Channel
+%          0:  No CAR
+
 [a,b,c]=fileparts(pathName);
 blockName=b;
 cd(pathName)
@@ -34,7 +40,7 @@ per_out=[];
 
 %%
 %Set default Values
-switch flag
+switch outFlag
     case 6
         sampFreq=1200;
     otherwise
@@ -79,7 +85,7 @@ switch input
         baselineDurMs=0;
         sampDur=1000/ecog.sampFreq;
         ecog=ecogRaw2EcogGUI(ecog.data,baselineDurMs,sampDur,[],ecog.sampFreq);
-        ecog=downsampleEcog(ecog,400,ecog.sampFreq);
+        ecog=downsampleEcog(ecog,sampFreq,ecog.sampFreq);
     case 5 %Downsampled Rat ecog
         ecog=loadHTKtoEcog_rat_CT(sprintf('%s/%s',pathName,'RawHTK'),channelsTot,timeInt,'rat');    
     otherwise
@@ -87,8 +93,7 @@ switch input
         baselineDurMs=0;
         sampDur=1000/ecog.sampFreq;
         ecog=ecogRaw2EcogGUI(ecog.data,baselineDurMs,sampDur,[],ecog.sampFreq);    
-        ecog=downsampleEcog(ecog,400,ecog.sampFreq);
-       
+        ecog=downsampleEcog(ecog,sampFreq,ecog.sampFreq);       
 end
 ecog.selectedChannels=1:size(ecog.data,1);
 ecog.sampDur=1000/sampFreq;
@@ -116,42 +121,35 @@ end
     
 %%
 %SUBTRACT CAR
-if  ~isempty(ref) 
-    filtered=ecogFilterTemporal(ecog,[1 200],3);
-    filtered.sampFreq=ecog.sampFreq;
-    CAR=repmat(filtered.data(ref,:),[256,1]);
-    ecog.data=ecog.data-CAR;
-    clear filtered;
+fprintf('\n1 Hz Filter begin...')
+filtered=ecogFilterTemporal(ecog,[1 200],3);
+filtered.sampFreq=ecog.sampFreq;
+fprintf('1 Hz Filter done...\n')
     
-else
-    switch input
-        case {3,4}
-            %INSERT code for CAR over all channel
-             fprintf('\n1 Hz Filter begin...')
-             filtered=ecogFilterTemporal(ecog,[1 200],3);
-             filtered.sampFreq=ecog.sampFreq;
-             fprintf('1 Hz Filter done...\n')
-             CAR=mean(filtered.data(setdiff(1:96,badChannels),:));
-             
-             ecog.data=ecog.data-repmat(CAR,[96,1]);
-             clear 'filtered'
-        otherwise
-            if ~ismember(flag,[6,7])
-                %keyboard
-                
-                fprintf('\n1 Hz Filter begin...')
-                filtered=ecogFilterTemporal(ecog,[1 200],3);
-                filtered.sampFreq=ecog.sampFreq;
-                fprintf('1 Hz Filter done...\n')
-                ecog=subtractCAR_16ChanBlocks(filtered,badChannels,ecog);
-                clear 'filtered'
-                
-            end
-    end
+switch CARflag
+    case channelsTot %CAR over all channels
+        CAR=mean(filtered.data(setdiff(1:size(filtered.data,1),badChannels),:));
+        ecog.data=ecog.data-repmat(CAR,[size(filtered.data,1),1]);
+    case 16 %CAR in 16 channel blocks
+        fprintf('\n1 Hz Filter begin...')
+        filtered=ecogFilterTemporal(ecog,[1 200],3);
+        filtered.sampFreq=ecog.sampFreq;
+        fprintf('1 Hz Filter done...\n')
+        ecog=subtractCAR_16ChanBlocks(filtered,badChannels,ecog);
+    case 1 %Use 1 channel (specified with ref flag) for CAR
+        if ~isempty(ref)
+            CAR=repmat(filtered.data(ref,:),[channelsTot,1]);
+            ecog.data=ecog.data-CAR;
+        else
+            printf('Error: No ref channel specified');
+            break
+        end
 end
+clear filtered;        
+
 %%
 %NOTCH FILTER at 60, 120, 180 Hz
-switch flag
+switch outFlag
     case {6,7}
         %No Notch Filter
     otherwise    
@@ -159,7 +157,7 @@ switch flag
 end
 
 
-%%
+%% SAVE PERIODOGRAM FIGURES
 switch perFlag
     case 1 %Plot Figures
     if ~isempty(badTimeSegments)
@@ -191,55 +189,33 @@ switch perFlag
     set(gcf,'Name',sprintf('%s After CAR',blockName))
     saveas(gcf,'FIG_spectrogramAfterCAR','fig')
     close all
-    cd(pathName)
-    
-%%Only save periodograms, no figures
-%NEED TO FIX!!!
-%{
-    case 2
-    periodogram_noFigure(ecog,'periodogramDS')
-    periodogram_noFigure(ecogTmp,'periodogramAfterCAR')
-
-    cd(sprintf('%s/Figures',pathName))
-    for i=1:256
-        spectrogramDS{i}=abs(specgram(ecogDS.data(i,:),[],400));
-        spectrogramAfterCAR{i}=specgram(ecogTmp.data(i,:),[],400)
-        save(spectrogramDS)
-        save(spectrogramAfterCAR)
-    end
-    cd(pathName)
-%}
+    cd(pathName)  
 end
 
 %%
-switch flag
+switch outFlag
     case {4,7} %Save only AfterCARandNotch
-        if flag==4
+        if outFlag==4
             newfolder='AfterCARandNotch';
-        elseif flag==7
+        elseif outFlag==7
             newfolder='Downsampled400';
         end
         
         if input==3
             mkdir([pathName filesep newfolder])
             cd([pathName filesep newfolder])
-    %         mkdir('/data/Kunal/EC2_B88/AfterCARandNotch');
-    %         cd('/data/Kunal/EC2_B88/AfterCARandNotch');
             Fs=sampFreq;
             fprintf('Saving:\n')
-            for nBlocks=1:96
+            for nBlocks=1:channelsTot
                    varName=sprintf('Wave%s.htk',num2str(nBlocks));
                    chanNum=nBlocks;
                    fprintf('%i\n.',chanNum)
                    data=(ecog.data(nBlocks,:));
                    writehtk (varName, data, Fs, chanNum);        
             end
-        else        
-        
+        else  
             mkdir([pathName filesep newfolder])
             cd([pathName filesep newfolder])
-    %         mkdir('/data/Kunal/EC2_B88/AfterCARandNotch');
-    %         cd('/data/Kunal/EC2_B88/AfterCARandNotch');
             Fs=sampFreq;
             blockNum=floor(channelsTot/64);
             elecNum=rem(channelsTot,64);
@@ -346,7 +322,6 @@ switch flag
                     clear envData            
                 end   
          end
-%%
         case 3  %Calculate and save only HG
             [ecog,cfs,sigma_fs]=processingHilbertTransform_filterbankGUI(ecog, sampFreq, freqRange);
             currentPath=pwd;
@@ -359,7 +334,6 @@ switch flag
             currentPath=pwd;
             x=find(cfs>=freqRange(1)&cfs<=freqRange(2));
             newFolder=sprintf('HilbAA_%sto%s_%sband',int2str(freqRange(1)),int2str(freqRange(2)),int2str(length(x)));
-            %newPath=sprintf('%s/%s','/data/AR/FilterTests/EC2',newFolder);
             saveEcogToHTK([pathName filesep newFolder],ecog)
         case 6 
             mkdir('HilbReal_4to500_45band_1200Hz')
@@ -384,27 +358,7 @@ switch flag
                       data2=imag(squeeze(hilbdata))';
                       writehtk (varName, data2, sampFreq, chanNum); 
                       clear data2
-                      cd ..
-                        
-                      %{
-                        x=find(cfs>=freqRange(1)&cfs<=freqRange(2));
-                        newFolder=sprintf('HilbAA_%sto%s_%sband',int2str(freqRange(1)),int2str(freqRange(2)),int2str(length(x)));
-                        newPath=sprintf('%s/%s',pathName,newFolder);
-                        if w==1
-                            mkdir(newPath);
-                            w=0;
-                        end
-                      
-                        cd(newPath)            
-                        envData=abs(hilbdata(1,:,:));
-                        data3=squeeze(envData(:,:,x));
-                        writehtk (varName, data3', Fs, chanNum);        
-                        cd ..
-                      
-                        clear hilbdata
-                        clear data3
-                        clear envData   
-      %}
+                      cd ..           
                 end
             end
 end

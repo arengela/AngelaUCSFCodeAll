@@ -17,7 +17,7 @@ for child=1:length(tmp)
         %colormap(flipud(gray))
         %freezeColors;
     elseif isfield(y,'XData')
-         %plot(y.XData,y.YData,'k')
+        plot(y.XData,y.YData,'k')
     elseif isfield(y,'String')
         title(y.String)
     end

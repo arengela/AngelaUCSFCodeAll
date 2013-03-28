@@ -138,6 +138,17 @@ switch handles.type
         channelsTot=256;
         timeInt=[];
         handles.ecog=loadHTKtoEcog_CT(sprintf('%s/%s',handles.pathName,'RawHTK'),channelsTot,timeInt);
+    case 'Hipp'
+        channelsTot=8;
+        timeInt=[];
+        cd(handles.pathName)
+        contents=cellstr(ls);
+        contents=contents(4:end);
+        for i=1:length(contents)        
+            [handles.ecog.data(i,:),sampFreq]=readhtk(contents{i});
+        end
+        handles.ecog.sampFreq=sampFreq;
+        flag=1;
     case 'RatDS'
         channelsTot=96;
         timeInt=[];
@@ -180,6 +191,11 @@ handles.badTimeSegments=[];
 handles.ecogDS.badChannels=[];
 handles.ecogDS.badTimeSegments=[];
 rmfield(handles,'ecog');
+
+
+if strmatch(handles.type,'Hipp')
+    handles.ecogDS=ecogFilterTemporal(handles.ecogDS,[80 200],3);   
+end
 guidata(hObject, handles);
 
 % --- Executes on button press in lookAtTimeSeries.
@@ -386,6 +402,7 @@ b=[];
 for i=1:size(badTimeSegments,1)
     b=[b ceil(badTimeSegments(i,1)*400):floor(badTimeSegments(i,2)*400)];
 end
+b=b(find(b>0 & b<size(ecogTmp.data,2)));
 ecogTmp.data(handles.badChannels,:)=[];%temporarily delete all bad channels from ecog matrix
 if ~isempty(b)
     ecogTmp.data(:,b)=[];%temporarily delete all bad time points from ecog matrix

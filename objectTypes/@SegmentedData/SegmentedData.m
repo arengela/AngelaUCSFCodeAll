@@ -168,6 +168,7 @@ classdef SegmentedData < handle
                 end
             end
             
+            cd(handles.BaselineChoice);
             fprintf('Baseline File opened: %s\n',handles.BaselineChoice);
             handles.BaselineChoice=handles.BaselineChoice;
             baselineMainPath=fileparts(handles.BaselineChoice);
@@ -177,8 +178,10 @@ classdef SegmentedData < handle
             for c= 1:length(handles.usechans)
                         printf([int2str(c) '\n'])
                         chanNum=handles.usechans(c);
-                        cd(handles.BaselineChoice)
-                        tmp=fileparts(handles.BaselineChoice);
+                        if strmatch(handles.BaselineChoice,'rest')
+                            cd(handles.BaselineChoice)
+                            tmp=fileparts(handles.BaselineChoice);
+                        end
                         switch output
                             case 'aa'
                                 if strmatch(handles.folderType,'HilbAA_70to150_8band')
@@ -205,7 +208,7 @@ classdef SegmentedData < handle
             cd( handles.MainPath)
         end
         
-        function segmentedDataEvents40band(handles,subsetLabel,segmentTimeWindow,trialnum,output,freqband,sorttrials,getEventMatrix)
+        function segmentedDataEvents40band(handles,subsetLabel,segmentTimeWindow,trialnum,output,freqband,sorttrials,getEventMatrix,transcriptionFile)
             %% LOAD TIMESEGMENTS FROM ECOG DATA ON DISK
             % INPUTS: subsetLabel (cell array)= index (from AllConditions file) of event you want to segment by (each cell array specifies different segmentation group) ex {[2],[3]}
                     %           second row is event to sort by ex {[2;3]}
@@ -244,17 +247,26 @@ classdef SegmentedData < handle
             
             handles.eventParams.subsetLabel=subsetLabel;
             handles.eventParams.segmentTimeWindow=segmentTimeWindow;
-            load([handles.MainPath '/Analog/allEventTimes.mat'])
-            load([handles.MainPath '/Analog/allConditions.mat'])
-            
-            %load baseline
-            if ~strcmp(handles.BaselineChoice,'ave')
-                handles.loadBaselineFolder(output,freqband);
+            if nargin<9
+                load([handles.MainPath '/Analog/allEventTimes.mat'])
+                load([handles.MainPath '/Analog/allConditions.mat'])
+            else
+                [allEventTimes,allConditions]=readLabFile([handles.MainPath '/Analog/' transcriptionFile]);
             end
             
+            %load baseline
+            try
+                handles.loadBaselineFolder(output,freqband);
+            end
+            allConditions=lower(allConditions);
+            allEventTimes(:,2)=lower(allEventTimes(:,2));
             for i=1:length(handles.eventParams.subsetLabel)
                 %% FIND EVENT TIMES FROM TRIALLOG
-                curevent=allConditions(unique(handles.eventParams.subsetLabel{i}(1,:)));
+                try
+                    curevent=allConditions(unique(handles.eventParams.subsetLabel{i}(1,:)));
+                catch
+                    curevent=intersect(allConditions,lower(handles.eventParams.subsetLabel{i}));
+                end
                 p3=find(ismember(allEventTimes(:,2),curevent));
                 if size(handles.eventParams.subsetLabel{i},1)>2
                     pidx=find(ismember(allEventTimes(p3,3),allConditions(unique(handles.eventParams.subsetLabel{i}(3,:)))));
@@ -280,21 +292,32 @@ classdef SegmentedData < handle
                         end
                     end
                     
+                    [d,fs]=readhtk([handles.Filepath filesep 'Wav12.htk']);
+                     if timeInt(2)>(size(d,2)/fs)*1000
+                         continue
+                     end
+                    
                     %LOAD ANALOG
                     cd([handles.MainPath '/Analog'])
                     [an1,f]=readhtk(['ANIN1.htk'],round(timeInt));
-                    [an2,f]=readhtk(['ANIN2.htk'],round(timeInt));
-                    handles.segmentedEcog(i).analog(1,:,:,s)=resample(an1,400,round(f));
-                    handles.segmentedEcog(i).analog(2,:,:,s)=resample(an2,400,round(f));
+                    [an2,f]=readhtk(['ANIN2.htk'],round(timeInt));               
                     handles.segmentedEcog(i).analog24Hz(1,:,1,s)=an1;
                     handles.segmentedEcog(i).analog24Hz(2,:,1,s)=an2;
+                    handles.segmentedEcog(i).analog400Env(1,:,1,s)=resample(abs(hilbert(an1)),400,round(f));
+                    handles.segmentedEcog(i).analog400Env(2,:,1,s)=resample(abs(hilbert(an2)),400,round(f));
                     
-                    %GET EVENT INFORMATION
+                    try
+                        load(([handles.MainPath '/Analog/formants.mat']));
+                        handles.segmentedEcog(i).formant100Hz(:,:,1,s)=formants(round(timeInt(1)/10):round(timeInt(2)/10),:)';
+                    end
+                        %GET EVENT INFORMATION
                     switch getEventMatrix
                         case 'DelayRep'
                             handles.segmentedEcog(i).event(s,1:4)=[allEventTimes(p3(s),1:2)  0 0 ];
                             curset=allEventTimes(p3(s),3);
-                            sortbyword=unique(allConditions(handles.eventParams.subsetLabel{i}(2,:)));
+                            try
+                                sortbyword=unique(allConditions(handles.eventParams.subsetLabel{i}(2,:)));
+                            end
                             position=5;
                             %Get events associated with same word
                             for ii=-5:6
@@ -321,8 +344,12 @@ classdef SegmentedData < handle
                         otherwise
                             %Get event info from allEventTimes file
                             handles.segmentedEcog(i).event(s,:)=[allEventTimes(p3(s),:)];
-                            curset=allEventTimes(p3(s),3);
-                            sortbyword=unique(allConditions(handles.eventParams.subsetLabel{i}(2,:)));
+                            try
+                                curset=allEventTimes(p3(s),3);
+                            end
+                            try
+                                sortbyword=unique(allConditions(handles.eventParams.subsetLabel{i}(2,:)));
+                            end
                     end
                     
                     for c= 1:length(handles.usechans)
@@ -354,6 +381,7 @@ classdef SegmentedData < handle
                         end
                     end
                 end
+                trialnum=[];
             end
             
             %SORT TRIALS
@@ -402,9 +430,12 @@ classdef SegmentedData < handle
                 
         end
         
-        function plotData(handles,plottype,idx,compareFlag_type,compareFlag_onlyLong,compareFlag_equal,freqBandType)            
+        function plotData(handles,plottype,idx,compareFlag_type,compareFlag_onlyLong,compareFlag_equal,freqBandType,analogFlag)            
             if nargin<3
                 idx=1;
+            end
+            if nargin<8
+                analogFlag=1;
             end
             eventSamp=handles.eventParams.segmentTimeWindow{idx}(1)*handles.Params.sampFreq/1000;
             badChannels=handles.Artifacts.badChannels;            
@@ -432,7 +463,7 @@ classdef SegmentedData < handle
             if nargin>6
                 freqbands=handles.FrequencyBands.(freqBandType);
             else
-                freqbands=1:size(handles.segmentedEcog.zscore_separate,3); 
+                freqbands=1:size(handles.segmentedEcog(idx).zscore_separate,3); 
             end
             
             try
@@ -446,6 +477,7 @@ classdef SegmentedData < handle
                 switch plottype
                     case 'line'
                         [h,p]=plotGridPosition(epos);
+                        h=subplot('Position',p);
                         hp=errorarea(mean(mean(handles.segmentedEcog(1).zscore_separate(usechans(i),:,freqbands,indices.cond1),3),4),...
                             ste(mean(handles.segmentedEcog(1).zscore_separate(usechans(i),:,freqbands,indices.cond1),3),4));
                         hold on
@@ -462,13 +494,23 @@ classdef SegmentedData < handle
                         set(h, 'ButtonDownFcn', @popupImage4)
                         hold on                        
                     case 'stacked'
+                        [s,sidx]=sort(cell2mat(handles.segmentedEcog(idx).event(usetrials,9))- cell2mat(handles.segmentedEcog(idx).event(usetrials,7)));
+                        usetrials=usetrials(sidx);
+                        
                         [h,p]=plotGridPosition(epos);
                         hp=imagesc(squeeze(mean(handles.segmentedEcog(idx).zscore_separate(usechans(i),:,freqbands,usetrials),3))',[-1.5 1.5]);
+                         axis tight
                         ht=text(p(1),p(2),int2str(usechans(i)));
                         hold on
                         for col=[5 7 9 11 13 15]
                             try
-                                plot(eventSamp+(cell2mat(handles.segmentedEcog(idx).event(usetrials,col))-cell2mat(handles.segmentedEcog(idx).event(usetrials,1)))*handles.Params.sampFreq,[1:size(handles.segmentedEcog(idx).zscore_separate,3)],'r')
+                                idx2=find(cellfun(@isempty,handles.segmentedEcog(idx).event(usetrials,col)));
+                                if ~isempty(idx2)
+                                    handles.segmentedEcog(idx).event{idx2,col}=NaN;
+                                end
+                                plot(eventSamp+(cell2mat(handles.segmentedEcog(idx).event(usetrials,col))...
+                                    -cell2mat(handles.segmentedEcog(idx).event(usetrials,1)))*handles.Params.sampFreq,...
+                                    [1:size(handles.segmentedEcog(idx).zscore_separate,4)],'r')
                             end
                         end 
                         plot([eventSamp eventSamp+.001],[0 size(handles.segmentedEcog(idx).zscore_separate,3)],'k')
@@ -490,6 +532,20 @@ classdef SegmentedData < handle
                 if find(ismember(badChannels,usechans(i)))
                     set(ht,'BackgroundColor','y')
                 end
+                try
+                   if find(ismember(handles.Params.activeCh,usechans(i)))
+                        set(ht,'BackgroundColor','g')
+                   end
+                end
+                
+                if analogFlag==0
+                      plot(mean(mean(handles.segmentedEcog(1).analog400Env(1,:,1,indices.cond1),3),4).*4,'g')
+                      hold on
+                      try
+                        plot(mean(mean(handles.segmentedEcog(1).analog400Env(1,:,1,indices.cond2),3),4).*4,'k')
+                      end
+                end
+                colormap(flipud(pink));
             end
         end
         
@@ -1072,7 +1128,12 @@ classdef SegmentedData < handle
             
             switch r
                 case {'1','2','3','6'}
-                    Labels=handles.segmentedEcog(1).event(:,8);
+                    try
+                        Labels=handles.segmentedEcog(1).event(:,8);
+                    catch
+                        Labels=handles.segmentedEcog(1).event(:,2);
+                    end
+
                     try
                         brocawords=handles.Params.brocawords;
                     catch
@@ -1170,7 +1231,7 @@ classdef SegmentedData < handle
 
             indices.cond2=intersect(useidx,find(all_label==conditions(2)));
             
-            Labels([indices.cond1 indices.cond2])
+            Labels([indices.cond1 indices.cond2]);
         end
     end
 end

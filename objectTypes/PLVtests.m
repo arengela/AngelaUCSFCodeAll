@@ -53,18 +53,23 @@ classdef PLVtests < handle
                 'E:\PreprocessedFiles\EC26\EC26_B35';
                 'E:\PreprocessedFiles\EC26\EC26_B36';
                 'E:\DelayWord\EC23\EC23_with16CAR';
-                'E:\DelayWord\EC23\EC23_withCARWholeGrid\';
+                'E:\DelayWord\EC23\EC23_withCARWholeGrid';
                 'E:\DelayWord\EC18\EC18_16CAR';
-                'E:\DelayWord\EC28\EC28_B5\';
-                'E:\DelayWord\EC28\EC28_B20\'
-                'E:\DelayWord\EC28\EC28_B22\'
-                'E:\DelayWord\EC28\EC28_B29\'
-                'E:\DelayWord\EC28\EC28_B49\'
-                'E:\DelayWord\EC28\EC28_B50\'
+                'E:\DelayWord\EC28\EC28_B5';
+                'E:\DelayWord\EC28\EC28_B20'
+                'E:\DelayWord\EC28\EC28_B22'
+                'E:\DelayWord\EC28\EC28_B29'
+                'E:\DelayWord\EC28\EC28_B49'
+                'E:\DelayWord\EC28\EC28_B50'
                 'E:\PreprocessedFiles\EC28\EC28_B33'
                 'E:\PreprocessedFiles\EC28\EC28_B45'
                 'E:\PreprocessedFiles\EC28\EC28_B33'
-
+                'E:\DelayWord\EC29\EC29_B2'
+                'E:\DelayWord\EC29\EC29_B4'
+                'E:\DelayWord\EC30\EC30_B1'
+                'E:\DelayWord\EC30\EC30_B2'
+                'E:\DelayWord\EC31\EC31_B1'
+                'C:\Users\ego\Documents\UCSF\EcogData\EC33\EC33_B5'
                 }
             
             %path of associated baseline
@@ -106,8 +111,15 @@ classdef PLVtests < handle
             handles.AllBaselinePaths{40}='E:\PreprocessedFiles\EC28\EC28_B33';
             handles.AllBaselinePaths{41}='E:\PreprocessedFiles\EC28\EC28_B44';
             handles.AllBaselinePaths{42}='E:\PreprocessedFiles\EC28\EC28_B35';
+            handles.AllBaselinePaths{43}='E:\DelayWord\EC29\EC29_B3'
+            handles.AllBaselinePaths{44}='E:\DelayWord\EC29\EC29_B3'
+            handles.AllBaselinePaths{45}='E:\DelayWord\EC30\EC30_rest'
+            handles.AllBaselinePaths{46}='E:\DelayWord\EC30\EC30_rest'
+            handles.AllBaselinePaths{47}='E:\DelayWord\EC31\EC31_B1'
+            handles.AllBaselinePaths{48}='C:\Users\ego\Documents\UCSF\EcogData\EC33\EC33_B4'
 
-            
+
+            %%
             lh=1:40%load all words            
             handles.SegmentTypes={[repmat([41],[1 length(lh)]);lh],[lh;repmat([42],[1 length(lh)])],...
                 [repmat([42],[1 length(lh)]);lh],[repmat([43],[1 length(lh)]);lh],...
@@ -189,11 +201,11 @@ classdef PLVtests < handle
             end
             
             test=SegmentedData([handles.FilePath filesep folder],[handles.BaselinePath filesep folder],handles.ActiveCh); 
-            %test.BaselineChoice='PreEvent';%use specified pre-event segment as baseline
-            test.Params.baselineMS=[500 1000];%time of pre-event baseline (ms)            
+            %test.BaselineChoice='rest';%use specified pre-event segment as baseline
+            test.Params.baselineMS=[400 800];%time of pre-event baseline (ms)            
             sorttrials=0;%1 to sort trials, 0 to skip sorting
-            test.segmentedDataEvents40band(seg(:,handles.EventIdx),{[2000 2000]},[],'aa',freqband,sorttrials,handles.TaskType)%load data segments
-            test.calcZscore(1,1);%calculate zscore
+            test.segmentedDataEvents40band(seg(:,handles.EventIdx),{[2000 7000]},[],'aa',freqband,sorttrials,handles.TaskType)%load data segments
+            %test.calcZscore(1,1);%calculate zscore
             handles.Data=test;%save data object in handles
         end  
     end

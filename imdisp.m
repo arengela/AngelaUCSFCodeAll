@@ -1,4 +1,3 @@
-function hIm = imdisp(I, varargin)
 %IMDISP  Display one or more images nicely
 %
 % Examples:
@@ -60,6 +59,10 @@ function hIm = imdisp(I, varargin)
 %      'DisplayRange' - Same as lims input.
 %      'Map' - Kx3 colormap or (additionally from above) name of MATLAB
 %              colormap, for use with indexed images. Default: gray(256).
+%      'FigureSize' - [W H] size of the figure used to set the montage 
+%                     layout.
+%      'FigureHandle' - 1x1 figure handle. The dimensions of this figure
+%                       will be used to set the montage layout.
 %
 % OUT:
 %   h - HxW array of handles to images.
@@ -68,8 +71,9 @@ function hIm = imdisp(I, varargin)
 
 % Copyright: Oliver Woodford 2010
 
+function hIm = imdisp(I, varargin)
 % Parse inputs
-[map layout gap indices lims] = parse_inputs(varargin);
+[map layout gap indices lims figSize] = parse_inputs(varargin);
 
 if nargin == 0 || (iscell(I) && isempty(I))
     % Read in all the images in the directory
@@ -207,7 +211,7 @@ elseif n == 1
 else
     % MONTAGE mode
     % Compute a good layout
-    layout = choose_layout(n, y, x, layout);
+    layout = choose_layout(n, y, x, layout, figSize);
 
     % Create a data structure to store the data in
     num = prod(layout);
@@ -433,13 +437,12 @@ set(hIm, 'CDataMapping', 'scaled');
 return
 
 %% Choose a good layout for the images
-function layout = choose_layout(n, y, x, layout)
+function layout = choose_layout(n, y, x, layout, sz)
 v = numel(layout);
 N = isnan(layout);
 if v == 0 || all(N)
     % Compute approximate layout
-    sz = get(0, 'ScreenSize');
-    sz = sz(3:4) ./ [x y];
+    sz = sz ./ [x y];
     layout = ceil(sz([2 1]) ./ sqrt(prod(sz) / n));
     % Remove superfluous rows or columns
     while 1
@@ -584,7 +587,7 @@ L = L(1:n);
 return
 
 %% Parse inputs
-function [map layout gap indices lims] = parse_inputs(inputs)
+function [map layout gap indices lims figSize] = parse_inputs(inputs)
 
 % Set defaults
 map = [];
@@ -592,6 +595,8 @@ layout = [];
 gap = 0;
 indices = -1;
 lims = 0;
+figSize = get(0, 'ScreenSize');
+figSize = figSize(3:4);
 
 % Check for map and display range
 for b = 1:numel(inputs)
@@ -622,6 +627,11 @@ for a = b+1:2:numel(inputs)
             indices = inputs{a+1};
         case {'lims', 'displayrange'}
             lims = inputs{a+1};
+        case 'figuresize'
+            figSize = inputs{a+1};
+        case 'figurehandle'
+            figSize = get(inputs{a+1}, 'Position');
+            figSize = figSize(3:4);            
         otherwise
             error('Input option %s not recognized', inputs{a});
     end

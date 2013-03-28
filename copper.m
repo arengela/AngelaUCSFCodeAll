@@ -1,4 +1,3 @@
-function map = copper(varargin)
 %COPPER  Black-copper colormap
 %
 % Examples:
@@ -25,8 +24,8 @@ function map = copper(varargin)
 %   map - (len)x3 colormap table.
 %   B - size(A)x3 truecolor array.
 
-% $Id: copper.m,v 1.2 2009/04/10 13:00:32 ojw Exp $
 % Copyright: Oliver Woodford, 2009
 
+function map = copper(varargin)
 map = [0 0 0 8; 1 0.625 0.398 2; 1 0.7812 0.4975 0];
 map = colormap_helper(map, varargin{:});

@@ -1,4 +1,3 @@
-function map = cool(varargin)
 %COOL  Cyan-magenta colormap
 %
 % Examples:
@@ -25,8 +24,8 @@ function map = cool(varargin)
 %   map - (len)x3 colormap table.
 %   B - size(A)x3 truecolor array.
 
-% $Id: cool.m,v 1.2 2009/04/10 13:00:32 ojw Exp $
 % Copyright: Oliver Woodford, 2009
 
+function map = cool(varargin)
 map = [0 1 1; 1 0 1];
 map = colormap_helper(map, varargin{:});

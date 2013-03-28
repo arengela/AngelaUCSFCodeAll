@@ -3,6 +3,12 @@ Tall{2}=PLVTests(10,2,1:256,'aa')
 Tall{3}=PLVTests(10,2,1:256,'aa')
 Tall{4}=PLVTests(10,4,1:256,'aa')
 Tall{5}=PLVTests(10,5,1:256,'aa')
+
+
+%% EC28
+Tall{2}=PLVTests(34,2,1:256,'aa')
+Tall{5}=PLVTests(34,5,1:256,'aa')
+%%
 %% EC28
 Tall{2}=PLVTests(34,2,1:256,'aa')
 Tall{5}=PLVTests(34,5,1:256,'aa')
@@ -39,10 +45,11 @@ for x=[2 5]
 end
 %% GET ACTIVE ELECTRODES FOR PERC AND PROD
 usesamps=[100:300]
+chTot=size(Tall{2}.Data.segmentedEcog.smoothed100,1);
 for eidx=[2 5 ]
     indices=Tall{eidx}.Data.findTrials('1','n','n')
     indicesB=Tall{2}.Data.findTrials('1','n','n')
-    for c=1:256
+    for c=1:chTot
         [t,p]=ttest2(squeeze(Tall{eidx}.Data.segmentedEcog.smoothed100(c,usesamps,:,indices.cond2))',...
             repmat(squeeze(mean(Tall{2}.Data.segmentedEcog.smoothed100(c,1:200,:,indicesB.cond2),2)),1,length(usesamps)),.01,'right','unequal');
         tIdx=find(t);
@@ -70,7 +77,7 @@ for eidx=[2 5]
             [t,p]=ttest2([squeeze(Tall{eidx}.Data.segmentedEcog.smoothed100(c,usesamps,:,indices.cond2))]',...
                 repmat(squeeze(mean(Tall{2}.Data.segmentedEcog.smoothed100(c,1:200,:,indicesB.cond2),2)),1,length(usesamps)),.01,[],'unequal');
             tIdx=find(t);
-            [ps_fdr,h_fdr]=MT_FDR_PRDS(p(tIdx),.01);
+            [ps_fdr,h_fdr]=MT_FDR_PRDS(p(tIdx),.05);
             t=zeros(1,length(t));
             t(tIdx(find(h_fdr)))=1;
             if eidx==2
@@ -157,32 +164,6 @@ ch=[ch1 ch2];
 electrodes=E{eidx}.electrodes
 pkTime=[electrodes.peakTime];
 [~,sortIdx]=sort(pkTime)
-
-% line([vertcat(electrodes(sortIdx).startTime) vertcat(electrodes(sortIdx).stopTime)]',[1:256;1:256])
-% hold on
-% plot([electrodes(sortIdx).peakTime],1:256,'.')
-%%
-% VISUALIZE PEAK TIMES ON BRAIN
-figure
-%visualizeGrid(9,['E:\General Patient Info\' Tall{2}.Data.patientID '\brain.jpg'],ch(s),pkTime(ch),[],ones(1,length(ch))*100);
-visualizeGrid(5,['E:\General Patient Info\' Tall{2}.Data.patientID '\brain.jpg'],ch(s),pkTime(ch),[],[],[],rgb('purple'),1);
-
-colormap(autumn.*copper)
-colorjet=flipud(jet)
-
-h=colorbar
-%extremeRange2=linspace(min(pkTime(ch)),max(pkTime(ch)),256)
-extremeRange2=linspace(900,2000,256);
-idx=findnearest([900:100:2000],extremeRange2)
-set(h,'YTick',idx)
-set(h,'YTickLabel',[-100:100:1000])
-clear idxAll
-children=get(gca,'Children')
-dots=get(children(1))
-for i=1:length(dots.Children)
-    idxAll(i)=findnearest(pkTime(ch(i)),extremeRange2)
-end
-set(children(1),'CData',idxAll)
 
 %% PLOT PERC AND PRODUCTION DATA VERTICALLY
 % SORTED BY PRODUCTION PEAK TIME
@@ -336,7 +317,7 @@ set(gca,'Visible','off')
 ind{1}=Tall{2}.Data.findTrials('1','n','n')
 ind{2}=Tall{5}.Data.findTrials('1','n','n')
 figure
-for c=1:256
+for c=1:chTot
     [t,p]=ttest2([squeeze(Tall{2}.Data.segmentedEcog.smoothed100(c,usesamps,:,ind{1}.cond2))]',...
         [squeeze(Tall{5}.Data.segmentedEcog.smoothed100(c,usesamps,:,ind{2}.cond2))]',.01,'right','equal');
     tIdx=find(t);
@@ -366,7 +347,8 @@ tOut=vertcat(electrodes.PercProdTTest_50ms);
 chidx=find(sum(tOut,2)>2);
 time=[1:50:2000]
 for s=1:length(t)
-    visualizeGrid(5,['E:\General Patient Info\' Tall{2}.Data.patientID '\brain.jpg'],chidx,sum(tOut(chidx,s),2))
+    %visualizeGrid(5,['E:\General Patient Info\' Tall{2}.Data.patientID '\brain.jpg'],chidx,sum(tOut(chidx,s),2))
+    visualizeGrid(1,['E:\General Patient Info\' Tall{2}.Data.patientID '\brain.jpg'],chidx,sum(tOut(chidx,s),2))
     title(int2str(time(s)))
     %saveppt2('ppt',powerpoint_object,'scale','off','stretch','off');
     input('n')
@@ -379,7 +361,7 @@ ch2=find(s(ch)>1)
 visualizeGrid(5,['E:\General Patient Info\' Tall{2}.Data.patientID '\brain.jpg'],ch(ch2),s(ch(ch2)));
 %% PLOT PERCEPTION AND PRODUCTION ON SAME PLOT ALL CHANNELS
 figure
-for epos=1:256
+for epos=1:chTot
     if ~ismember(epos,activeCh)
         continue
     end
@@ -416,16 +398,15 @@ tOut=vertcat(E{eidx}.electrodes.TTest);
 chidx=find(sum(tOut,2)>2);
 time=[-100:50:100]
 visualizeGrid(5,['E:\General Patient Info\' Tall{2}.Data.patientID '\brain.jpg'],[],[],[],[],[],colorjet(idx,:),1);
-step=5
 ch=activeCh
 for s=(200/step):-1:1   
     data=mean(tOut(:,(s-1)*step+1:(s)*step),2);
     idx=findNearest(((s-1)*step+1)*10,extremeRange);
-    visualizeGrid(5,['E:\General Patient Info\' Tall{eidx}.Data.patientID '\brain.jpg'],1:256,data',[],[],[],colorjet(idx,:),0);
+    visualizeGrid(1,['E:\General Patient Info\' Tall{eidx}.Data.patientID '\brain.jpg'],1:256,data',[],[],[],colorjet(idx,:),0);
     %title(int2str(time(s)))
     %saveppt2('ppt',powerpoint_object,'scale','off','stretch','off');
     hold on
-    %input('n')    
+    input('n')    
 end
 set(gcf,'Color','w')
 %%
@@ -433,10 +414,9 @@ eidx=2
 figure
 visualizeGrid(5,['E:\General Patient Info\' Tall{2}.Data.patientID '\brain.jpg'],[],[],[],[],[],colorjet(idx,:),1);
 pkTime=[E{eidx}.electrodes.peakTime]
-ch=find(pkTime~=100000 & pkTime>700 & pkTime<2000 & ~ismember(1:256,Tall{2}.Data.Artifacts.badChannels) & [E{eidx}.electrodes.startTime]<1500 & ...
-    sum(vertcat(E{eidx}.electrodes.TTest),2)'>50)
+ch=find(pkTime~=100000 & ~ismember(1:256,Tall{2}.Data.Artifacts.badChannels))
 pkTime=[E{eidx}.electrodes(ch).peakTime]
-
+step=2
 s=(200/step)
 chidx=1
 while ~isempty(chidx) | s==1
@@ -444,10 +424,44 @@ while ~isempty(chidx) | s==1
     stopTime=((s)*step)*10;
     chidx=find(pkTime<=stopTime )
     idx=findNearest(startTime,extremeRange);
-    visualizeGrid(5,['E:\General Patient Info\' Tall{eidx}.Data.patientID '\brain.jpg'],ch(chidx),ones(size(chidx)),[],[],[],colorjet(idx,:),0);
+    visualizeGrid(1,['E:\General Patient Info\' Tall{eidx}.Data.patientID '\brain.jpg'],ch(chidx),ones(size(chidx)),[],[],[],colorjet(idx,:),0);
     %title(int2str(time(s)))
     %saveppt2('ppt',powerpoint_object,'scale','off','stretch','off');
     hold on
     %input('n')    
     s=s-1;
+end
+%%
+eidx=2
+figure
+%visualizeGrid(5,['E:\General Patient Info\' Tall{2}.Data.patientID '\brain.jpg'],[],[],[],[],[],colorjet(idx,:),1);
+pkTime=[E{eidx}.electrodes.peakTime]
+ch=find(pkTime~=100000 & ~ismember(1:256,Tall{2}.Data.Artifacts.badChannels))
+pkTime=[E{eidx}.electrodes(ch).peakTime]
+step=2
+s=(200/step)
+chidx=1
+figure
+line([-1000 1000],[0 0])
+line([0 0],[-1000 1000])
+hold on
+while ~isempty(chidx) | s==1
+    startTime=((s-1)*step+1)*10;
+    stopTime=((s)*step)*10;
+    chidx=find(pkTime<=stopTime )
+    idx=findNearest(startTime,extremeRange);
+    for c=1:length(chidx)
+        xyCur=xy(:,ch(chidx(c)));
+        %[posSF,posCS]=getSulcusDev(xyCur,xySF,xyCS);
+
+        [devCS,devSF]=getSulcusDev(xyCur,xySF,xyCS);
+        scatter(devCS,devSF,100,colorjet(idx,:),'fill')
+        hold on
+    end
+    %title(int2str(time(s)))
+    %saveppt2('ppt',powerpoint_object,'scale','off','stretch','off');
+    %hold off
+    %input('n')    
+    s=s-1;
+    %clf
 end

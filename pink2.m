@@ -1,4 +1,3 @@
-function map = pink2(varargin)
 %PINK2  Black-pink-white colormap
 %
 % Examples:
@@ -26,9 +25,9 @@ function map = pink2(varargin)
 %   map - (len)x3 colormap table.
 %   B - size(A)x3 truecolor array.
 
-% $Id: pink2.m,v 1.2 2009/04/10 13:00:33 ojw Exp $
 % Copyright: Oliver Woodford, 2009
 
+function map = pink2(varargin)
 map = [0 0 0; 0.0455 0.0635 0.1801; 0.2425 0.0873 0.1677;...
        0.2089 0.2092 0.2546; 0.3111 0.2841 0.2274; 0.4785 0.3137 0.2624;...
        0.5781 0.3580 0.3997; 0.5778 0.4510 0.5483; 0.5650 0.5682 0.6047;...

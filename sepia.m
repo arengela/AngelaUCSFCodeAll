@@ -1,4 +1,3 @@
-function map = sepia(varargin)
 %SEPIA  Black-brown-white colormap
 %
 % Examples:
@@ -26,8 +25,8 @@ function map = sepia(varargin)
 %         inter-color bins.
 %   B - size(A)x3 truecolor array.
 
-% $Id: sepia.m,v 1.2 2009/04/10 13:00:33 ojw Exp $
 % Copyright: Oliver Woodford, 2009
 
+function map = sepia(varargin)
 map = [0 0 0 5; 0.1 0.05 0 85; 1 0.9 0.8 10; 1 1 1 0];
 map = colormap_helper(map, varargin{:});

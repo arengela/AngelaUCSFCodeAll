@@ -67,7 +67,7 @@ handles.badIntervals=handles.ecog.badIntervals;
 % Make sure that channel selection is populated first
 set(handles.channelSelector,'String',num2str(handles.ecog.selectedChannels)) %number of channels selected
 %set(handles.nChannelsDisplayed,'String',num2str(length(handles.ecog.selectedChannels))) %number of channels simultaneously displayed
-set(handles.nChannelsDisplayed,'String',num2str(64))%number of channels simultaneously displayed
+set(handles.nChannelsDisplayed,'String',num2str(8))%number of channels simultaneously displayed
 
 set(handles.channelScrollDown,'UserData',[1:str2double(get(handles.nChannelsDisplayed,'String'))]); %number of channels simultaneously displayed
 set(handles.axesFig,'CloseRequestFcn',@closeFigure_Callback);

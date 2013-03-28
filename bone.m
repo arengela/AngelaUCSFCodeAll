@@ -1,4 +1,3 @@
-function map = bone(varargin)
 %BONE  Black-blue-white colormap
 %
 % Examples:
@@ -27,8 +26,8 @@ function map = bone(varargin)
 %         inter-color bins.
 %   B - size(A)x3 truecolor array.
 
-% $Id: bone.m,v 1.2 2009/04/10 13:00:32 ojw Exp $
 % Copyright: Oliver Woodford, 2009
 
+function map = bone(varargin)
 map = [0 0 0 3; 21 21 29 3; 42 50 50 2; 64 64 64 1]/64;
 map = colormap_helper(map, varargin{:});

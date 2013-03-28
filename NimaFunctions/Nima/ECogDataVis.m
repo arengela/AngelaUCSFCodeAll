@@ -1,4 +1,4 @@
-function ECogDataVis (dpath, subject, elects, data, flag, imname,maxsc,data2,impch,colormat,showImFlag)
+function ECogDataVis (dpath, subject, elects, data, flag, imname,maxsc,data2,impch,colormat,showImFlag,alphaData)
 %
 %
 %{
@@ -32,42 +32,56 @@ end
 switch flag
     case 0
         %figure;
-        imagesc(img);colormap(gray);
-        hold on;
-        plot(xy(1,:),xy(2,:),'r.');
-    case 2
-        %figure;
-        %imagesc(img);
         %colormap(gray);
         if showImFlag
             hi=imagesc(G);
         end
+        hold on;
+         s=scatter(xy(1,:),xy(2,:),30,'filled','r');
+
+        if ~isempty(colormat)
+             set(s,'MarkerFaceColor',colormat)
+        end
+    case 2
+        %figure;
+        if showImFlag
+            imshow(img);
+        end
+
         %set(hi,'AlphaData',.7)
         axis tight
         hold on;
         %plot(xy(1,:),xy(2,:),'r.','LineWidth',100);
-        s=scatter(xy(1,:),xy(2,:),200,'filled','r');
+        s=scatter(xy(1,:),xy(2,:),30,'filled','r');
 
         if ~isempty(colormat)
              set(s,'MarkerFaceColor',colormat)
         end
         for cnt1 = 1:size(xy,2)
-            text(xy(1,cnt1)+3,xy(2,cnt1),num2str(elects(cnt1)),'color','y','FontSize',15);
+            text(xy(1,cnt1)+3,xy(2,cnt1),num2str(elects(cnt1)),'color','b','FontSize',6);
         end
         %axis([200 1400 150 900])
     case 1
         xy = ceil(xy);
         % this line has to be optimized:
         tmp1 = zeros(size(img));
-        for cnt1 = 1:length(xy)
+        for cnt1 = 1:size(xy,2)
             tmp1(xy(2,cnt1),xy(1,cnt1)) = data(cnt1);
         end
         %         tmp1 = conv2(tmp1,fspecial('disk',16),'same');
-        r = cat(3,ones(size(img)),zeros(size(img)),zeros(size(img)));
+        if nargin<8 | isempty(colormat)
+            r = cat(3,ones(size(img)),zeros(size(img)),zeros(size(img)));
+        else
+            r = cat(3,ones(size(img))*colormat(1),ones(size(img))*colormat(2),ones(size(img))*colormat(3));
+        end
+        
+        if showImFlag
+            imshow(img);
+            hold on
+        end
+        
         b = cat(3,zeros(size(img)),zeros(size(img)),ones(size(img)));
         %         figure;
-        imshow(img);
-        hold on
         hr = imshow(r);
         hb = imshow(b);
         %
@@ -88,11 +102,22 @@ switch flag
         end
         tmpp = tmpp/mm;
         tmpn = tmpn/mm;
+        
+        if ~isempty(alphaData)
+            tmpp(find(tmpp>0))=alphaData;
+        end
         set(hr,'AlphaData',tmpp);
         set(hb,'AlphaData',tmpn);
+        for cnt1 = 1:size(xy,2)
+            text(xy(1,cnt1)+3,xy(2,cnt1),num2str(elects(cnt1)),'color','y','FontSize',10);
+        end
         
       case 5
-        corners = round(allxy(:,[1 16 241 256]));
+          try
+                corners = round(allxy(:,[1 16 241 256]));
+          catch
+                corners = round(allxy(:,[57  128 1 72 ]));
+          end
         tmp = zeros(16);
         tmp(elects) = data;
         t = maketform('affine',[16 16 1;16 1 16]',corners(:,1:3)');
@@ -106,7 +131,7 @@ switch flag
             imshow(img);
         end
         hold on
-        if nargin<8 | isequal(colormat,0)
+        if nargin<8 | isempty(colormat)
             r = cat(3,ones(size(img)),zeros(size(img)),zeros(size(img)));
         else
             r = cat(3,ones(size(img))*colormat(1),ones(size(img))*colormat(2),ones(size(img))*colormat(3));
@@ -118,8 +143,69 @@ switch flag
         tmp3=tmp3./2;
         %set(hb,'AlphaData',max(-tmp3,0));
         tmp3=tmp3;
-        set(hr,'AlphaData',max(tmp3,0));           
-    case 8 
+        set(hr,'AlphaData',max(tmp3,0));       
+        
+     case 51
+         try
+             corners = round(allxy(:,[1 16 241 256]));
+             
+         catch
+             corners = round(allxy(:,[57  128 1 72 ]));
+         end
+         tmp = zeros(16);
+            tmp(elects) = data;
+            t = maketform('affine',[16 16 1;16 1 16]',corners(:,1:3)');
+            R = makeresampler('cubic','fill');
+            tmp2 = imtransform(tmp,t,R,'XYScale',1);
+            tmp2 = rot90(tmp2,2);
+            if ~isempty(maxsc)
+               tmp2 = tmp2/maxsc;                
+            else
+                tmp2 = tmp2/max(max(abs(tmp2)));
+            end
+            tmp3 = zeros(size(img));
+            tmp3(min(corners(2,:)):min(corners(2,:))+size(tmp2,1)-1,min(corners(1,:)):min(corners(1,:))+size(tmp2,2)-1) = tmp2;
+            hold off;         
+
+            %axes('visible','off'); 
+             ha = axes('units','normalized', ...
+     'position',[0 0 1 1]);
+            
+            if showImFlag
+                imshow(real2rgb(img,'gray'));   
+            end
+            %freezeColors
+             set(ha,'handlevisibility','off', ...
+    'visible','off')
+            zeroMat=zeros(size(img));
+            hold on
+            %imshow(zeroMat);
+            %a=axis;
+            hold on
+            %colormap(gray)
+            %freezeColors
+
+             axes('position',[0 0 1 1])
+            imshow(tmp3,[min(data)./max(data) 1])
+            %imshow(tmp5)
+            %imagesc(tmp3)
+            tmp3(find(tmp3<0))=0;
+            %imagesc(tmp3,[min(data)./max(data) 1])
+            %tmp4=tmp3.^3;
+            tmp4=double(tmp3>max(max(tmp3))*.7);
+            
+            %tmp4(find(tmp3>prctile(reshape(tmp3,1,[]),99.9)))=.7;
+            alpha(tmp4*alphaData)
+            %alpha(tmp3);
+            %axis(a)
+            %colormap(jet)
+            if ~isempty(colormat)
+                colormap(repmat(colormat,256,1));
+            else
+                %load('C:\\Users\Angela_2\Dropbox\AngelaUCSFFiles\AngelaSVN\basic\redblueblack_diverge.mat')
+                colormap(redblue)
+            end
+        case 8 
         xy = ceil(xy);
         % this line has to be optimized:
         tmp1 = zeros(size(img));

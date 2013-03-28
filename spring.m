@@ -1,4 +1,3 @@
-function map = spring(varargin)
 %SPRING  Magenta-yellow colormap
 %
 % Examples:
@@ -25,8 +24,8 @@ function map = spring(varargin)
 %   map - (len)x3 colormap table.
 %   B - size(A)x3 truecolor array.
 
-% $Id: spring.m,v 1.2 2009/04/10 13:00:33 ojw Exp $
 % Copyright: Oliver Woodford, 2009
 
+function map = spring(varargin)
 map = [1 0 1; 1 1 0];
 map = colormap_helper(map, varargin{:});

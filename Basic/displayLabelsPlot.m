@@ -1,0 +1,7 @@
+xl=get(gca,'XLim')
+set(gca,'XTick',0:100:xl(2))
+set(gca,'XTickLabel',(0:1:xl(2)/100)-2)
+set(gca,'Box','off')
+set(gca,'YTickLabel',[])
+set(gca,'FontSize',8)
+set(gca,'XColor',rgb('gray'),'YColor',rgb('gray'))

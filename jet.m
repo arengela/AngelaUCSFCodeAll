@@ -1,4 +1,3 @@
-function map = jet(varargin)
 %JET  Variant of HSV colormap
 %
 % Examples:
@@ -27,8 +26,8 @@ function map = jet(varargin)
 %         inter-color bins.
 %   B - size(A)x3 truecolor array.
 
-% $Id: jet.m,v 1.2 2009/04/10 13:00:33 ojw Exp $
 % Copyright: Oliver Woodford, 2009
 
+function map = jet(varargin)
 map = [0 0 0.5 1; 0 0 1 2; 0 1 1 2; 1 1 0 2; 1 0 0 1; 0.5 0 0 0];
 map = colormap_helper(map, varargin{:});

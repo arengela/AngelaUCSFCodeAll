@@ -7,14 +7,14 @@ load('E:\DelayWord\frequencybands');
 load('E:\DelayWord\wordpairs');
 %% SET WHICH CHANNELS, TRIALS, AND SAMPLES TO USE
 badtr=[27 29  39 41 45];
-badtr=[ 39 41];
-badtr=[]
+badtr=[ 34 38];
+%badtr=[]
 %badtr=find(cellfun(@(x) isequal(x,0),wordProp.ed))
 usetr=setdiff(1:size(T.Data.segmentedEcog.zscore_separate,4),badtr);
 usechan=setdiff(T.Data.usechans,T.Data.Artifacts.badChannels);
 usesamp=801:1400;
 %% GET WORD PROPERTIES FOR WORD EVENTS
-Labels=T.Data.segmentedEcog.event(usetr,8);
+Labels=T.Data.segmentedEcog.event(usetr,3);
 clear wordLength wordFreq wordProp
 for i=1:length(Labels)
     idx=find(strcmp(Labels(i), {brocawords.names}'))
@@ -37,7 +37,9 @@ wordLength=cell2mat(wordProp.l);
 wordFreq=cell2mat(wordProp.f);
 %% SMOOTH AND DOWNSAMPLE TO 100 Hz
 for x=[2 5]
+    Tall{x}.Data.segmentedEcog.smoothed100=[]
     for c=1:256
+        
         for tr=1:size(Tall{x}.Data.segmentedEcog.zscore_separate,4)
             Tall{x}.Data.segmentedEcog.smoothed100(c,:,:,tr)=smooth(resample(squeeze(Tall{x}.Data.segmentedEcog.zscore_separate(c,:,:,tr)),1,4),10);
         end
@@ -596,7 +598,7 @@ for c=1:256
 end
 %%
 for c=1:length(usechan)
-    for s=1:4000    
+    for s=1:1600    
         tresult(c,s)=ttest(squeeze(T.Data.segmentedEcog.zscore_separate(usechan(c),s,:,:)));
     end
 end

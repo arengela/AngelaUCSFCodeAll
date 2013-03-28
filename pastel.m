@@ -1,4 +1,3 @@
-function map = pastel(varargin)
 %PASTEL  Black-pastel-white colormap
 %
 % Examples:
@@ -25,9 +24,9 @@ function map = pastel(varargin)
 %   map - (len)x3 colormap table.
 %   B - size(A)x3 truecolor array.
 
-% $Id: pastel.m,v 1.2 2009/04/10 13:00:33 ojw Exp $
 % Copyright: Oliver Woodford, 2009
 
+function map = pastel(varargin)
 map = [0 0 0; 0.4709 0 0.018; 0 0.3557 0.6747; 0.8422 0.1356 0.8525;
        0.4688 0.6753 0.3057; 1 0.6893 0.0934; 0.9035 1 0; 1 1 1];
 map = colormap_helper(map, varargin{:});
