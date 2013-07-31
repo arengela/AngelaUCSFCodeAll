@@ -71,57 +71,21 @@ sds=sigma_fs.*sqrt(2);
     end
 
 
-
-
-%CHANGE: vectorize across channels, take out loop*******************
-%x=fft(ecog.data,nfft,2);
 filteredData.data=zeros(size(ecog.data,1),T,npbs);
 
-for nBlocks=1:4
-    for e=1:64
-            c=(nBlocks-1)*64+e;
-            adat=fft(ecog.data(c,:),T);           
-            for f=1:npbs
-                H = zeros(1,T); 
-                k = freqs-cfs(f);
-                H(1:nfreqs) = exp((-0.5).*((k./sds(f)).^2));
-                H(nfreqs+1:end)=fliplr(H(2:ceil(T/2))); 
-                H(1)=0;
-                hilbdata(1,:,f)=ifft(adat(end,:).*(H.*h),T);
-                envData=abs(hilbdata(1,:,f));
-                %phaseData=angle(hilbdata(c,:,f));                
-                filteredData.data(c,:,f)=envData;
-                %phaseInfo.data(c,:,f)=phaseData;
-            end
-            
-            
-           varName=sprintf('Wav%s%s.htk',num2str(nBlocks),num2str(e))
-           chanNum=(nBlocks-1)*64+e
-           %data=mean(handles.ecogFiltered.data((nBlocks-1)*64+k,:,:),3);
-           data1=real(squeeze(hilbdata))';
-           cd('HilbReal_4to200_40band')
-
-           writehtk (varName, data1, 400, chanNum); 
-            cd ..
-            
-            cd('HilbImag_4to200_40band')
-
-           data2=imag(squeeze(hilbdata))';
-           writehtk (varName, data2, 400, chanNum); 
-           cd ..
+for c=1:size(ecog.data,1)
+    adat=fft(ecog.data(c,:),T);
+    for f=1:npbs
+        H = zeros(1,T);
+        k = freqs-cfs(f);
+        H(1:nfreqs) = exp((-0.5).*((k./sds(f)).^2));
+        H(nfreqs+1:end)=fliplr(H(2:ceil(T/2)));
+        H(1)=0;
+        hilbdata(1,:,f)=ifft(adat(end,:).*(H.*h),T);
+        envData=abs(hilbdata(1,:,f));
+        filteredData.data(c,:,f)=envData;
     end
 end
 
 
-%filteredData.timebase=ecog.timebase;
-%filteredData.sampDur=ecog.sampDur;
 filteredData.sampFreq=ecog.sampFreq;
-%phaseInfo.sampFreq=ecog.sampFreq;
-%filteredData.baselineDur=ecog.baselineDur;
-%filteredData.nSamp=ecog.nSamp;
-%filteredData.nBaselineSamp=ecog.nBaselineSamp;
-%filteredData.selectedChannels=ecog.selectedChannels;
-%filteredData.badChannels=ecog.badChannels;
-%filteredData.excludeBad=ecog.excludeBad;
-%filteredData.channel2GridMatrixIdx=ecog.channel2GridMatrixIdx;
-%filteredData.baselineSamps=ecog.baselineSamps;

@@ -1,15 +1,25 @@
 filename='E:\DelayWord\segmentedDataAllEvents'
-for n=1%numSet
-    if n~=17 & p~=2
-        ch=1:256;      
-    else
-        ch=1:128;
-    end
-     for eidx=1:6
-        D=PLVTests(n,2,ch,'aa');
-        data=D.Data;
-        mkdir([filename filesep D.Data.patientID])
-        save([filename filesep D.Data.patientID filesep 'D_e' int2str(eidx)],'D','-v7.3');
+for p=[ 2 3 4 5 6  8]
+     n=numSet(p);
+     ch=1:256
+     if p==2
+         ch=1:128
+     end
+     for eidx=2:6
+        D=PLVTests(n,eidx,ch,'aa');
+        %data=D.Data;
+        %mkdir([filename filesep D.Data.patientID])
+        %save([filename filesep D.Data.patientID filesep 'D_e' int2str(eidx)],'D','-v7.3');
+        %load([filename filesep patients{p} filesep 'D_e' int2str(eidx)])
+        D.Data.calcZscore;
+        for c=1:D.Data.channelsTot
+            for t=1:size(D.Data.segmentedEcog.zscore_separate,4)
+                D.Data.segmentedEcog.smoothed100(c,:,:,t)=smooth(resample(D.Data.segmentedEcog.zscore_separate(c,:,:,t),1,4));
+            end
+        end
+         D.Data.segmentedEcog.data=[];
+         D.Data.segmentedEcog.zscore_separate=[];
+         AllP{p}.Tall{eidx}=D;
      end
  end
 %%
@@ -23,11 +33,9 @@ numSet=[1 17 9 10 11 43 45 47 35];
 for p=1:8%1:length(patients)-1%p=1:length(patients)-1
     if n~=17 & p~=2
         ch=1:256;
-        events=[2 4 5]
-        
+        events=[2 3 4 5 6]        
     else
         ch=1:128;
-        events=[2 4 5]
     end
     %filename='E:\DelayWord\segmentedDataAllEvents'
     filename='E:\DelayWord\Figure1_withCAR_slideBaseline_ev2'
@@ -945,8 +953,8 @@ for p=1:8
         clear LabelsGroups
         %usech=unique([reshape(AllP{p}.Tall{2}.Data.Params.activeCh,1,[]) reshape(AllP{p}.Tall{5}.Data.Params.activeCh,1,[])]);
 
-        usetr=AllP{p}.Tall{eidx}.Data.Params.usetr;
-        if 1%eidx==2
+        usetr=setdiff(1:size(AllP{p}.Tall{eidx}.Data.segmentedEcog.smoothed100,4),AllP{p}.Tall{eidx}.Data.Artifacts.badTrials)        if 1%eidx==2
+        if 1    
             usesamps=[201:350];
         else
             usesamps=50:350;

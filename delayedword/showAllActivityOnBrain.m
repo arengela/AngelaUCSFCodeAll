@@ -391,7 +391,7 @@ for s=1:400/stepSize
                 end
                 
                 if eidx==2
-                    h=text(pos(1),pos(2)+50,[num2str(stext) ' ms'],'Fontsize',5)
+                    h=text(pos(1),pos(2)+50,[num2str(stext) ' ms'],'Fontsize',15)
                 end
                 if stext>=0
                     set(h,'BackgroundColor','y')
@@ -419,10 +419,11 @@ ha=axes('position',[0 0 1 1]);
 movie(MovieHold{p,eidx}.M,10,10)
 %% GO THROUGH MOVIE FRAME BY FRAME
 clf
-for i=50:length(M)
+for i=25:length(M)
     clf
-    imshow(M(i).cdata)print -dmeta
-
+    imshow(M(i).cdata)
+    set(gcf,'Name',int2str(i))
+    %print -dmeta
     input('b')
 end
 

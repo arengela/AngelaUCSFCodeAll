@@ -353,6 +353,12 @@ imshow(repmat(a,[1 1 3]))
 end
 %%
 idx=find(ismember(allD.kgroup,kGroups(:,1)'))
-d=allD.data(idx,:);
+d=allD.data(:,:);
 Y=pdist(d);
 [H,T]=dendrogram(linkage(Y,'average'))
+%%
+for k=unique(T)'
+    idx2=find(T==k)
+    imagesc(d(idx2,[1:400 1500:end]))
+    input('b')
+end

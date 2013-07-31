@@ -187,6 +187,12 @@ switch handles.type
         sampDur=1000/handles.ecog.sampFreq;
         flag=0;
         handles.ecogDS=handles.ecog;
+    case 'SaveMemory'
+        cd([handles.pathName filesep 'RawHTK'])
+        contents=cellstr(ls);
+        contents=contents(4:end);
+        handles.ecogDS=loadHTKtoEcog_CT_Downsample([handles.pathName filesep 'RawHTK'],length(contents),[]);
+        flag=0;
 end
 
 if flag==1
@@ -196,6 +202,7 @@ if flag==1
     handles.ecog=ecogRaw2EcogGUI(handles.ecog.data,baselineDurMs,sampDur,[],handles.ecog.sampFreq);
     handles.ecogDS=downsampleEcog(handles.ecog,400);
     fprintf('Downsampled Frequency: %d Hz\n',handles.sampFreq);
+    handles = rmfield(handles,'ecog');
 end
 
 handles.ecogDS.selectedChannels=1:size(handles.ecogDS.data,1);
@@ -206,12 +213,14 @@ handles.badChannels=[];
 handles.badTimeSegments=[];
 handles.ecogDS.badChannels=[];
 handles.ecogDS.badTimeSegments=[];
-handles = rmfield(handles,'ecog');
+
+
 
 
 if strmatch(handles.type,'Hipp')
     handles.ecogDS=ecogFilterTemporal(handles.ecogDS,[80 200],3);   
 end
+fprintf('\nDone Loading Data\n');
 
 guidata(hObject, handles);
 
@@ -302,7 +311,7 @@ end
 % --- Executes on button press in saveBadTimeSegments.
 function saveBadTimeSegments_Callback(hObject, eventdata, handles)
 % SAVES BAD TIME SEGMENTS AS BOTH A MATLAB FUNCTION AND A .LAB FILE ON DISK
-cd('Artifacts')
+cd([handles.pathName filesep 'Artifacts'])
 BadTimesConverterGUI(handles.badTimeSegments,'bad_time_segments.lab');
 save('badTimeSegments','-struct','handles','badTimeSegments');
 fprintf('%d Bad time segments saved\n',size(handles.badTimeSegments,1));
@@ -312,7 +321,7 @@ cd(handles.pathName)
 % --- Executes on button press in saveBadCh.
 function saveBadCh_Callback(hObject, eventdata, handles)
 % SAVES BAD CHANNELS AS TEXT FILE ON DISK
-cd('Artifacts')
+cd([handles.pathName filesep 'Artifacts'])
 fid = fopen('badChannels.txt', 'w');
 fprintf(fid, '%6.0f', handles.badChannels);
 fclose(fid);
@@ -322,7 +331,7 @@ cd(handles.pathName)
 % --- Executes on button press in loadBadTimeSegments.
 function loadBadTimeSegments_Callback(hObject, eventdata, handles)
 % PURPOSE: LOAD BAD TIME SEGMENTS SAVED ON DISK INTO GUI
-cd('Artifacts')
+cd([handles.pathName filesep 'Artifacts'])
 load 'badTimeSegments.mat';
 handles.badTimeSegments=badTimeSegments;
 guidata(hObject, handles);
@@ -333,7 +342,7 @@ cd(handles.pathName)
 % --- Executes on button press in loadBadCh.
 function loadBadCh_Callback(hObject, eventdata, handles)
 % PURPOSE: LOAD BAD CHANNELS SAVED ON DISK INTO GUI
-cd('Artifacts')
+cd([handles.pathName filesep 'Artifacts'])
 fid = fopen('badChannels.txt');
 tmp = fscanf(fid, '%d');
 handles.badChannels=tmp';

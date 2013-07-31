@@ -1330,11 +1330,11 @@ end
 
 
 function Simulator_Callback(hObject, eventdata, handles)
-%{
+
 a = pwd;
 
 f=fields(handles);
-for i=[24:32 34:length(fields(handles))]
+for i=setdiff(1:length(fields(handles)),find(strcmp(f,'handles')))
     eval(sprintf('%s=deal(handles.(f{i}));',f{i}));
 end
 
@@ -1576,7 +1576,7 @@ num_samples=0;
 last_used_ind=0;%%
 profile on;
 good_event_count=0;
-desired_ANchan = 1;
+desired_ANchan = 1
 desired_ANchan2 = 2; % ADD TO GUI 
 threshold = .5;
 threshold2 = .7; % ADD TO GUI 
@@ -1619,18 +1619,20 @@ for i = 1:length(index)-1
         %ANNewData_finalMAT(:,ANposInNewData:ANfinalPos)=ANNewDataMAT;
         %%
         %find events
-        prev_num_events=detected_num_events;
-        event=(ANNewData_finalMAT(desired_ANchan,:)>threshold);
-        trigger=(diff(event)>0);
-        detected_num_events = sum(trigger);
-        eventIndices(1,1:detected_num_events)=event;
+        try
+            prev_num_events=detected_num_events;
+            event=find(ANNewData_finalMAT(desired_ANchan,:)>threshold);
+            trigger=(diff(event)>0);
+            detected_num_events = sum(trigger);
+            eventIndices(1,1:detected_num_events)=event;
+        end
+        
         
         set(0,'currentfigure',handles.figure1);
         set(handles.figure1,'CurrentAxes',fh5);
         hold on
         plot(matlab_loopCounter,detected_num_events,'*');
-        grid on;        
-
+        grid on;       
         
         %%
         %Plot average spectrogram
@@ -1787,7 +1789,7 @@ end
 profile off
 keyboard
 %uisave({'avg_to_plot', 'finalstackeddata', 'sing_to_plot'}, 'to_plot')
-%}
+
 %simulator_motormapping_SMART_modified(handles)
 %{
 DataAfterCAR,AmountOfData,number_electrodes ,num_freq_bands, freqs2plot,...
@@ -1845,11 +1847,12 @@ function loadsimdata_Callback(hObject, eventdata, handles)
 % handles    structure with handles and user data (see GUIDATA)
 
 % Hint: get(hObject,'Value') returns toggle state of loadsimdata
-load('C:\Users\Angela_2\Desktop\ANGELA\TDT_DataMAT\to_plot.mat')
-load('C:\Users\Angela_2\Desktop\ANGELA\TDT_DataMAT\EC9_B58_start_ind_AND_threshold.mat')
+%sourceFile='C:\Users\Angela_2\Dropbox\Connie_Angela (1)\EC9_B58\TDT_DataMAT';
+%load([sourceFile '\to_plot.mat'])
+load(['C:\Users\Angela_2\Dropbox\Connie_Angela (1)\EC9_B58\TDT_DataMAT' '\EC9_B58_start_ind_AND_threshold.mat'])
 
-load('C:\Users\Angela_2\Desktop\ANGELA\TDT_DataMAT\DataMAT.mat')
-load('C:\Users\Angela_2\Desktop\ANGELA\baseline_stats_EC9_b58.mat')
+load(['C:\Users\Angela_2\Dropbox\Connie_Angela (1)\EC9_B58\TDT_DataMAT' '\DataMAT.mat'])
+load(['C:\Users\Angela_2\Dropbox\Connie_Angela (1)\EC9_B58\TDT_DataMAT' '\baseline_stats_EC9_b58.mat'])
 
 vars=whos;
 for i=1:length(vars)

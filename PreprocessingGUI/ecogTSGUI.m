@@ -114,9 +114,6 @@ axis off
 
 refreshScreen(hObject, eventdata, handles);
 % Update handles structure
-
-
-
 guidata(hObject, handles);
 
 % UIWAIT makes ecogTSGUI wait for user response (see UIRESUME)
@@ -134,7 +131,10 @@ function varargout = ecogTSGUI_OutputFcn(hObject, eventdata, handles)
 
 varargout{1} = handles.output;
 varargout{2} = handles.badIntervals;
-delete(hObject)
+close force
+%delete(hObject)
+%
+%
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %               Channel Selection
@@ -651,8 +651,15 @@ for i=1:size(handles.badIntervals,1)
     set(h,'FaceAlpha',.2,'EdgeColor','none')
     text(BI(1),ymin,num2str(BI(1)),'Color','r');
     text(BI(2),ymin,num2str(BI(2)),'Color','r');
-end
+    
+    x =ymin;
+    y = 0;
+    w = ymax;
+    h = 1;
+    
 
+   handles.BIRects(i) = rectangle('Position',[x,y,w,h],'FaceColor','r');
+end
 
 % PLOT EVENTS
 if isfield(handles,'eventmarkers')
@@ -669,11 +676,6 @@ end
 hold(handles.ecg_axes,'off');
 guidata(hObject, handles);
 
-
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%%%%%%%%%%%% SHOOULD BECOME OBSOLETE
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 function []=update(handles)
 [axesParams]=updateAxesParams(handles);
@@ -726,7 +728,7 @@ set(h,'FaceAlpha',.5);
 set(h,'EdgeColor','none');
 handles.badIntervals=[handles.badIntervals; BadInterval];
 b=handles.badIntervals;
-assignin('base','badIntervals',b)
+%assignin('base','badIntervals',b)
 refreshScreen(hObject, eventdata, handles);
 guidata(hObject, handles);
 
@@ -857,8 +859,11 @@ x = getrect(handles.ecg_axes);
 x = x(1);
 BIs = handles.badIntervals;
 di = x >= BIs(:,1) & x <= BIs(:,2); %badInterval selected
-delete(handles.BIRects(di)); %remove red rect on timeline
-handles.BIRects(di) = []; %delete handle of red rect
+%delete(handles.BIRects(di)); %remove red rect on timeline
+
+try
+    handles.BIRects(di) = []; %delete handle of red rect
+end
 handles.badIntervals(di,:) = [];
 
 set(handles.deleteInterval,'String','Delete Interval');
@@ -875,7 +880,7 @@ function closeFigure_Callback(hObject, eventdata, handles)
 % handles    structure with handles and user data (see GUIDATA)
 %close force %Added by Ben as a hack to fix error where figure does not close
 uiresume
-close force
+%close force
 
 % function scaleFac = getScaleFac(handles,channelsToShow,startSamp,endSamp)
 % %Finds the greatest scale factor such that the scale factor of each channel

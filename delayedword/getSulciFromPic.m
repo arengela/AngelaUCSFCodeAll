@@ -1,4 +1,4 @@
-load(['E:\DelayWord\Figure1_withCAR\BrainCoord2'])   
+load(['C:\Users\Angela_2\Dropbox\AngelaUCSFFiles\DelayWordBackup\allBrainPics\BrainCoord2'])   
 cd('C:\Users\Angela_2\Dropbox\AngelaUCSFFiles\DelayWordBackup\allBrainPics')
 for p=1:8
     clf

@@ -1,7 +1,7 @@
 function [Tall,E]=analyzeData(n,ch,Tall,events)
 %%INITIATE 
 brainFile='C:\Users\Angela_2\Dropbox\ChangLab\General Patient Info\'
-destFile='E:\DelayWord\Figure1_withCAR_slideBaseline_ev2\'
+destFile='E:\DelayWord\Figure1_withCAR_slideBaseline_ev3\'
 % %% LOAD DATA
 tmp=PLVTests(n,2,1,'aa')
 

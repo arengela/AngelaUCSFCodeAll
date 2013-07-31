@@ -1,4 +1,4 @@
-function [bestc, bestg, bestcv, model, predicted_label,accuracy, decision_values] = svm(instanceMatrix, labelVector,testinstanceMatrix, testlabelVector,kernel)
+function [bestc, bestg, bestcv, model, predicted_label,accuracy, decision_values] = svm2(instanceMatrix, labelVector,testinstanceMatrix, testlabelVector)
 % instanceMatrix  An m by n matrix of m training instances with n features
 % labelVector   An m by 1 vector of classes
 
@@ -11,9 +11,9 @@ scale = spdiags(1./max(instanceMatrix,[],1)',...
 instanceMatrixNorm = instanceMatrix*scale;
 %% find best parameters
 bestcv = 0;
-for log2c = -5:2:10
-  for log2g =  [-4:2:10]
-    cmd = ['-t ' num2str(kernel) ' -q -b 1 -v 5 -c ', num2str(2^log2c), ' -g ', num2str(2^log2g)];
+for log2c = -5:2:5
+  for log2g =  [-4:2:1]
+    cmd = ['-t 2 -q -b 1 -v 5 -c ', num2str(2^log2c), ' -g ', num2str(2^log2g)];
     cv = svmtrain(labelVector, instanceMatrixNorm, cmd);
     if (cv >= bestcv),
       bestcv = cv; bestc = 2^log2c; bestg = 2^log2g;
@@ -22,7 +22,7 @@ for log2c = -5:2:10
   end
 end
 %% train
-cmd = ['-t ' num2str(kernel) ' q -b 1 -c ', num2str(bestc), ' -g ', num2str(bestg)];
+cmd = ['-t 2 q -b 1 -c ', num2str(bestc), ' -g ', num2str(bestg)];
 model = svmtrain(labelVector, instanceMatrixNorm, cmd);
 
 %% test

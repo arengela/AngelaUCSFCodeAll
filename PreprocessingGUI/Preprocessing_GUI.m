@@ -75,15 +75,22 @@ if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgr
     set(hObject,'BackgroundColor','white');
 end
 
-function inputFileLocation_Callback(hObject, eventdata, handles)
+function handles = inputFileLocation_Callback(hObject, eventdata, handles)
 % PURPOSE: GET LOCATION OF DATA
 handles.pathName=get(handles.inputFileLocation,'String');
 [~,s,b]=fileparts(handles.pathName);
 handles.blockName=b;
-cd(handles.pathName);
 
-if isempty(strmatch('Artifacts',ls))
-    mkdir('Artifacts')
+if isdir(handles.pathName)
+    cd(handles.pathName);
+else
+    disp(['Could not find directory "',handles.pathName,'"'])
+    beep;
+    return;
+end
+
+if ~isdir('Artifacts')
+    mkdir('Artifacts');
 end
 
 cd('Artifacts')
@@ -108,7 +115,7 @@ else
     handles.badChannels=tmp';
     fclose(fid);
     set(handles.inputBadChannels,'String',int2str(handles.badChannels));
-    fprintf('Bad Channels: %s',int2str(handles.badChannels));
+    fprintf('Bad Channels: %s\n',int2str(handles.badChannels));
     cd(handles.pathName)
     guidata(hObject, handles);
 end
@@ -116,11 +123,11 @@ cd(handles.pathName)
 
 fprintf('File opened: %s\n',handles.pathName);
 fprintf('Block: %s',handles.blockName);
-handles=loadMatlabVar_Callback(hObject, eventdata, handles)
+handles = loadMatlabVar_Callback(hObject, eventdata, handles);
 guidata(hObject, handles);
 
 
-% --- Executes automatically when file location is entered
+% --- Executes automatically when directory is entered
 function handles=loadMatlabVar_Callback(hObject, eventdata, handles)
 % PURPOSE: READ RAW HTK FILES AND ASSEMBLE IN MATLAB MATRIX WHERE
 % M=CHANNELS, N=SAMPLES
@@ -137,7 +144,16 @@ switch handles.type
     case 'Human'
         channelsTot=256;
         timeInt=[];
-        handles.ecog=loadHTKtoEcog_CT(sprintf('%s/%s',handles.pathName,'RawHTK'),channelsTot,timeInt);
+        datapath = sprintf('%s/%s',handles.pathName,'RawHTK');
+        if isdir(datapath)
+            handles.ecog=loadHTKtoEcog_CT(datapath,channelsTot,timeInt);
+        else
+            sprintf('\n');
+            display(['Could not find directory "',datapath,'"']);
+            beep;
+            return;
+        end
+        
     case 'Hipp'
         channelsTot=8;
         timeInt=[];
@@ -171,6 +187,12 @@ switch handles.type
         sampDur=1000/handles.ecog.sampFreq;
         flag=0;
         handles.ecogDS=handles.ecog;
+    case 'SaveMemory'
+        cd([handles.pathName filesep 'RawHTK'])
+        contents=cellstr(ls);
+        contents=contents(4:end);
+        handles.ecogDS=loadHTKtoEcog_CT_Downsample([handles.pathName filesep 'RawHTK'],length(contents),[]);
+        flag=0;
 end
 
 if flag==1
@@ -180,6 +202,7 @@ if flag==1
     handles.ecog=ecogRaw2EcogGUI(handles.ecog.data,baselineDurMs,sampDur,[],handles.ecog.sampFreq);
     handles.ecogDS=downsampleEcog(handles.ecog,400);
     fprintf('Downsampled Frequency: %d Hz\n',handles.sampFreq);
+    handles = rmfield(handles,'ecog');
 end
 
 handles.ecogDS.selectedChannels=1:size(handles.ecogDS.data,1);
@@ -190,12 +213,15 @@ handles.badChannels=[];
 handles.badTimeSegments=[];
 handles.ecogDS.badChannels=[];
 handles.ecogDS.badTimeSegments=[];
-rmfield(handles,'ecog');
+
+
 
 
 if strmatch(handles.type,'Hipp')
     handles.ecogDS=ecogFilterTemporal(handles.ecogDS,[80 200],3);   
 end
+fprintf('\nDone Loading Data\n');
+
 guidata(hObject, handles);
 
 % --- Executes on button press in lookAtTimeSeries.
@@ -204,6 +230,12 @@ function lookAtTimeSeries_Callback(hObject, eventdata, handles)
 % VARIABLE.
 % If bad segments already selected or pre-loaded, additional ones will be
 % appended.
+if ~isfield(handles,'ecogDS')
+    display('Please specify data path');
+    beep;
+    return;
+end
+
 dcshifted=handles.ecogDS;
 dcshifted.badChannels=handles.badChannels;
 dcshifted.data=handles.ecogDS.data-repmat(mean(handles.ecogDS.data,2),[1 size(handles.ecogDS.data,2)]);
@@ -279,7 +311,7 @@ end
 % --- Executes on button press in saveBadTimeSegments.
 function saveBadTimeSegments_Callback(hObject, eventdata, handles)
 % SAVES BAD TIME SEGMENTS AS BOTH A MATLAB FUNCTION AND A .LAB FILE ON DISK
-cd('Artifacts')
+cd([handles.pathName filesep 'Artifacts'])
 BadTimesConverterGUI(handles.badTimeSegments,'bad_time_segments.lab');
 save('badTimeSegments','-struct','handles','badTimeSegments');
 fprintf('%d Bad time segments saved\n',size(handles.badTimeSegments,1));
@@ -289,7 +321,7 @@ cd(handles.pathName)
 % --- Executes on button press in saveBadCh.
 function saveBadCh_Callback(hObject, eventdata, handles)
 % SAVES BAD CHANNELS AS TEXT FILE ON DISK
-cd('Artifacts')
+cd([handles.pathName filesep 'Artifacts'])
 fid = fopen('badChannels.txt', 'w');
 fprintf(fid, '%6.0f', handles.badChannels);
 fclose(fid);
@@ -299,7 +331,7 @@ cd(handles.pathName)
 % --- Executes on button press in loadBadTimeSegments.
 function loadBadTimeSegments_Callback(hObject, eventdata, handles)
 % PURPOSE: LOAD BAD TIME SEGMENTS SAVED ON DISK INTO GUI
-cd('Artifacts')
+cd([handles.pathName filesep 'Artifacts'])
 load 'badTimeSegments.mat';
 handles.badTimeSegments=badTimeSegments;
 guidata(hObject, handles);
@@ -310,7 +342,7 @@ cd(handles.pathName)
 % --- Executes on button press in loadBadCh.
 function loadBadCh_Callback(hObject, eventdata, handles)
 % PURPOSE: LOAD BAD CHANNELS SAVED ON DISK INTO GUI
-cd('Artifacts')
+cd([handles.pathName filesep 'Artifacts'])
 fid = fopen('badChannels.txt');
 tmp = fscanf(fid, '%d');
 handles.badChannels=tmp';
@@ -433,10 +465,21 @@ high_std=find(s>upperbound);
 fprintf('Channels with standard dev above %d: %s\n',upperbound,int2str(find(s>upperbound)));
 
 figure
+subplot(2,1,1)
 plot(s); axis tight
 hold on;
 plot(handles.badChannels,s(handles.badChannels),'r.')
 legend({'standard deviation', 'currently marked bad channels'})
+subplot(2,1,2)
+trend=handles.ecogDS.data-detrend(handles.ecogDS.data')';
+%plot(std(handles.ecogDS.data-detrend(handles.ecogDS.data')',[],2))
+for i=1:size(trend,1)
+    c=polyfit(1:size(trend,2),trend(i,:),1);
+    m(i)=c(1);
+end
+plot(m)
+
+
 
 if length(s)>64
     %map stanndard deviation onto grid layout
@@ -494,6 +537,8 @@ elseif s==64
     end
 end
 colorbar
+
+
 cd(handles.pathName)
 
 % --- Executes on button press in LookatsignalafterCAR.
@@ -565,3 +610,17 @@ assignin('base','DoneLog',handles.donelog)
 
 
 
+
+
+% --- Executes on button press in locate_button.
+function locate_button_Callback(hObject, eventdata, handles)
+% hObject    handle to locate_button (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+pathName = uigetdir('/Users/bendichter/Dropbox/Spring 2013/Chang Lab/MATLAB/data');
+set(handles.inputFileLocation,'string',pathName);
+drawnow
+handles.pathName = pathName;
+handles = inputFileLocation_Callback(hObject, eventdata, handles);
+guidata(hObject, handles);
